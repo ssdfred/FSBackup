@@ -1,0 +1,2397 @@
+{
+  "format_version": 1,
+  "created_at": "2026-07-21T10:56:54.717745Z",
+  "application": "FSBackup",
+  "application_version": "0.1.0",
+  "machine_name": "fred",
+  "platform": "Windows",
+  "browsers": [
+    {
+      "name": "Chrome",
+      "version": "150.0.7871.129",
+      "profiles": [
+        {
+          "name": "Default",
+          "path": "C:\\Users\\ssdfr\\AppData\\Local\\Google\\Chrome\\User Data\\Default",
+          "profile_size_bytes": 387407964,
+          "profile_size_human": "369.46 MB",
+          "last_used": "2026-07-21T10:56:49.794862Z",
+          "bookmarks_count": 0,
+          "bookmarks": [],
+          "extensions_count": 13,
+          "history_entries": 0,
+          "cookies_count": 0
+        }
+      ]
+    },
+    {
+      "name": "Edge",
+      "version": "150.0.4078.83",
+      "profiles": [
+        {
+          "name": "Default",
+          "path": "C:\\Users\\ssdfr\\AppData\\Local\\Microsoft\\Edge\\User Data\\Default",
+          "profile_size_bytes": 213759401,
+          "profile_size_human": "203.86 MB",
+          "last_used": "2026-07-21T10:56:29.994837Z",
+          "bookmarks_count": 260,
+          "bookmarks": [
+            {
+              "id": "5638b6d0c8325eb904944ac7c7f2eda83a8bde7f",
+              "title": "Lenovo Support",
+              "url": "http://support.lenovo.com/",
+              "folder": "Barre des favoris/Lenovo",
+              "source": "edge",
+              "date_added": "2022-12-23T09:46:19.455938Z",
+              "date_modified": null
+            },
+            {
+              "id": "4c42298614c14a3fb4e79a15f6369f7a3c9769eb",
+              "title": "Lenovo",
+              "url": "http://www.lenovo.com/",
+              "folder": "Barre des favoris/Lenovo",
+              "source": "edge",
+              "date_added": "2022-12-23T09:46:19.455938Z",
+              "date_modified": null
+            },
+            {
+              "id": "93e0036b9d5e91b5bc0a7fefa3d144f99c574ce2",
+              "title": "(79) Tutoriel WINDEV : Leçon 4.7. Imprimer une liste de clients - YouTube",
+              "url": "https://www.youtube.com/watch?v=PmFX-iHuiMc&list=PLI6fRsLPTA4gjevtou2V2qCLDo2w2i4bM&index=17",
+              "folder": "Barre des favoris",
+              "source": "edge",
+              "date_added": "2024-06-01T13:06:28.183233Z",
+              "date_modified": null
+            },
+            {
+              "id": "1e2dceeacf69f7abb3b3feb0697c6a2041afea9f",
+              "title": "Le financement des formations | Mon Parcours Handicap",
+              "url": "https://www.monparcourshandicap.gouv.fr/formation-professionnelle/le-financement-des-formations#quelle-remuneration-pendant-ma-formation",
+              "folder": "Barre des favoris/formation",
+              "source": "edge",
+              "date_added": "2021-10-11T13:50:50.120290Z",
+              "date_modified": null
+            },
+            {
+              "id": "6c33e80e12eaa7419dd60e5a6ec4d47df3b766ac",
+              "title": "Replay du live - studi",
+              "url": "https://app.studi.fr/#/dashboard/events/23166/replay",
+              "folder": "Barre des favoris/formation",
+              "source": "edge",
+              "date_added": "2021-11-16T09:21:49.447853Z",
+              "date_modified": null
+            },
+            {
+              "id": "d547eaef6b1108ee1f02902635db73b2bac34dc8",
+              "title": "Audio element | Can I use... Support tables for HTML5, CSS3, etc",
+              "url": "https://caniuse.com/audio",
+              "folder": "Barre des favoris/formation",
+              "source": "edge",
+              "date_added": "2021-11-26T09:00:26.133092Z",
+              "date_modified": null
+            },
+            {
+              "id": "2246330d707e0de5de865c7f82c0652d9822f0fb",
+              "title": "List of CSS3 Properties - Tutorial Republic",
+              "url": "https://www.tutorialrepublic.com/css-reference/css3-properties.php",
+              "folder": "Barre des favoris/formation",
+              "source": "edge",
+              "date_added": "2021-11-29T08:31:49.937619Z",
+              "date_modified": null
+            },
+            {
+              "id": "58c651e0117b125d3b586ecc70f020e0efc2b811",
+              "title": "Browse Fonts - Google Fonts",
+              "url": "https://fonts.google.com/",
+              "folder": "Barre des favoris/formation",
+              "source": "edge",
+              "date_added": "2021-12-01T15:21:54.925383Z",
+              "date_modified": null
+            },
+            {
+              "id": "d9bfae19215e591491bef5d59f808568bc202dd1",
+              "title": "cubic-bezier(.18,.62,.92,.17) ✿ cubic-bezier.com",
+              "url": "https://cubic-bezier.com/#.18,.62,.92,.17",
+              "folder": "Barre des favoris/formation",
+              "source": "edge",
+              "date_added": "2021-12-10T15:12:48.208175Z",
+              "date_modified": null
+            },
+            {
+              "id": "3a3a72f0bc9b1e404f340b9c7001668b7d2b978f",
+              "title": "Schema.org - Schema.org",
+              "url": "https://schema.org/",
+              "folder": "Barre des favoris/formation",
+              "source": "edge",
+              "date_added": "2022-01-10T10:14:03.814930Z",
+              "date_modified": null
+            },
+            {
+              "id": "160625cfde5102d8a8104c1be2f7108ca80adccf",
+              "title": "Outil d'aide au balisage",
+              "url": "https://www.google.com/webmasters/markup-helper/u/0/?hl=fr",
+              "folder": "Barre des favoris/formation",
+              "source": "edge",
+              "date_added": "2022-01-10T10:14:08.443003Z",
+              "date_modified": null
+            },
+            {
+              "id": "e5577717d55d66566f24b6bd385f2dd4e8161489",
+              "title": "Robots.txt - Manuel d'implémentation",
+              "url": "http://robots-txt.com/",
+              "folder": "Barre des favoris/formation",
+              "source": "edge",
+              "date_added": "2022-01-10T10:14:25.195892Z",
+              "date_modified": null
+            },
+            {
+              "id": "d097051efb7445bfe8ea445a4411cd490a5b4fec",
+              "title": "École informatique en alternance : votre formation informatique en alternance bac + 2 à bac +5 avec CESI",
+              "url": "https://ecole-alternance.cesi.fr/informatique-numerique/",
+              "folder": "Barre des favoris/formation/ecole",
+              "source": "edge",
+              "date_added": "2021-10-05T14:37:52.139487Z",
+              "date_modified": null
+            },
+            {
+              "id": "997688b2bda4aa4d9931bfedcffe66f6bb4f24b3",
+              "title": "Portail d'authentification",
+              "url": "https://sso.eforpro.afpa.fr/saml/singleSignOn?SAMLRequest=fVJNT4NAEP0rZO8Fdi2pbgoJtgebVNsU9ODFLHQomyy7uLNU%2FfdC0VovTeY2b95XZo6iUS1PO1frHbx3gM77bJRGflrEpLOaG4ESuRYNIHclz9LHNWd%2ByFtrnCmNIl6KCNZJoxdGY9eAzcAeZQnPu3VMauda5EEAR6O6AcSoL6pW%2BJUNsloWhVHgah%2FRBAM1C7abLCfesvcitRgO%2Fjh6kA%2BVsb30mWNwGqDUBwWZPOiNJt5qGZM3wUTZz7S8KaYsjIBCGFE2qwpGxe0%2Boj0MsYOVRie0iwkLGZ3QcBJGeXjHoxln7JV425%2BQ91Lve43rjRQjCPlDnm8nY44XsHjK0ANIMh%2Fc8pOwvWj6Oq34rZck18rEc5nz4EJm1Gz5U8%2B7Wm6NkuWXlyplPhYWhIOYUBIk48n%2FV0i%2BAQ%3D%3D&RelayState=ss%3Amem%3Acc0a8643f6e26fdc15df9e6edf988183eb15e1b02bde504f3d9a8fd2f0423ace&SigAlg=http%3A%2F%2Fwww.w3.org%2F2000%2F09%2Fxmldsig%23rsa-sha1&Signature=cprW6KQAubfACVfiUR4xGXMsnnpviyKz5YXF%2Bh1TLZjl4unlmf7MxBOpT6uqV911vtB3F4xS7nGxISYoJ4ezZrBTRtzfKmc62Ad%2B8gDelRuTh%2Fmmj%2BvkuNEXS9wTeM73pn%2FswkKxYuBBkAxtyNN3TFTIA7zA%2Fsgq6aQyCiPW7Ic3SJLasIFSk%2FinNx3c5l7GBhTOYwfv9ddVt%2FVNjZuG0yldn%2BPpmOArVToKyHzkS%2BgNnX9fcm4kfc9h5f0Q5ZfNKLKVMn%2FeXo4ajxGzWfGIWgPlidsVx%2B2QUQgV6oqWBdDa%2B0DcdKm9QlyXVmdnCmJCnzatuzAkCjCpuHOzqCyxbgQz4BKOKOU62ksH2iCOwchXRexoOGheeKGRZdFAfox5ctXYkORDdaow9t%2FY0ysvo2hm5h04MJIgqXqPRfx18Rroaj9GCIvNZ1dspnUL86xh32oZMFqQk2RZHWgY2mKetRSMVe5W7WiUJwBY0%2Ftr%2FEDxI0n8ZcTvlwlJydgLbC3n",
+              "folder": "Barre des favoris/formation/ecole",
+              "source": "edge",
+              "date_added": "2021-10-05T14:38:21.091860Z",
+              "date_modified": null
+            },
+            {
+              "id": "3404f0b0ddb7d0521b85157b4917c6c7906582a2",
+              "title": "▷ Offre de Formation Développeur Web en 6 mois avec OpenClassrooms - CPF | Maformation.fr",
+              "url": "https://www.maformation.fr/formation/developpeur-web-en-6-mois-171867",
+              "folder": "Barre des favoris/formation/ecole",
+              "source": "edge",
+              "date_added": "2021-10-05T14:38:34.352414Z",
+              "date_modified": null
+            },
+            {
+              "id": "153f59f898aa4e6ac69820febbfcd2060ed51365",
+              "title": "Formez-vous à distance en développement avec DCL",
+              "url": "https://info.digital-campus.live/formation-distance-developpement/?utm_source=google&utm_medium=cpc&utm_campaign=developpeur_web&utm_content=search&utm_term=2&gclid=EAIaIQobChMIrPny16m18wIVg4XVCh2MVgD3EAAYAiAAEgJpqPD_BwE",
+              "folder": "Barre des favoris/formation/ecole",
+              "source": "edge",
+              "date_added": "2021-10-06T08:19:02.020300Z",
+              "date_modified": null
+            },
+            {
+              "id": "5215f6bcbcea4e22a1e96264a18a8348285d2ce4",
+              "title": "Confirmation | Digital Campus Live",
+              "url": "https://www.digital-campus.live/confirmation",
+              "folder": "Barre des favoris/formation/ecole",
+              "source": "edge",
+              "date_added": "2021-10-06T11:59:33.966539Z",
+              "date_modified": null
+            },
+            {
+              "id": "ee87843865b5af72cb186e647462b2fb4fcf842f",
+              "title": "Graduate Monteur Multimédia | formation en ligne | Studi",
+              "url": "https://www.studi.com/fr/formation/animation-3d-vfx/graduate-monteur-multimedia",
+              "folder": "Barre des favoris/formation/ecole",
+              "source": "edge",
+              "date_added": "2021-10-06T12:42:06.993304Z",
+              "date_modified": null
+            },
+            {
+              "id": "08888721358644760a34dca6d0d830c377827dad",
+              "title": "Me former à distance avec le réseau Occitanie e-formation | Me former en Occitanie",
+              "url": "https://www.meformerenregion.fr/me-former-distance-avec-le-reseau-occitanie-e-formation",
+              "folder": "Barre des favoris/formation/ecole",
+              "source": "edge",
+              "date_added": "2021-10-06T14:18:00.912511Z",
+              "date_modified": null
+            },
+            {
+              "id": "81ddbc8a54d0eee005018b1f3b8b81256ff1e89a",
+              "title": "Développement web / web mobile : l'École Régionale du Numérique de Narbonne recrute sa nouvelle promotion - Actualités - Le Grand Narbonne - Entreprendre",
+              "url": "https://entreprendre.legrandnarbonne.com/71-actualites/18562-developpement-web-web-mobile-l-ecole-regionale-du-numerique-de-narbonne-recrute-sa-nouvelle-promotion.html",
+              "folder": "Barre des favoris/formation/ecole",
+              "source": "edge",
+              "date_added": "2021-10-07T12:06:19.313766Z",
+              "date_modified": null
+            },
+            {
+              "id": "658f49d27cc73256d30827f08d8a4e5b999a3b63",
+              "title": "Développeur web et web mobile - Narbonne - Simplon.co - Fabriques labellisées Grande Ecole du Numérique - In Code We Trust #frenchtech #ess #empowerment",
+              "url": "https://occitanie.simplon.co/session/developpeur-web-et-web-mobile-14/268",
+              "folder": "Barre des favoris/formation/ecole",
+              "source": "edge",
+              "date_added": "2021-10-07T12:06:09.717543Z",
+              "date_modified": null
+            },
+            {
+              "id": "a0b3d40860bf88e95a006aab1601eef43cf72ae9",
+              "title": "Brackets - Un éditeur de code open source moderne qui comprend et facilite la conception de sites web.",
+              "url": "https://brackets.io/",
+              "folder": "Barre des favoris/formation/Extension",
+              "source": "edge",
+              "date_added": "2022-01-10T14:06:44.059900Z",
+              "date_modified": null
+            },
+            {
+              "id": "5ea636f7c6ac8363112d0aaae23c2f9ffe69acad",
+              "title": "Atom",
+              "url": "https://atom.io/",
+              "folder": "Barre des favoris/formation/Extension",
+              "source": "edge",
+              "date_added": "2022-01-10T14:06:52.348286Z",
+              "date_modified": null
+            },
+            {
+              "id": "88e341c1df0f760e1b9b6cb4760665adf0f582aa",
+              "title": "Sublime Text - Text Editing, Done Right",
+              "url": "https://www.sublimetext.com/",
+              "folder": "Barre des favoris/formation/Extension",
+              "source": "edge",
+              "date_added": "2022-01-10T14:06:58.524537Z",
+              "date_modified": null
+            },
+            {
+              "id": "a6cc91ee706fbce96e9a8069f96b7e85212a8131",
+              "title": "Download PuTTY - a free SSH and telnet client for Windows",
+              "url": "https://www.putty.org/",
+              "folder": "Barre des favoris/formation/Extension",
+              "source": "edge",
+              "date_added": "2022-01-10T14:13:37.972408Z",
+              "date_modified": null
+            },
+            {
+              "id": "7f0213d73f121cf403fbdf5b27c8bb3e78390966",
+              "title": "PHP: Que peut faire PHP ? - Manual",
+              "url": "https://www.php.net/manual/fr/intro-whatcando.php",
+              "folder": "Barre des favoris/formation/Php",
+              "source": "edge",
+              "date_added": "2022-01-11T09:47:19.607147Z",
+              "date_modified": null
+            },
+            {
+              "id": "c6d9223e4a89857fed35d668054f7d7eb261c8f9",
+              "title": "Playlists Dév' - Google Sheets",
+              "url": "https://docs.google.com/spreadsheets/d/1BPNodpJmi_GhKKFxKxAKNtOCdgwiwofXjc5dHexRzmI/edit#gid=0",
+              "folder": "Barre des favoris/formation/Php/cours",
+              "source": "edge",
+              "date_added": "2022-01-12T09:46:28.660491Z",
+              "date_modified": null
+            },
+            {
+              "id": "aa7710a16e8834fbb5f6c96b58f7864128aa4dd8",
+              "title": "PHP: Référence des fonctions - Manual",
+              "url": "https://www.php.net/manual/fr/funcref.php",
+              "folder": "Barre des favoris/formation/Php/cours",
+              "source": "edge",
+              "date_added": "2022-01-14T10:08:47.653981Z",
+              "date_modified": null
+            },
+            {
+              "id": "14a1687f353213db0866373e2252bd4d718351ba",
+              "title": "Nouvel onglet",
+              "url": "chrome://newtab/",
+              "folder": "Barre des favoris/formation/Php/cours",
+              "source": "edge",
+              "date_added": "2022-01-17T09:32:15.046925Z",
+              "date_modified": null
+            },
+            {
+              "id": "3b534afe5c64e4cbb255700d02e9e1f88e840eb2",
+              "title": "PHP: Référence du langage - Manual",
+              "url": "https://www.php.net/manual/fr/langref.php",
+              "folder": "Barre des favoris/formation/Php",
+              "source": "edge",
+              "date_added": "2022-01-27T12:48:40.770948Z",
+              "date_modified": null
+            },
+            {
+              "id": "e8c248d1bf6b5808e24ed88741e2fd3e02e26395",
+              "title": "regex101: build, test, and debug regex",
+              "url": "https://regex101.com/",
+              "folder": "Barre des favoris/formation/Php",
+              "source": "edge",
+              "date_added": "2022-02-21T13:20:08.835939Z",
+              "date_modified": null
+            },
+            {
+              "id": "a3cf56995918d6ce8361a43cd082bfcf6c0e4645",
+              "title": "PHP Standards Recommendations - PHP-FIG",
+              "url": "https://www.php-fig.org/psr/",
+              "folder": "Barre des favoris/formation/Php",
+              "source": "edge",
+              "date_added": "2022-02-23T07:13:10.377445Z",
+              "date_modified": null
+            },
+            {
+              "id": "0840f21d8a9f7f47e4a9039fcb452195ee55be92",
+              "title": "FriendsOfPHP/PHP-CS-Fixer: A tool to automatically fix PHP Coding Standards issues",
+              "url": "https://github.com/FriendsOfPHP/PHP-CS-Fixer",
+              "folder": "Barre des favoris/formation/Php",
+              "source": "edge",
+              "date_added": "2022-02-23T07:21:27.161379Z",
+              "date_modified": null
+            },
+            {
+              "id": "5c070f95b84b27d92e15ccfaaf93d61651616959",
+              "title": "Patrons de conception / Design patterns",
+              "url": "https://refactoring.guru/fr/design-patterns",
+              "folder": "Barre des favoris/formation/Php",
+              "source": "edge",
+              "date_added": "2022-03-08T09:43:48.976247Z",
+              "date_modified": null
+            },
+            {
+              "id": "e58f0ab223606dfae3b859c79250207a1b0673d8",
+              "title": "Frédéric - A4",
+              "url": "https://www.canva.com/design/DAE2Er2hMBU/6jLJsm0xZEABEJVKw_Q8Tg/edit?category=tACZCki4tbY#",
+              "folder": "Barre des favoris/formation",
+              "source": "edge",
+              "date_added": "2022-01-21T12:04:58.667491Z",
+              "date_modified": null
+            },
+            {
+              "id": "5a4801a03b9b3c09e58310fed0ef6ffa23a76b8c",
+              "title": "Mes événements Emploi",
+              "url": "https://peactions.pole-emploi.fr/evenements",
+              "folder": "Barre des favoris/formation",
+              "source": "edge",
+              "date_added": "2022-01-25T10:38:06.525852Z",
+              "date_modified": null
+            },
+            {
+              "id": "9225b8260e36aa934546993e9e32713a1c0da33b",
+              "title": "GIMP - GNU Image Manipulation Program",
+              "url": "https://www.gimp.org/",
+              "folder": "Barre des favoris/formation",
+              "source": "edge",
+              "date_added": "2022-02-22T14:52:16.143093Z",
+              "date_modified": null
+            },
+            {
+              "id": "f6dee70961b828749e8344c8b0ad6b66044e382c",
+              "title": "default",
+              "url": "http://www.dossierprofessionnel.fr/administrative/",
+              "folder": "Barre des favoris/formation",
+              "source": "edge",
+              "date_added": "2022-03-14T13:20:31.689408Z",
+              "date_modified": null
+            },
+            {
+              "id": "8a66ebb45d9df6a1dc3d31d3da25107b8e49e7e4",
+              "title": "Issue boards | GitLab",
+              "url": "https://docs.gitlab.com/ee/user/project/issue_board.html",
+              "folder": "Barre des favoris/formation/Orguanisation",
+              "source": "edge",
+              "date_added": "2022-03-15T08:58:33.157463Z",
+              "date_modified": null
+            },
+            {
+              "id": "ec2f83efb9a06e9374297b0b5c26de369e6f079c",
+              "title": "Alternatives à",
+              "url": "https://alt.framasoft.org/fr/framaboard",
+              "folder": "Barre des favoris/formation/Orguanisation",
+              "source": "edge",
+              "date_added": "2022-03-15T08:59:10.198936Z",
+              "date_modified": null
+            },
+            {
+              "id": "5280f5f3d54d4d6a29eb1ed7d352c9225a62c354",
+              "title": "GitHub - wekan/wekan: The Open Source kanban (built with Meteor). Keep variable/table/field names camelCase. For translations, only add Pull Request changes to wekan/i18n/en.i18n.json , other translations are done at https://transifex.com/wekan/wekan only.",
+              "url": "https://github.com/wekan/wekan",
+              "folder": "Barre des favoris/formation/Orguanisation",
+              "source": "edge",
+              "date_added": "2022-03-15T08:59:27.981731Z",
+              "date_modified": null
+            },
+            {
+              "id": "3d77db3144457c5669f6a064d79d004688809a0c",
+              "title": "Les meilleurs cours et tutoriels sur la programmation et l'informatique professionnelle",
+              "url": "https://general.developpez.com/cours/",
+              "folder": "Barre des favoris/formation/Aide forum",
+              "source": "edge",
+              "date_added": "2022-03-15T09:07:58.851776Z",
+              "date_modified": null
+            },
+            {
+              "id": "00749a725264281e2f44a8418583d686799a79a7",
+              "title": "MDN Web Docs",
+              "url": "https://developer.mozilla.org/fr/",
+              "folder": "Barre des favoris/formation/Aide forum",
+              "source": "edge",
+              "date_added": "2022-03-15T09:08:27.867506Z",
+              "date_modified": null
+            },
+            {
+              "id": "1c72f7c16eb9c6cf85ac97ca1ae61ab67eabb3e5",
+              "title": "Stack Overflow - Where Developers Learn, Share, & Build Careers",
+              "url": "https://stackoverflow.com/",
+              "folder": "Barre des favoris/formation/Aide forum",
+              "source": "edge",
+              "date_added": "2021-12-13T08:14:52.042537Z",
+              "date_modified": null
+            },
+            {
+              "id": "43b7c749df15d0594d6c19394df9abdf15c85b0a",
+              "title": "User Guide — DevDocs",
+              "url": "https://devdocs.io/help",
+              "folder": "Barre des favoris/formation/Aide forum",
+              "source": "edge",
+              "date_added": "2022-03-29T13:15:20.286432Z",
+              "date_modified": null
+            },
+            {
+              "id": "ffbe6068586668697a1885b477891a7bffb5f6c1",
+              "title": "TinyPNG – Compress WebP, PNG and JPEG images intelligently",
+              "url": "https://tinypng.com/",
+              "folder": "Barre des favoris/formation/Aide forum",
+              "source": "edge",
+              "date_added": "2022-05-19T15:12:38.377824Z",
+              "date_modified": null
+            },
+            {
+              "id": "228298a173bffca886d67c4e0f64fee255d8d3f8",
+              "title": "JavaScript Standard Style",
+              "url": "https://standardjs.com/rules-fr.html#javascript-standard-style",
+              "folder": "Barre des favoris/formation/javascript",
+              "source": "edge",
+              "date_added": "2022-03-16T06:49:44.286786Z",
+              "date_modified": null
+            },
+            {
+              "id": "d88c11af20b06b93d33fb40c894cd0c091cd449b",
+              "title": "Littéraux de gabarits - JavaScript | MDN",
+              "url": "https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Template_literals",
+              "folder": "Barre des favoris/formation/javascript",
+              "source": "edge",
+              "date_added": "2022-03-18T09:25:25.005636Z",
+              "date_modified": null
+            },
+            {
+              "id": "00b83ff77f7e8f08f62dc69325bc03b9dd1d4aef",
+              "title": "Objets globaux - JavaScript | MDN",
+              "url": "https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects",
+              "folder": "Barre des favoris/formation/javascript",
+              "source": "edge",
+              "date_added": "2022-03-25T09:22:06.875465Z",
+              "date_modified": null
+            },
+            {
+              "id": "98b8b25722d8e145805d80398fe58d3f2023b78d",
+              "title": "Normes - Ecma International",
+              "url": "https://www.ecma-international.org/publications-and-standards/standards/",
+              "folder": "Barre des favoris/formation/javascript/aide",
+              "source": "edge",
+              "date_added": "2022-07-25T14:10:07.776721Z",
+              "date_modified": null
+            },
+            {
+              "id": "69b80384bd306593141248d5e74e090f60bdbf51",
+              "title": "GitHub - tc39/ecma262 : statut, processus et documents pour ECMA-262",
+              "url": "https://github.com/tc39/ecma262",
+              "folder": "Barre des favoris/formation/javascript/aide",
+              "source": "edge",
+              "date_added": "2022-07-25T14:10:53.406602Z",
+              "date_modified": null
+            },
+            {
+              "id": "1759029a53517ea1441c075960d8431abf7423e5",
+              "title": "Babel · The compiler for next generation JavaScript",
+              "url": "https://babeljs.io/",
+              "folder": "Barre des favoris/formation/javascript/aide",
+              "source": "edge",
+              "date_added": "2022-07-25T14:33:03.539482Z",
+              "date_modified": null
+            },
+            {
+              "id": "06a5873282d80d003a70046e756c25b8d7efb2a9",
+              "title": "FAQ de programmation — Documentation Python 3.10.4",
+              "url": "https://docs.python.org/fr/3/faq/programming.html#how-do-i-write-a-function-with-output-parameters-call-by-reference",
+              "folder": "Barre des favoris/formation/python",
+              "source": "edge",
+              "date_added": "2022-03-25T10:10:10.004247Z",
+              "date_modified": null
+            },
+            {
+              "id": "c9e72049da13dbf2a5c6a982500a1c57ca17c973",
+              "title": "DuckDuckGo Search Syntax | DuckDuckGo Help Pages",
+              "url": "https://help.duckduckgo.com/duckduckgo-help-pages/results/syntax/",
+              "folder": "Barre des favoris/formation/debug",
+              "source": "edge",
+              "date_added": "2022-03-25T10:34:25.840713Z",
+              "date_modified": null
+            },
+            {
+              "id": "5c8bc44026da8448ce1980e5d0efb28971182d6a",
+              "title": "javascript - \"Uncaught TypeError: undefined is not a function\" - Beginner Backbone.js Application - Stack Overflow",
+              "url": "https://stackoverflow.com/questions/13502733/uncaught-typeerror-undefined-is-not-a-function-beginner-backbone-js-applica",
+              "folder": "Barre des favoris/formation/debug",
+              "source": "edge",
+              "date_added": "2022-03-25T10:35:21.611322Z",
+              "date_modified": null
+            },
+            {
+              "id": "022ae01a455e35fed570957a7c16722a1b3b5a6d",
+              "title": "Outils de développement Firefox | MDN",
+              "url": "https://developer.mozilla.org/fr/docs/Tools",
+              "folder": "Barre des favoris/formation/debug",
+              "source": "edge",
+              "date_added": "2022-03-25T10:52:12.850507Z",
+              "date_modified": null
+            },
+            {
+              "id": "3995a4ee65a6c3948809c7f7b446380d7069fc6d",
+              "title": "DB Fiddle - SQL Database Playground",
+              "url": "https://www.db-fiddle.com/",
+              "folder": "Barre des favoris/formation/base de donnée",
+              "source": "edge",
+              "date_added": "2022-03-30T08:09:44.661762Z",
+              "date_modified": null
+            },
+            {
+              "id": "86d99f33f8336498b5ab61bd307cab8bc6a80e26",
+              "title": "Photopea | Online Photo Editor",
+              "url": "https://www.photopea.com/",
+              "folder": "Barre des favoris/formation",
+              "source": "edge",
+              "date_added": "2022-05-17T08:05:51.910438Z",
+              "date_modified": null
+            },
+            {
+              "id": "a442c816352910c3d74ad1420aadef1335e9afa2",
+              "title": "Netlify Drop | Netlify",
+              "url": "https://app.netlify.com/drop",
+              "folder": "Barre des favoris/formation/hebergeur",
+              "source": "edge",
+              "date_added": "2022-05-19T15:19:17.077113Z",
+              "date_modified": null
+            },
+            {
+              "id": "9fc15be146abaaacdc2c4c76e85745487d37b662",
+              "title": "Create a Palette - Coolors",
+              "url": "https://coolors.co/033f63-28666e-7c9885-b5b682-fedc97",
+              "folder": "Barre des favoris/formation/aide contenu",
+              "source": "edge",
+              "date_added": "2022-05-19T15:28:32.518158Z",
+              "date_modified": null
+            },
+            {
+              "id": "3fd007becdf7534b91037f71f93eda538c4775c8",
+              "title": "Fontjoy - Generate font pairings in one click",
+              "url": "https://fontjoy.com/",
+              "folder": "Barre des favoris/formation/aide contenu",
+              "source": "edge",
+              "date_added": "2022-05-19T15:29:01.008861Z",
+              "date_modified": null
+            },
+            {
+              "id": "1a771df1cd9e015b46824033128e03897d4ae560",
+              "title": "Cheat Sheet",
+              "url": "https://docs.emmet.io/cheat-sheet/",
+              "folder": "Barre des favoris/formation/aide contenu",
+              "source": "edge",
+              "date_added": "2022-05-19T14:43:12.772891Z",
+              "date_modified": null
+            },
+            {
+              "id": "d61733005c2e18771def7be1f0e54b5fc468723a",
+              "title": "Comment utiliser le HTML sémantique pour structurer votre page web",
+              "url": "https://fr.semrush.com/blog/balises-structurelles-html-semantique/?kw=&cmp=FR_SRCH_DSA_Blog_Core_BU_FR&label=dsa_pagefeed&Network=g&Device=c&utm_content=486542001727&kwid=dsa-1100351996564&cmpid=11849486850&agpid=113156859297&BU=Core&extid=23618958962&adpos=&gclid=Cj0KCQjw1ZeUBhDyARIsAOzAqQJkQDPsZF6WnBpWYF-wFohHHA0xEsPcCm5GpZPna0pJYeMm_7aSN84aAiZbEALw_wcB",
+              "folder": "Barre des favoris/formation/aide contenu",
+              "source": "edge",
+              "date_added": "2022-05-19T15:30:19.232994Z",
+              "date_modified": null
+            },
+            {
+              "id": "bf5a1b484638e2cbb9cc5b8c893abd3aa064a224",
+              "title": "Référence des éléments HTML - HTML (HyperText Markup Language) | MDN",
+              "url": "https://developer.mozilla.org/fr/docs/Web/HTML/Element",
+              "folder": "Barre des favoris/formation/aide contenu",
+              "source": "edge",
+              "date_added": "2022-05-19T15:30:26.114966Z",
+              "date_modified": null
+            },
+            {
+              "id": "e9dc9f20f670b653bd334e2404385720679e02e4",
+              "title": "Documents Web MDN",
+              "url": "https://developer.mozilla.org/en-US/",
+              "folder": "Barre des favoris/formation/aide contenu",
+              "source": "edge",
+              "date_added": "2022-07-25T14:11:19.533246Z",
+              "date_modified": null
+            },
+            {
+              "id": "a95228b699fd6b4cb89ee4cad01d5e3daaddc62a",
+              "title": "Can I use... Support tables for HTML5, CSS3, etc",
+              "url": "https://caniuse.com/",
+              "folder": "Barre des favoris/formation/aide contenu",
+              "source": "edge",
+              "date_added": "2021-11-29T08:22:47.508406Z",
+              "date_modified": null
+            },
+            {
+              "id": "b55038993085e01eafde11b18d431f021aa8db0a",
+              "title": "CodePen : éditeur de code en ligne et communauté de développeurs Web frontaux",
+              "url": "https://codepen.io/",
+              "folder": "Barre des favoris/formation/aide contenu",
+              "source": "edge",
+              "date_added": "2022-07-25T14:45:05.672160Z",
+              "date_modified": null
+            },
+            {
+              "id": "1c0a48c49d935d698bcd547a6370bc889245a2e8",
+              "title": "JSFiddle - Aire de jeux de code",
+              "url": "https://jsfiddle.net/",
+              "folder": "Barre des favoris/formation/aide contenu",
+              "source": "edge",
+              "date_added": "2022-07-25T14:45:16.622529Z",
+              "date_modified": null
+            },
+            {
+              "id": "5e0e51bbe15ce8b982957680edb891c9bdbd3e85",
+              "title": "Démo ESLint - ESLint - Linter JavaScript enfichable",
+              "url": "https://eslint.org/demo",
+              "folder": "Barre des favoris/formation/Javascript",
+              "source": "edge",
+              "date_added": "2022-06-03T10:42:31.932848Z",
+              "date_modified": null
+            },
+            {
+              "id": "dc0a82e62d99cd05ae3dbaa7f01a42abee3dde09",
+              "title": "Style standard JavaScript",
+              "url": "https://standardjs.com/",
+              "folder": "Barre des favoris/formation/Javascript",
+              "source": "edge",
+              "date_added": "2022-06-03T10:47:48.202064Z",
+              "date_modified": null
+            },
+            {
+              "id": "ce055e98dd7949da7cef9210e4a22edf8e9e78ed",
+              "title": "String - JavaScript | MDN",
+              "url": "https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/String",
+              "folder": "Barre des favoris/formation/Javascript",
+              "source": "edge",
+              "date_added": "2022-06-08T10:19:21.802712Z",
+              "date_modified": null
+            },
+            {
+              "id": "941d6678bbcd90261db52e0e0dd0482285d0fe21",
+              "title": "RegExp - JavaScript | MDN",
+              "url": "https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/RegExp",
+              "folder": "Barre des favoris/formation/Javascript",
+              "source": "edge",
+              "date_added": "2022-06-08T10:19:34.743319Z",
+              "date_modified": null
+            },
+            {
+              "id": "f938385273a6e897c19ddca1878e437e2b95eae9",
+              "title": "Documentation de l'API jQuery",
+              "url": "https://api.jquery.com/",
+              "folder": "Barre des favoris/formation/Javascript",
+              "source": "edge",
+              "date_added": "2022-08-24T09:18:48.488340Z",
+              "date_modified": null
+            },
+            {
+              "id": "5988a32f42a9e0da6068731561d26958bb63a0c4",
+              "title": ".animer() | Documentation de l'API jQuery",
+              "url": "https://api.jquery.com/animate/",
+              "folder": "Barre des favoris/formation/Javascript",
+              "source": "edge",
+              "date_added": "2022-08-25T09:57:27.303516Z",
+              "date_modified": null
+            },
+            {
+              "id": "709c01900f2668d08794eaa3844004ae1384a66f",
+              "title": "Velocity.js",
+              "url": "http://velocityjs.org/",
+              "folder": "Barre des favoris/formation/Javascript",
+              "source": "edge",
+              "date_added": "2022-08-25T09:57:50.984455Z",
+              "date_modified": null
+            },
+            {
+              "id": "fb9001e7f8e2d412990aa3f9db59a6d95b3d5973",
+              "title": "JSON",
+              "url": "https://www.json.org/json-fr.html",
+              "folder": "Barre des favoris/formation/Javascript",
+              "source": "edge",
+              "date_added": "2022-08-25T11:36:31.637256Z",
+              "date_modified": null
+            },
+            {
+              "id": "49cb43da431a4711410354b0700c55ed1e49dbd9",
+              "title": "Blog Stéphane Bortzmeyer: RFC 8259: The JavaScript Object Notation (JSON) Data Interchange Format",
+              "url": "https://www.bortzmeyer.org/8259.html",
+              "folder": "Barre des favoris/formation/Javascript",
+              "source": "edge",
+              "date_added": "2022-08-25T11:36:43.589844Z",
+              "date_modified": null
+            },
+            {
+              "id": "d944243369b8aaf104fe7e0ba48825c5a98e1f11",
+              "title": "Méthodes de requête HTTP - HTTP | MDN",
+              "url": "https://developer.mozilla.org/fr/docs/Web/HTTP/Methods",
+              "folder": "Barre des favoris/formation/Javascript",
+              "source": "edge",
+              "date_added": "2022-08-25T14:01:41.743808Z",
+              "date_modified": null
+            },
+            {
+              "id": "cb138b1114d8cb7899d5dc7f2691e243fbf76eb7",
+              "title": "XMLHttpRequest - Référence Web API | MDN",
+              "url": "https://developer.mozilla.org/fr/docs/Web/API/XMLHttpRequest",
+              "folder": "Barre des favoris/formation/Javascript",
+              "source": "edge",
+              "date_added": "2022-08-25T14:01:48.024181Z",
+              "date_modified": null
+            },
+            {
+              "id": "e5031f23eedf19577852a8d25b13e240cb7a0071",
+              "title": "FormData() - Référence Web API | MDN",
+              "url": "https://developer.mozilla.org/fr/docs/Web/API/FormData/FormData",
+              "folder": "Barre des favoris/formation/Javascript",
+              "source": "edge",
+              "date_added": "2022-08-25T14:01:54.052311Z",
+              "date_modified": null
+            },
+            {
+              "id": "14d3d7af0bcfa365f1b07948e26ca8eda97b45ca",
+              "title": "Dessiner des formes avec le canevas - Référence Web API | MDN",
+              "url": "https://developer.mozilla.org/fr/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes#Arcs",
+              "folder": "Barre des favoris/formation/Javascript",
+              "source": "edge",
+              "date_added": "2022-08-29T08:11:01.353975Z",
+              "date_modified": null
+            },
+            {
+              "id": "e21d6b15da84a1e52ad91ec7ad59b619c9eacf05",
+              "title": "Creating a scene – three.js docs",
+              "url": "https://threejs.org/docs/index.html#manual/en/introduction/Creating-a-scene",
+              "folder": "Barre des favoris/formation/Javascript",
+              "source": "edge",
+              "date_added": "2022-08-29T18:23:56.427523Z",
+              "date_modified": null
+            },
+            {
+              "id": "f912f7ff507b8ceb482999143593564a019dde5b",
+              "title": "SphereGeometry - docs three.js",
+              "url": "https://threejs.org/docs/#api/en/geometries/SphereGeometry",
+              "folder": "Barre des favoris/formation/Javascript",
+              "source": "edge",
+              "date_added": "2022-08-30T08:29:09.094623Z",
+              "date_modified": null
+            },
+            {
+              "id": "14f687faacf5ac5130fe27d1dbaea1d2007a0726",
+              "title": "MeshStandardMaterial - docs three.js",
+              "url": "https://threejs.org/docs/#api/en/materials/MeshStandardMaterial",
+              "folder": "Barre des favoris/formation/Javascript",
+              "source": "edge",
+              "date_added": "2022-08-30T08:29:20.967089Z",
+              "date_modified": null
+            },
+            {
+              "id": "f4e600d26c8924adf7c97e2bd98444e726b3202d",
+              "title": "Télécharger | Node.js",
+              "url": "https://nodejs.org/en/download/",
+              "folder": "Barre des favoris/formation/NodeJs",
+              "source": "edge",
+              "date_added": "2022-07-28T12:25:09.203171Z",
+              "date_modified": null
+            },
+            {
+              "id": "e57878fbbc32f40c587e709f8bc210c07d5ff6f8",
+              "title": "Liste des types MIME communs - HTTP | MDN",
+              "url": "https://developer.mozilla.org/fr/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types",
+              "folder": "Barre des favoris/formation/html",
+              "source": "edge",
+              "date_added": "2021-11-25T13:38:35.869057Z",
+              "date_modified": null
+            },
+            {
+              "id": "46260410a29ea71a4d54006f7b624d258b930fd3",
+              "title": "🎨 Flat UI Palette v1 | Flat UI Colors 🎨 280 handpicked colors ready for COPY & PASTE",
+              "url": "https://flatuicolors.com/palette/defo",
+              "folder": "Barre des favoris/formation/html",
+              "source": "edge",
+              "date_added": "2021-11-24T08:04:52.078772Z",
+              "date_modified": null
+            },
+            {
+              "id": "a74ff60e1da11652b956076d137856b6d9dcead6",
+              "title": "Media Types",
+              "url": "https://www.iana.org/assignments/media-types/media-types.xhtml",
+              "folder": "Barre des favoris/formation/html",
+              "source": "edge",
+              "date_added": "2021-11-25T13:38:48.613581Z",
+              "date_modified": null
+            },
+            {
+              "id": "406c6532d52f2a10b74c0b1399bd69545a8f77a1",
+              "title": "<audio> : l'élément audio embarqué - HTML (HyperText Markup Language) | MDN",
+              "url": "https://developer.mozilla.org/fr/docs/Web/HTML/Element/audio",
+              "folder": "Barre des favoris/formation/html",
+              "source": "edge",
+              "date_added": "2021-11-26T09:06:24.700224Z",
+              "date_modified": null
+            },
+            {
+              "id": "bbfce42001c5f9dd818b62922e52c13af2af3446",
+              "title": "letter-spacing - CSS : Feuilles de style en cascade | MDN",
+              "url": "https://developer.mozilla.org/fr/docs/Web/CSS/letter-spacing",
+              "folder": "Barre des favoris/formation/html",
+              "source": "edge",
+              "date_added": "2021-11-29T12:26:43.698096Z",
+              "date_modified": null
+            },
+            {
+              "id": "a87b4ef941f267ebd5f4a75284110e3df3850154",
+              "title": "line-height - CSS : Feuilles de style en cascade | MDN",
+              "url": "https://developer.mozilla.org/fr/docs/Web/CSS/line-height",
+              "folder": "Barre des favoris/formation/html",
+              "source": "edge",
+              "date_added": "2021-11-29T12:26:48.826238Z",
+              "date_modified": null
+            },
+            {
+              "id": "80dafa9c5a153e0e1dcb66ec02ac0553227645da",
+              "title": "overflow-wrap - CSS : Feuilles de style en cascade | MDN",
+              "url": "https://developer.mozilla.org/fr/docs/Web/CSS/overflow-wrap",
+              "folder": "Barre des favoris/formation/html",
+              "source": "edge",
+              "date_added": "2021-11-29T12:26:58.998779Z",
+              "date_modified": null
+            },
+            {
+              "id": "f041bd4c868087f784b087031c3c1d2b684a2dd2",
+              "title": "Comprendre le poids des règles CSS - THE BLOWG",
+              "url": "https://blog.organicweb.fr/comprendre-le-poids-des-regles-css/",
+              "folder": "Barre des favoris/formation/html",
+              "source": "edge",
+              "date_added": "2021-12-01T14:24:44.420139Z",
+              "date_modified": null
+            },
+            {
+              "id": "df6aedabbd9723e603999e4b0bb7923f76a4f5ae",
+              "title": "L'alignement des boîtes avec Flexbox - CSS : Feuilles de style en cascade | MDN",
+              "url": "https://developer.mozilla.org/fr/docs/Web/CSS/CSS_Box_Alignment/Box_Alignment_in_Flexbox",
+              "folder": "Barre des favoris/formation/html",
+              "source": "edge",
+              "date_added": "2021-12-06T09:17:02.078383Z",
+              "date_modified": null
+            },
+            {
+              "id": "ada787c1186cdca3ca7877ba5e3f19ebaaf80cbe",
+              "title": "30 bonnes pratiques et astuces pour vos formulaires - Newflux",
+              "url": "https://newflux.fr/2017/10/22/30-bonnes-pratiques-astuces-vos-formulaires/",
+              "folder": "Barre des favoris/formation/html",
+              "source": "edge",
+              "date_added": "2021-12-08T09:49:54.228022Z",
+              "date_modified": null
+            },
+            {
+              "id": "3cb4d4f1ee1dea435677a515060f0bd9dc2b5e37",
+              "title": "Dribbble - Discover the World’s Top Designers & Creative Professionals",
+              "url": "https://dribbble.com/",
+              "folder": "Barre des favoris/formation/html",
+              "source": "edge",
+              "date_added": "2021-12-10T14:02:34.098703Z",
+              "date_modified": null
+            },
+            {
+              "id": "e59ca22c7a19cf8571b1d6c3a5113c4dae0a90fd",
+              "title": "<input> - HTML (HyperText Markup Language) | MDN",
+              "url": "https://developer.mozilla.org/fr/docs/Web/HTML/Element/Input",
+              "folder": "Barre des favoris/formation/html",
+              "source": "edge",
+              "date_added": "2021-12-08T10:09:58.758777Z",
+              "date_modified": null
+            },
+            {
+              "id": "8c3798555e64fe714d3b8874337d2a4308115f68",
+              "title": "Commits Conventionnels",
+              "url": "https://www.conventionalcommits.org/fr/v1.0.0-beta.3/",
+              "folder": "Barre des favoris/formation/git",
+              "source": "edge",
+              "date_added": "2022-08-31T09:08:47.333450Z",
+              "date_modified": null
+            },
+            {
+              "id": "584442093fa50ee8f5485fd4729ea13cb4480c5a",
+              "title": "Git - Documentation gitignore",
+              "url": "https://git-scm.com/docs/gitignore",
+              "folder": "Barre des favoris/formation/git",
+              "source": "edge",
+              "date_added": "2022-08-31T09:09:20.270941Z",
+              "date_modified": null
+            },
+            {
+              "id": "b46a87394d268cd66a7392d56fbc1205ccc3fa9d",
+              "title": "EasyAdmin - Recherche Google",
+              "url": "https://www.google.com/search?q=EasyAdmin&sourceid=chrome&ie=UTF-8",
+              "folder": "Barre des favoris/formation/aide ecf",
+              "source": "edge",
+              "date_added": "2022-09-03T11:09:11.911285Z",
+              "date_modified": null
+            },
+            {
+              "id": "323ddaac896483f91473ed7598987535143d39b7",
+              "title": "CodePen : éditeur de code en ligne et communauté de développeurs Web frontaux",
+              "url": "https://codepen.io/?cursor=ZD0xJm89MCZwPTEmdj02OTY2NQ==",
+              "folder": "Barre des favoris/formation/aide ecf",
+              "source": "edge",
+              "date_added": "2022-09-03T11:09:38.896252Z",
+              "date_modified": null
+            },
+            {
+              "id": "3f7fff0e2fa0961231f7823b82369c5ab294d3ef",
+              "title": "mongodb - Recherche Google",
+              "url": "https://www.google.com/search?q=mongodb&oq=mongo&aqs=chrome.1.69i57j0i67i433j0i10i67j46i433i512j0i67i433l2j0i10i512j0i67j0i433i512l2.7148j1j7&sourceid=chrome&ie=UTF-8",
+              "folder": "Barre des favoris/formation/aide ecf",
+              "source": "edge",
+              "date_added": "2022-09-03T11:10:12.617655Z",
+              "date_modified": null
+            },
+            {
+              "id": "9297036411fae0f9f1baece122a81826aa774ed7",
+              "title": "Accueil - Twig - Le moteur de template PHP flexible, rapide et sécurisé",
+              "url": "https://twig.symfony.com/",
+              "folder": "Barre des favoris/formation/aide ecf",
+              "source": "edge",
+              "date_added": "2022-09-03T11:10:18.145894Z",
+              "date_modified": null
+            },
+            {
+              "id": "5ddb5096e53cdd5daf0651aa945fb68323a7ddfb",
+              "title": "panel d'administration easy admi – Recherche Google",
+              "url": "https://www.google.com/search?q=panel+d%27administration+easy+admi&tbm=isch&ved=2ahUKEwjw76yruPj5AhWqx4UKHVyJA1kQ2-cCegQIABAA&oq=panel+d%27administration+easy+admi&gs_lcp=CgNpbWcQAzoECCMQJzoECAAQGFDtCVjiX2CdZ2gCcAB4AIABXogB7AeSAQIxM5gBAKABAaoBC2d3cy13aXotaW1nwAEB&sclient=img&ei=4i8TY_D2I6qPlwTcko7IBQ&bih=937&biw=1920#imgrc=8DnN1gm1LtIbiM",
+              "folder": "Barre des favoris/formation/aide ecf",
+              "source": "edge",
+              "date_added": "2022-09-03T11:10:23.010116Z",
+              "date_modified": null
+            },
+            {
+              "id": "5ccfca06f16812c8e765851a944a56343931c832",
+              "title": "Documentation EasyAdminBundle",
+              "url": "https://symfony.com/bundles/EasyAdminBundle/current/index.html",
+              "folder": "Barre des favoris/formation/aide ecf",
+              "source": "edge",
+              "date_added": "2022-09-03T11:10:35.930629Z",
+              "date_modified": null
+            },
+            {
+              "id": "d812d8c33a2ed80995784a7526b752e32118eaed",
+              "title": "Signup - MockFlow",
+              "url": "https://mockflow.com/signup/",
+              "folder": "Barre des favoris/formation",
+              "source": "edge",
+              "date_added": "2022-09-06T07:08:24.490659Z",
+              "date_modified": null
+            },
+            {
+              "id": "8c2f7156bfc2bb57bc2c53d426b86374e054fed9",
+              "title": "prem | Your First Project | premier | Balsamiq Cloud",
+              "url": "https://balsamiq.cloud/sy3dyhh/p7x0cg2/r5E78",
+              "folder": "Barre des favoris/formation/design",
+              "source": "edge",
+              "date_added": "2022-09-06T07:34:27.190949Z",
+              "date_modified": null
+            },
+            {
+              "id": "65efc7b2817780bdbd4d08082a3cf298c6612cf3",
+              "title": "WireframePro - Untitled / Page 1",
+              "url": "https://wireframepro.mockflow.com/editor.jsp?editor=on&publicid=M75a6dd23aeeabc837d878cfbb3765f541662448131347&perm=Create&projectid=MUKCUJtHiob&spaceid=&ptitle=Untitled&bgcolor=white&category=Mdaeb7bb443852365c2546af5a3f055171637821950838&pcompany=C0da6e362302b4a4ea5518d955287f916&store=yes#/page/4ab3afb9860641538344dfd1af96d4c0",
+              "folder": "Barre des favoris/formation/design",
+              "source": "edge",
+              "date_added": "2022-09-06T07:35:41.649578Z",
+              "date_modified": null
+            },
+            {
+              "id": "251cf0cf4dc5ce78d21282d967d0e86f706406af",
+              "title": "Babel · Le compilateur pour JavaScript de nouvelle génération",
+              "url": "https://babeljs.io/repl#?browsers=defaults%2C%20not%20ie%2011%2C%20not%20ie_mob%2011&build=&builtIns=false&corejs=3.21&spec=false&loose=false&code_lz=MYewdgzgLgBApgGzgWzmWBeGAeAJgSwDcZgEBDCCAOTNQwCJR0z8w4AnegPgAlEEQMAOoh2CXNgD0BQlwDcQA&debug=false&forceAllTransforms=false&shippedProposals=false&circleciRepo=&evaluate=false&fileSize=false&timeTravel=false&sourceType=module&lineWrap=true&presets=env%2Creact%2Cstage-2&prettier=false&targets=&version=7.19.0&externalPlugins=&assumptions=%7B%7D",
+              "folder": "Barre des favoris/formation/react",
+              "source": "edge",
+              "date_added": "2022-09-08T12:59:02.016254Z",
+              "date_modified": null
+            },
+            {
+              "id": "9b32befaff3fdd80c046d3878da814c69cef454b",
+              "title": "Diagramme sans nom.drawio - diagrams.net",
+              "url": "https://app.diagrams.net/#G1nedWXEieYIpZptOrMdOfgeIZnjsCsirO",
+              "folder": "Barre des favoris/formation",
+              "source": "edge",
+              "date_added": "2022-09-12T15:04:40.706716Z",
+              "date_modified": null
+            },
+            {
+              "id": "3e485585214485b031fe0ebed9aa04a88b198c4c",
+              "title": "Excalidraw",
+              "url": "https://excalidraw.com/",
+              "folder": "Barre des favoris/formation",
+              "source": "edge",
+              "date_added": "2022-09-13T15:23:40.848850Z",
+              "date_modified": null
+            },
+            {
+              "id": "c5d7b43065a8f2f3f497e4b50bb1cbcfeb7274fe",
+              "title": "Plugins de framework client - Froala",
+              "url": "https://froala.com/wysiwyg-editor/docs/framework-plugins/",
+              "folder": "Barre des favoris/formation",
+              "source": "edge",
+              "date_added": "2022-09-21T17:19:31.744368Z",
+              "date_modified": null
+            },
+            {
+              "id": "3f6686ffb2d734a5e859c683576c233ffe0fe370",
+              "title": "Page de connexion - Conception de la liste de contrôle",
+              "url": "https://www.checklist.design/pages/login",
+              "folder": "Barre des favoris/formation",
+              "source": "edge",
+              "date_added": "2022-09-21T17:20:05.661720Z",
+              "date_modified": null
+            },
+            {
+              "id": "0cf2dd91e0a478b93c7b7a1fa924e013614b1be6",
+              "title": "Visual Paradigm Online",
+              "url": "https://online.visual-paradigm.com/drive/#diagramlist:proj=0&diagram=list",
+              "folder": "Barre des favoris/formation/basededonées",
+              "source": "edge",
+              "date_added": "2022-10-05T12:54:37.379489Z",
+              "date_modified": null
+            },
+            {
+              "id": "031e93a61c943e2d939049239735aeb9277e55bc",
+              "title": "Visual Paradigm Online",
+              "url": "https://online.visual-paradigm.com/drive/#diagramlist:proj=0&dashboard",
+              "folder": "Barre des favoris/formation/basededonées",
+              "source": "edge",
+              "date_added": "2022-10-05T14:44:06.411851Z",
+              "date_modified": null
+            },
+            {
+              "id": "405eb83bf6b7123396d4caba02ffaf7511f84347",
+              "title": "Untitled, Online Whiteboard for Visual Collaboration",
+              "url": "https://miro.com/app/board/uXjVPQWG2IM=/#tpicker-content",
+              "folder": "Barre des favoris/formation/basededonées",
+              "source": "edge",
+              "date_added": "2022-10-06T13:39:54.737170Z",
+              "date_modified": null
+            },
+            {
+              "id": "684b460006bf4b068897e0ee43372862be68718e",
+              "title": "Packagist",
+              "url": "https://packagist.org/",
+              "folder": "Barre des favoris/formation/symfony",
+              "source": "edge",
+              "date_added": "2022-10-19T09:32:44.479486Z",
+              "date_modified": null
+            },
+            {
+              "id": "67f2ad2d604ef114db8aa426e3db83bfffe1a432",
+              "title": "Bootswatch: Free themes for Bootstrap",
+              "url": "https://bootswatch.com/",
+              "folder": "Barre des favoris/formation/symfony",
+              "source": "edge",
+              "date_added": "2022-11-15T15:32:53.306137Z",
+              "date_modified": null
+            },
+            {
+              "id": "cb3713b47cf5ad69f97fd77a0fe94181e4d09961",
+              "title": "12 - Live Coding : Gérer les rôles utilisateurs avec Symfony 4 - Nouvelle-Techno.fr - Nouvelle-Techno.fr",
+              "url": "https://nouvelle-techno.fr/articles/live-coding-gerer-les-roles-utilisateur-avec-symfony-4",
+              "folder": "Barre des favoris/formation/symfony",
+              "source": "edge",
+              "date_added": "2022-12-16T08:33:20.449824Z",
+              "date_modified": null
+            },
+            {
+              "id": "7eac643e5dfb0dbfec894e037fdaf84b732399da",
+              "title": "Mockaroo - Random Data Generator and API Mocking Tool | JSON / CSV / SQL / Excel",
+              "url": "https://www.mockaroo.com/",
+              "folder": "Barre des favoris/formation/symfony",
+              "source": "edge",
+              "date_added": "2022-12-19T17:00:37.949027Z",
+              "date_modified": null
+            },
+            {
+              "id": "9c464be3f238b3bbf2c2313b432488d7171c32c1",
+              "title": "php - phpMyAdmin ERROR: mysqli_real_connect(): (HY000/1045): Access denied for user 'pma'@'localhost' (using password: NO) - Stack Overflow",
+              "url": "https://stackoverflow.com/questions/46736319/phpmyadmin-error-mysqli-real-connect-hy000-1045-access-denied-for-user-p",
+              "folder": "Barre des favoris/formation/xammp",
+              "source": "edge",
+              "date_added": "2022-11-23T12:39:32.113635Z",
+              "date_modified": null
+            },
+            {
+              "id": "1abbdf9feee0adfc2bc26d7d0e3c96eff0d9061f",
+              "title": "Forums - WPFR",
+              "url": "https://wpfr.net/support/",
+              "folder": "Barre des favoris/formation",
+              "source": "edge",
+              "date_added": "2022-11-28T14:25:23.624570Z",
+              "date_modified": null
+            },
+            {
+              "id": "88326ccbde6230a2ca93936f7841e55600e768a9",
+              "title": "13 astuces pour sécuriser son site Wordpress - Codeur Blog",
+              "url": "https://www.codeur.com/blog/securiser-site-wordpress/",
+              "folder": "Barre des favoris/formation",
+              "source": "edge",
+              "date_added": "2022-11-28T14:25:36.833045Z",
+              "date_modified": null
+            },
+            {
+              "id": "ae5d95b74e0220ef93c0fb332380ae776f4b189c",
+              "title": "DimitriKft/myp_symfony: Projet Symfony qui met à disposition un Template de portfolio clés en main en open source.",
+              "url": "https://github.com/DimitriKft/myp_symfony",
+              "folder": "Barre des favoris/formation/ECf",
+              "source": "edge",
+              "date_added": "2022-12-20T09:34:57.111024Z",
+              "date_modified": null
+            },
+            {
+              "id": "250a4a0e0d2d78c94e4860e24800fc631b5244cf",
+              "title": "unite-workshop-shopifyql/fly-io.md à main · Shopify/unite-workshop-shopifyql",
+              "url": "https://github.com/Shopify/unite-workshop-shopifyql/blob/main/web/docs/fly-io.md",
+              "folder": "Barre des favoris/formation/ECf",
+              "source": "edge",
+              "date_added": "2022-12-21T15:21:52.189375Z",
+              "date_modified": null
+            },
+            {
+              "id": "bfb39f17204af7d1655ac8242b0525751e9214be",
+              "title": "Databases and the Doctrine ORM (Symfony Docs)",
+              "url": "https://symfony.com/doc/current/doctrine.html",
+              "folder": "Barre des favoris/formation/ECf",
+              "source": "edge",
+              "date_added": "2022-12-22T16:48:45.728435Z",
+              "date_modified": null
+            },
+            {
+              "id": "fa9f84ae3eb2e2dc6fc49b86da3be036d073f375",
+              "title": "Deploying a Symfony app on Fly.io - Johan de Jager",
+              "url": "https://dejager.sh/articles/deploying-symfony-on-fly",
+              "folder": "Barre des favoris/formation/ECf",
+              "source": "edge",
+              "date_added": "2022-12-28T16:14:48.755432Z",
+              "date_modified": null
+            },
+            {
+              "id": "64474953c00b7580505e25ad14d64910a632df79",
+              "title": "Belles images et photos gratuites | Unsplash",
+              "url": "https://unsplash.com/fr",
+              "folder": "Barre des favoris/formation/ECf/ressource",
+              "source": "edge",
+              "date_added": "2023-01-02T13:43:10.443493Z",
+              "date_modified": null
+            },
+            {
+              "id": "ca37f89683c1f2621415b233b3a064a5423858e3",
+              "title": "Restaurant - Découvrir - Google Trends",
+              "url": "https://trends.google.fr/trends/explore?geo=FR-K&q=%2Fm%2F06l8d",
+              "folder": "Barre des favoris/formation/ECf/ressource",
+              "source": "edge",
+              "date_added": "2023-01-02T13:43:31.575753Z",
+              "date_modified": null
+            },
+            {
+              "id": "b832bb9ccf7c2e66c3067417e762fbc1544aa615",
+              "title": "Lorem Ipsum - All the facts - Lipsum generator",
+              "url": "https://www.lipsum.com/",
+              "folder": "Barre des favoris/formation/ECf/ressource",
+              "source": "edge",
+              "date_added": "2023-01-02T13:43:37.680041Z",
+              "date_modified": null
+            },
+            {
+              "id": "c372b8ccac4462edb5e6f216f2041613172d9532",
+              "title": "reCAPTCHA",
+              "url": "https://www.google.com/recaptcha/admin/create",
+              "folder": "Barre des favoris/formation/ECf/ressource",
+              "source": "edge",
+              "date_added": "2023-01-02T13:43:41.719999Z",
+              "date_modified": null
+            },
+            {
+              "id": "5e229ea5a85c0f746c72f1a457277c7ef7972896",
+              "title": "Web & SEO : Affiliation, Site de Niche & Revenus Passifs",
+              "url": "https://www.webandseo.fr/",
+              "folder": "Barre des favoris/formation/ECf/ressource",
+              "source": "edge",
+              "date_added": "2023-01-04T17:06:42.224278Z",
+              "date_modified": null
+            },
+            {
+              "id": "110f6cbdb0d862fb601ded760ed1a2d8d7151446",
+              "title": "Le guide ultime de l'utilisation des permaliens WordPress",
+              "url": "https://kinsta.com/fr/blog/permaliens-wordpress/",
+              "folder": "Barre des favoris/formation/ECf/ressource",
+              "source": "edge",
+              "date_added": "2023-01-04T17:08:12.806098Z",
+              "date_modified": null
+            },
+            {
+              "id": "9a00167f4b09b25b323e6adf662ae7afc30bb0a8",
+              "title": "Color Combination Gingerbread Ice Cream - Canva's Design Wiki",
+              "url": "https://www.canva.com/colors/color-palettes/gingerbread-ice-cream/",
+              "folder": "Barre des favoris/formation/ECf/ressource",
+              "source": "edge",
+              "date_added": "2023-01-05T11:16:51.941114Z",
+              "date_modified": null
+            },
+            {
+              "id": "3521bea6269456a4970a1152d84a58872dddab26",
+              "title": "Conteneuriser une application | Documentation Docker",
+              "url": "https://docs.docker.com/get-started/02_our_app/",
+              "folder": "Barre des favoris/formation/ECf/ressource",
+              "source": "edge",
+              "date_added": "2023-01-08T15:05:03.188720Z",
+              "date_modified": null
+            },
+            {
+              "id": "1995e29967acd5b73b952b44f5b49347c0c53cf4",
+              "title": "(333) REACTJS 18 JWT 15/? - Formulaire de login - mise en place - YouTube",
+              "url": "https://www.youtube.com/watch?v=K_YTd-X1uTw",
+              "folder": "Barre des favoris/formation/ECf/ressource",
+              "source": "edge",
+              "date_added": "2023-01-09T15:47:24.860914Z",
+              "date_modified": null
+            },
+            {
+              "id": "e512526f6352ba5246e45e785c630ab2e0e42f3c",
+              "title": "[Résolu] [Symfony5] Migration \"Aborted\" error - je n'arrive pas à interagir avec les programmes par MarkusJohnson1 - page 1 - OpenClassrooms",
+              "url": "https://openclassrooms.com/forum/sujet/symfony5-migration-aborted-error",
+              "folder": "Barre des favoris/formation/ECf/ressource",
+              "source": "edge",
+              "date_added": "2023-01-12T17:04:45.280679Z",
+              "date_modified": null
+            },
+            {
+              "id": "262205f7cc2c04446934a5c2d31e33825c5117ca",
+              "title": "Forum : Gestion des rôles / utilisateurs Symfony | Grafikart",
+              "url": "https://grafikart.fr/forum/25619",
+              "folder": "Barre des favoris/formation/ECf/ressource",
+              "source": "edge",
+              "date_added": "2023-01-13T16:30:30.500764Z",
+              "date_modified": null
+            },
+            {
+              "id": "af31075191c74523359e7d00fdb8c2a2410054af",
+              "title": "crée un formulaire qui permet de changer le rôle symfony - Recherche Google",
+              "url": "https://www.google.com/search?q=cr%C3%A9e+un+formulaire+qui+permet+de+changer+le+r%C3%B4le+symfony&sxsrf=AJOqlzW6IL52sC-b48-7nDaE0P0X9ZCMig%3A1673595469929&ei=TQrBY8iqOMOmkdUP_LWe-AE&oq=cr%C3%A9e+un+formulaire+qui+permet+de+changer+le+r%C3%B4le+symf&gs_lcp=Cgxnd3Mtd2l6LXNlcnAQARgAMgcIIRCgARAKOgoIABBHENYEELADOgQIIRAVSgQIQRgASgQIRhgAUPgBWJMsYJ80aAFwAXgAgAF3iAHUA5IBAzQuMZgBAKABAcgBCMABAQ&sclient=gws-wiz-serp",
+              "folder": "Barre des favoris/formation/ECf/ressource",
+              "source": "edge",
+              "date_added": "2023-01-13T16:30:42.264793Z",
+              "date_modified": null
+            },
+            {
+              "id": "0d90013891f6336c0ec21ee73307466b73223d13",
+              "title": "(341) 24 - Les formulaires dynamiques et le CollectionType dans un projet Symfony - YouTube",
+              "url": "https://www.youtube.com/watch?v=f7tdb30evUk",
+              "folder": "Barre des favoris/formation/ECf/ressource",
+              "source": "edge",
+              "date_added": "2023-01-13T16:30:58.129145Z",
+              "date_modified": null
+            },
+            {
+              "id": "6884a234c1a011ef4768e34f962ab0d73b09c0a8",
+              "title": "Authentification avec le SecurityBundle de Symfony — Fast PHP 2021",
+              "url": "https://www.univ-orleans.fr/iut-orleans/informatique/intra/tuto/php/symfony-securitybundle-auth.html",
+              "folder": "Barre des favoris/formation/ECf/ressource",
+              "source": "edge",
+              "date_added": "2023-01-13T16:32:08.954904Z",
+              "date_modified": null
+            },
+            {
+              "id": "47e11211868ba9805d4c300f573b986719ab4294",
+              "title": "(350) 3 - Création de la base de données (Symfony 6) - YouTube",
+              "url": "https://www.youtube.com/watch?v=MhVAwrujifQ",
+              "folder": "Barre des favoris/formation/ECf/ressource",
+              "source": "edge",
+              "date_added": "2023-01-16T16:20:33.905415Z",
+              "date_modified": null
+            },
+            {
+              "id": "2201c8717e728e296ff1df2d0d5896c6657cd5a8",
+              "title": "Contrôleurs CRUD (Documentation EasyAdminBundle)",
+              "url": "https://symfony.com/bundles/EasyAdminBundle/current/crud.html",
+              "folder": "Barre des favoris/formation/ECf/ressource",
+              "source": "edge",
+              "date_added": "2023-01-18T20:02:05.251961Z",
+              "date_modified": null
+            },
+            {
+              "id": "d623088495fd6ff1acb3668bf68d47cef3df1ad2",
+              "title": "NestJS - A progressive Node.js framework",
+              "url": "https://nestjs.com/",
+              "folder": "Barre des favoris/formation/ECf/ressource",
+              "source": "edge",
+              "date_added": "2023-01-18T20:09:43.351182Z",
+              "date_modified": null
+            },
+            {
+              "id": "fec1c10914b817701d5ca3dab5291385260db5ea",
+              "title": "Générateur gratuit de mentions légales RGPD pour votre site internet",
+              "url": "https://fr.orson.io/1371/generateur-mentions-legales",
+              "folder": "Barre des favoris/formation/ECf/ressource",
+              "source": "edge",
+              "date_added": "2023-01-18T20:15:06.682836Z",
+              "date_modified": null
+            },
+            {
+              "id": "290f050ae86ae7ad0c89015724ea2847f2d7957c",
+              "title": "Scoop",
+              "url": "https://scoop.sh/",
+              "folder": "Barre des favoris/formation/ECf/ressource",
+              "source": "edge",
+              "date_added": "2023-01-18T20:15:13.990279Z",
+              "date_modified": null
+            },
+            {
+              "id": "125988b50fbc163ec3cf8661d661dab51552eb2e",
+              "title": "(353) Un NOTION maison avec Symfony 6 et Editor.js - YouTube",
+              "url": "https://www.youtube.com/watch?v=ubgwWkjKirY",
+              "folder": "Barre des favoris/formation/ECf/ressource",
+              "source": "edge",
+              "date_added": "2023-01-19T15:25:00.794445Z",
+              "date_modified": null
+            },
+            {
+              "id": "cc26f657310435196b37bf69bdd1f133685a6e81",
+              "title": "Bootstrap & Webpack · Bootstrap v5.2",
+              "url": "https://getbootstrap.com/docs/5.2/getting-started/webpack/",
+              "folder": "Barre des favoris/formation/ECf/ressource",
+              "source": "edge",
+              "date_added": "2023-01-19T18:35:33.566055Z",
+              "date_modified": null
+            },
+            {
+              "id": "83cc2e20189936ddb33592caf0d883e42e977f93",
+              "title": "Configuring Symfony (Symfony Docs)",
+              "url": "https://symfony.com/doc/current/configuration.html#configuration-environments",
+              "folder": "Barre des favoris/formation/ECf/ressource",
+              "source": "edge",
+              "date_added": "2023-01-23T18:32:37.325915Z",
+              "date_modified": null
+            },
+            {
+              "id": "eee4a2e4f022b289b2f3a8afc281a667ac382cd4",
+              "title": "aesyadlin symfony - Recherche Google",
+              "url": "https://www.google.com/search?q=aesyadlin+symfony&oq=aesy&aqs=chrome.1.69i57j69i59j46i10i131i199i433i465i512j0i10i512j0i512j0i10i433i512j0i10i131i433i512j46i10i131i199i433i465i512j0i512.2876j0j7&sourceid=chrome&ie=UTF-8",
+              "folder": "Barre des favoris/formation/ECf/ressource",
+              "source": "edge",
+              "date_added": "2023-01-24T16:50:55.236822Z",
+              "date_modified": null
+            },
+            {
+              "id": "e99777f3145da0bfec34327d0e14929e6f62a1f5",
+              "title": "docker-compose Env Vars & Symfony > Doctrine, Symfony & the Database | SymfonyCasts",
+              "url": "https://symfonycasts.com/screencast/symfony5-doctrine/docker-env-vars#play",
+              "folder": "Barre des favoris/formation/ECf/ressource",
+              "source": "edge",
+              "date_added": "2023-01-31T19:42:33.085348Z",
+              "date_modified": null
+            },
+            {
+              "id": "7e9a111cbc6783ef4c8c61205cff1f2bf538053b",
+              "title": "(6) Comprendre ENFIN les VARIABLES d'ENVIRONNEMENT avec SYMFONY 🤯 - YouTube",
+              "url": "https://www.youtube.com/watch?v=n_wGBA_dl68",
+              "folder": "Barre des favoris/formation/ECf/ressource",
+              "source": "edge",
+              "date_added": "2023-01-31T19:42:57.173913Z",
+              "date_modified": null
+            },
+            {
+              "id": "37135ca3ad6fcd1956c458fa051a2d73968ae8da",
+              "title": "(4) Tutoriel Symfony 6 - Créer une interface d'administration avec EasyAdmin 4 - YouTube",
+              "url": "https://www.youtube.com/watch?v=ze6XJTACo1s&t=3286s",
+              "folder": "Barre des favoris/formation/ECf/ressource",
+              "source": "edge",
+              "date_added": "2023-02-02T17:01:41.585660Z",
+              "date_modified": null
+            },
+            {
+              "id": "3832dd9f6e3e15da80010bbb31112eed89e90c03",
+              "title": "The ultimate CSS tools for web designers | CSSmatic",
+              "url": "https://www.cssmatic.com/",
+              "folder": "Barre des favoris/formation/ECf",
+              "source": "edge",
+              "date_added": "2023-02-20T14:58:08.184106Z",
+              "date_modified": null
+            },
+            {
+              "id": "0b7e990d13f8257b8b962e4773c07260abc54da7",
+              "title": "FAQ JavaScript",
+              "url": "https://javascript.developpez.com/faq/javascript/?page=formChamps#ajoutName",
+              "folder": "Barre des favoris/formation/ECf",
+              "source": "edge",
+              "date_added": "2023-07-19T16:35:58.434980Z",
+              "date_modified": null
+            },
+            {
+              "id": "4c92b0e630469925bd00323724019a75bf4dc821",
+              "title": "(245) Création d'un formulaire de recherche avec Symfony - YouTube",
+              "url": "https://www.youtube.com/watch?v=_75fDJITerA",
+              "folder": "Barre des favoris/formation/ECf",
+              "source": "edge",
+              "date_added": "2023-07-23T19:01:51.478431Z",
+              "date_modified": null
+            },
+            {
+              "id": "135167efc74cf5b5a9fa5153566837a88a26bc4d",
+              "title": "Fractionnement de code | webpack",
+              "url": "https://webpack.js.org/guides/code-splitting/#dynamic-imports",
+              "folder": "Barre des favoris/formation/ECf",
+              "source": "edge",
+              "date_added": "2023-07-23T19:14:24.222965Z",
+              "date_modified": null
+            },
+            {
+              "id": "7ced71bbca1dc953cbc8e29646a4bed49a444800",
+              "title": "webpack-contrib/sass-loader: Compiles Sass to CSS",
+              "url": "https://github.com/webpack-contrib/sass-loader#resolving-import-at-rules",
+              "folder": "Barre des favoris/formation/scass bootstrap",
+              "source": "edge",
+              "date_added": "2023-01-20T19:34:17.275466Z",
+              "date_modified": null
+            },
+            {
+              "id": "fee93e61c38191af355f4567b889e28664861a8d",
+              "title": "(354) Angular Bootstrap Errors (SassError: Can't find stylesheet to import, Undefined variable) - Easy Fix - YouTube",
+              "url": "https://www.youtube.com/watch?v=M7ELWgF-csE",
+              "folder": "Barre des favoris/formation/scass bootstrap",
+              "source": "edge",
+              "date_added": "2023-01-20T19:34:54.161194Z",
+              "date_modified": null
+            },
+            {
+              "id": "f93d094772003bd78824ee2d820ba8efd139ecca",
+              "title": "(354) 4 - Mise en place des templates et des assets CSS et JS (Symfony 6) - YouTube",
+              "url": "https://www.youtube.com/watch?v=aqw1bgitDcE&list=PLBq3aRiVuwyzI0MT4LhvwqkVenz5pF_DM&index=4",
+              "folder": "Barre des favoris/formation/scass bootstrap",
+              "source": "edge",
+              "date_added": "2023-01-20T19:35:07.309534Z",
+              "date_modified": null
+            },
+            {
+              "id": "5794fe51653ac57deb650279012f58d609cb233b",
+              "title": "Useful Sass (SCSS) media query mixins for Bootstrap - Glenn McComb: front end developer and designer",
+              "url": "https://glennmccomb.com/articles/useful-sass-scss-media-query-mixins-for-bootstrap/",
+              "folder": "Barre des favoris/formation/scass bootstrap",
+              "source": "edge",
+              "date_added": "2023-02-23T16:45:45.218804Z",
+              "date_modified": null
+            },
+            {
+              "id": "de422c2354b92c9c3ce64b6dda70ddf22e919ad2",
+              "title": "Sass et media queries",
+              "url": "https://blog.smarchal.com/sass-et-media-queries",
+              "folder": "Barre des favoris/formation/scass bootstrap",
+              "source": "edge",
+              "date_added": "2023-02-23T16:46:00.071387Z",
+              "date_modified": null
+            },
+            {
+              "id": "76b4f11bf0e84c3cb1185085cfe653559f6359e5",
+              "title": "Breakpoints · Bootstrap v5.0",
+              "url": "https://getbootstrap.com/docs/5.0/layout/breakpoints/",
+              "folder": "Barre des favoris/formation/scass bootstrap",
+              "source": "edge",
+              "date_added": "2023-02-23T16:46:07.151589Z",
+              "date_modified": null
+            },
+            {
+              "id": "21bbe1b078b6f0cd77d7260a374c7e4db586b7ff",
+              "title": "Bootstrap-4_Res-Website/Index.html at master · akashyap2013/Bootstrap-4_Res-Website",
+              "url": "https://github.com/akashyap2013/Bootstrap-4_Res-Website/blob/master/Index.html",
+              "folder": "Barre des favoris/formation/scass bootstrap",
+              "source": "edge",
+              "date_added": "2023-02-23T16:46:35.128716Z",
+              "date_modified": null
+            },
+            {
+              "id": "3f6b5ce966656bd06b7832b8399c091e08424640",
+              "title": "Sass Mixins",
+              "url": "https://www.learnhowtoprogram.com/user-interfaces/building-layouts-preprocessors/sass-mixins",
+              "folder": "Barre des favoris/formation/scass bootstrap",
+              "source": "edge",
+              "date_added": "2023-02-23T18:43:18.053181Z",
+              "date_modified": null
+            },
+            {
+              "id": "42e1a799ceb4140bf14f4ef13a27b171735ce71d",
+              "title": "Rapid - The Next Generation API Hub",
+              "url": "https://rapidapi.com/",
+              "folder": "Barre des favoris/formation",
+              "source": "edge",
+              "date_added": "2023-03-15T14:33:06.054606Z",
+              "date_modified": null
+            },
+            {
+              "id": "e6433e98dcebf130dfb6c9d0e7b8d0b9c02191a2",
+              "title": "Top 25 Des Sites Web Pour Apprendre À Coder en 2022",
+              "url": "https://www.hostinger.fr/tutoriels/apprendre-a-coder-gratuitement/",
+              "folder": "Barre des favoris/formation",
+              "source": "edge",
+              "date_added": "2022-02-01T09:09:17.006913Z",
+              "date_modified": null
+            },
+            {
+              "id": "e0397855992c7a72faaed49725d205deffd77c8d",
+              "title": "Windows 10 - Comment accéder au BIOS ? - Base de connaissances - Make-IT-Simple",
+              "url": "https://portal.makeitsimple.ch/knowledgebase/1/Windows-10---Comment-acceder-au-BIOS-.html",
+              "folder": "Barre des favoris/formation",
+              "source": "edge",
+              "date_added": "2022-12-27T07:30:08.340079Z",
+              "date_modified": null
+            },
+            {
+              "id": "9ddc16e6145f3f11f2a9a4a2fb146cd5ae580a7f",
+              "title": "Guide du flux de travail en matière de sauvegarde et de stockage vidéo pour les professionnels du cinéma - MASV",
+              "url": "https://massive.io/fr/flux-de-travail/flux-de-travail-de-stockage-et-de-sauvegarde/#security",
+              "folder": "Barre des favoris/formation",
+              "source": "edge",
+              "date_added": "2023-04-12T15:28:24.111158Z",
+              "date_modified": null
+            },
+            {
+              "id": "4d71c8b8aef6f910ba531830bd2c5606d9055f9c",
+              "title": "Authentification des utilisateurs avec Firebase & React",
+              "url": "https://www.savoirdanslavie.com/firebase-react-authentication/",
+              "folder": "Barre des favoris/formation",
+              "source": "edge",
+              "date_added": "2022-09-28T16:37:33.709417Z",
+              "date_modified": null
+            },
+            {
+              "id": "7a808a73a54dd172fbe2652cde0024043f94a8a9",
+              "title": "Créer une Clé USB Linux (Ubuntu) + L’installer ou Essayer - YouTube",
+              "url": "https://www.youtube.com/watch?v=kZS84ctzii8",
+              "folder": "Barre des favoris/formation",
+              "source": "edge",
+              "date_added": "2021-11-23T10:14:50.165866Z",
+              "date_modified": null
+            },
+            {
+              "id": "45a08a99d851735f289c6c33564d9584811c3abc",
+              "title": "Stage Cybersécurité (H/F) - Atos - Stage à Montpellier",
+              "url": "https://www.welcometothejungle.com/fr/companies/atos/jobs/stage-cybersecurite-h-f_montpellier?q=2403be3314cec8a8e322d674ccac1240&o=693211f4-4b77-43e2-b9b2-4dfd6f58ebc7",
+              "folder": "Barre des favoris/formation",
+              "source": "edge",
+              "date_added": "2024-02-22T17:25:34.983413Z",
+              "date_modified": null
+            },
+            {
+              "id": "3cbc8706b84488c77519f0912cbabdd9560e7eb9",
+              "title": "Caisses Régionales de Crédit Agricole - Résultat de votre recherche (11 offres, page 1) / Profil : Informatique / Réseaux / Département : Occitanie-->Hérault (34)",
+              "url": "https://ca-recrute.talent-soft.com/offre-de-emploi/liste-offres.aspx",
+              "folder": "Barre des favoris/Emploi",
+              "source": "edge",
+              "date_added": "2023-02-13T16:21:01.603661Z",
+              "date_modified": null
+            },
+            {
+              "id": "fecd481bced8f035ed2bfad947d94e4ed922baf0",
+              "title": "Siteliner - Find Duplicate Content on your site",
+              "url": "https://www.siteliner.com/",
+              "folder": "Barre des favoris/referencement",
+              "source": "edge",
+              "date_added": "2023-03-07T09:07:18.751489Z",
+              "date_modified": null
+            },
+            {
+              "id": "9cbaee9a27289578998a4a7bddbea145d9f610b9",
+              "title": "Comment configurer l'interface de ligne de commande Elastic Beanstalk | AWS",
+              "url": "https://aws.amazon.com/fr/getting-started/hands-on/set-up-command-line-elastic-beanstalk/",
+              "folder": "Barre des favoris/aws",
+              "source": "edge",
+              "date_added": "2023-09-05T14:15:35.303700Z",
+              "date_modified": null
+            },
+            {
+              "id": "06c54b798aaa936dea57bcc3ed536a887592a337",
+              "title": "Lancer une instance | EC2 | eu-west-3",
+              "url": "https://eu-west-3.console.aws.amazon.com/ec2/home?region=eu-west-3#LaunchInstances:",
+              "folder": "Barre des favoris/aws",
+              "source": "edge",
+              "date_added": "2023-09-01T18:26:47.042445Z",
+              "date_modified": null
+            },
+            {
+              "id": "5ec6d0b88928f854224f199f80cb66fcafda5368",
+              "title": "Comment déployer l'application Symfony sur Amazon Web Service | Witékio",
+              "url": "https://witekio.com/fr/blog-fr/how-to-deploy-symfony-application-on-amazon-web-service/",
+              "folder": "Barre des favoris/aws",
+              "source": "edge",
+              "date_added": "2023-09-06T14:38:56.604394Z",
+              "date_modified": null
+            },
+            {
+              "id": "9ca8758f3578c092ab546e4545902d2f7a70cd85",
+              "title": "L'Object Storage dans une application Symfony :: YoanDev",
+              "url": "https://yoandev.co/lobject-storage-dans-une-application-symfony/",
+              "folder": "Barre des favoris/aws",
+              "source": "edge",
+              "date_added": "2023-09-06T18:34:26.740915Z",
+              "date_modified": null
+            },
+            {
+              "id": "acede7a9b1b9f8c5d3724ba606693d248a6c571f",
+              "title": "Build and Deploy a Symfony Application on AWS using CDK, ECS and RDS | by Julien Bras | Wiiisdom Labs | Medium",
+              "url": "https://medium.com/wiiisdom-labs/build-and-deploy-a-symfony-application-on-aws-using-cdk-ecs-and-rds-ec8c85465af6",
+              "folder": "Barre des favoris/aws",
+              "source": "edge",
+              "date_added": "2023-09-06T18:42:02.670853Z",
+              "date_modified": null
+            },
+            {
+              "id": "3e15eaaa6d508e181d166155d3df916ebe3032ea",
+              "title": "Jour 1: Notes",
+              "url": "https://cours.cocadmin.com/view/courses/formation-aws-gratuite/2130057-jour-1-s3-cloudfront/6712626-jour-1-notes",
+              "folder": "Barre des favoris/aws",
+              "source": "edge",
+              "date_added": "2023-09-07T14:46:26.819849Z",
+              "date_modified": null
+            },
+            {
+              "id": "d96a2f2fc8743aa33d0537baa547003c67187fb7",
+              "title": "Déploiement - Bref",
+              "url": "https://bref.sh/docs/deploy",
+              "folder": "Barre des favoris/aws",
+              "source": "edge",
+              "date_added": "2023-09-08T11:15:20.865722Z",
+              "date_modified": null
+            },
+            {
+              "id": "44715d02267afcbaf584212b58d220718bb1cf8a",
+              "title": "Symfony serverless avec Lambda et Bref | ACSEO",
+              "url": "https://www.acseo.fr/symfony-aws-serverless-bref-php",
+              "folder": "Barre des favoris/aws",
+              "source": "edge",
+              "date_added": "2023-09-08T11:15:28.169382Z",
+              "date_modified": null
+            },
+            {
+              "id": "ed25fdecafababee08a38ac1bc252533a4273a88",
+              "title": "Symfony Local Web Server (Symfony Docs)",
+              "url": "https://symfony.com/doc/current/setup/symfony_server.html",
+              "folder": "Barre des favoris/aws",
+              "source": "edge",
+              "date_added": "2023-09-08T13:49:37.232189Z",
+              "date_modified": null
+            },
+            {
+              "id": "3444e63c1420d23f70b9ad6e260dc563805312da",
+              "title": "(379) Docker avec Symfony 3, PHP 7 et MySQL sur AWS - Sandbox ! - YouTube",
+              "url": "https://www.youtube.com/watch?v=XrvL1404Yns",
+              "folder": "Barre des favoris/aws",
+              "source": "edge",
+              "date_added": "2023-09-09T08:07:43.295002Z",
+              "date_modified": null
+            },
+            {
+              "id": "bfbfe467d79fb7eb491f80067e1f2d8a665c7f47",
+              "title": "symfony4 - Uncaught PHP Exception Symfony\\Component\\HttpKernel\\Exception\\NotFoundHttpException: \"No route found for \"GET /\" - Stack Overflow",
+              "url": "https://stackoverflow.com/questions/55678255/uncaught-php-exception-symfony-component-httpkernel-exception-notfoundhttpexcept",
+              "folder": "Barre des favoris/aws",
+              "source": "edge",
+              "date_added": "2023-09-13T17:52:18.416650Z",
+              "date_modified": null
+            },
+            {
+              "id": "cd73519442661f921ef81ffd8a4d75b377681177",
+              "title": "(357) AWS - 1.4. EC2 : PREMIER INSTANCE VIA LA CONSOLE - YouTube",
+              "url": "https://www.youtube.com/watch?v=m1j5crtojGo",
+              "folder": "Barre des favoris/aws",
+              "source": "edge",
+              "date_added": "2023-09-02T12:33:53.083267Z",
+              "date_modified": null
+            },
+            {
+              "id": "e44280b6f97c8d59684fa3b60fc5f79d23483328",
+              "title": "API Sirene - api.gouv.fr",
+              "url": "https://api.gouv.fr/les-api/sirene_v3",
+              "folder": "Barre des favoris/medical",
+              "source": "edge",
+              "date_added": "2023-11-18T12:22:21.689327Z",
+              "date_modified": null
+            },
+            {
+              "id": "553349b923d64034cac1f693162d3d01817aee4a",
+              "title": "Documentation des services de l'API Sirene - Recherche multicritères",
+              "url": "https://www.sirene.fr/static-resources/htm/multi_histo_non_histo.html",
+              "folder": "Barre des favoris/medical",
+              "source": "edge",
+              "date_added": "2023-11-18T12:22:45.390179Z",
+              "date_modified": null
+            },
+            {
+              "id": "238b773ac48a6b77f7d66ed835e40aa2bf1c3f27",
+              "title": "Sirene3 - Catalogue API Insee",
+              "url": "https://api.insee.fr/catalogue/site/themes/wso2/subthemes/insee/pages/item-info.jag?name=Sirene3&version=V3.11&provider=insee#!/UniteLegale/findBySiren",
+              "folder": "Barre des favoris/medical",
+              "source": "edge",
+              "date_added": "2023-11-18T12:22:51.722411Z",
+              "date_modified": null
+            },
+            {
+              "id": "fab361e065e538c92f6e9ee156fe0c5e23e9280c",
+              "title": "Travailler avec des APIs dans WordPress - Benjamin Gosset",
+              "url": "https://www.benjamin-gosset.fr/travailler-avec-des-apis-dans-wordpress/",
+              "folder": "Barre des favoris/medical",
+              "source": "edge",
+              "date_added": "2023-11-24T17:46:39.163758Z",
+              "date_modified": null
+            },
+            {
+              "id": "b404529e2ac2e0f638452b105419a451e36e937b",
+              "title": "Authentification et autorisation | WPGetAPI",
+              "url": "https://wpgetapi.com/docs/authentication-authorization/",
+              "folder": "Barre des favoris/medical",
+              "source": "edge",
+              "date_added": "2023-11-24T17:46:46.772608Z",
+              "date_modified": null
+            },
+            {
+              "id": "c4c73bd56d3a7e1382cb00d60fe2eb581fda1e98",
+              "title": "172.17.0.1",
+              "url": "http://172.17.0.1/",
+              "folder": "Barre des favoris/medical",
+              "source": "edge",
+              "date_added": "2023-11-27T08:38:56.370992Z",
+              "date_modified": null
+            },
+            {
+              "id": "fe873059857c20a60fe40b3f264728b3e4fbce59",
+              "title": "Docker compose - tutoriaux français - Xavki",
+              "url": "https://xavki.blog/docker-compose-tutoriaux-francais/",
+              "folder": "Barre des favoris/medical",
+              "source": "edge",
+              "date_added": "2023-11-27T16:37:25.461163Z",
+              "date_modified": null
+            },
+            {
+              "id": "4e2370efec46c046181e1af9ae396ec62d0006c3",
+              "title": "Comment configurer les hôtes virtuels Apache sur Ubuntu 18.04 [Quickstart] | DigitalOcean",
+              "url": "https://www.digitalocean.com/community/tutorials/how-to-set-up-apache-virtual-hosts-on-ubuntu-18-04-quickstart-fr",
+              "folder": "Barre des favoris/medical",
+              "source": "edge",
+              "date_added": "2023-12-15T18:17:57.134112Z",
+              "date_modified": null
+            },
+            {
+              "id": "320b8f3ef5ac0c02df6771338eafc7daa3e500cf",
+              "title": "Comment Installer WordPress sur Raspberry Pi ? – RaspberryTips",
+              "url": "https://raspberrytips.fr/installer-wordpress-sur-raspberry-pi/?utm_content=cmp-true",
+              "folder": "Barre des favoris/raphbery",
+              "source": "edge",
+              "date_added": "2023-11-27T19:10:15.243538Z",
+              "date_modified": null
+            },
+            {
+              "id": "9dd12b99427e582d2c49b87812c8edbda553ed6e",
+              "title": "Installer Raspberry Pi OS Bookworm sur Raspberry Pi (Guide illustré) – RaspberryTips",
+              "url": "https://raspberrytips.fr/installer-raspbian-raspberry-pi/",
+              "folder": "Barre des favoris/raphbery",
+              "source": "edge",
+              "date_added": "2023-11-27T19:10:41.984655Z",
+              "date_modified": null
+            },
+            {
+              "id": "117d5580722b12d2c0652d865d7da77c7488b5ac",
+              "title": "Install the Compose plugin | Docker Docs",
+              "url": "https://docs.docker.com/compose/install/linux/#install-using-the-repository",
+              "folder": "Barre des favoris/raphbery",
+              "source": "edge",
+              "date_added": "2023-11-27T19:10:52.469030Z",
+              "date_modified": null
+            },
+            {
+              "id": "ae8c0c3cc445534027b57146989b3e722ed27bd3",
+              "title": "Install Docker Engine on Raspberry Pi OS (32-bit) | Docker Docs",
+              "url": "https://docs.docker.com/engine/install/raspberry-pi-os/#install-using-the-repository",
+              "folder": "Barre des favoris/raphbery",
+              "source": "edge",
+              "date_added": "2023-11-27T19:11:14.390336Z",
+              "date_modified": null
+            },
+            {
+              "id": "e1bf147b0adc0659c2c1253399fa9bab441d45ff",
+              "title": "Traefik Getting Started Quickly - Traefik",
+              "url": "https://doc.traefik.io/traefik/getting-started/quick-start/",
+              "folder": "Barre des favoris/raphbery",
+              "source": "edge",
+              "date_added": "2023-11-27T19:11:19.034835Z",
+              "date_modified": null
+            },
+            {
+              "id": "78fe6373b9f6c00769dc8443b24e3a8756113646",
+              "title": "Serveur web à la maison : raspberry pi",
+              "url": "https://raspberry-pi.developpez.com/cours-tutoriels/serveur-web/",
+              "folder": "Barre des favoris/raphbery",
+              "source": "edge",
+              "date_added": "2023-11-30T18:07:02.139813Z",
+              "date_modified": null
+            },
+            {
+              "id": "c0e12f545672f1fe540880ab6deff95e2283f852",
+              "title": "Install and configure WordPress | Ubuntu",
+              "url": "https://ubuntu.com/tutorials/install-and-configure-wordpress#4-configure-apache-for-wordpress",
+              "folder": "Barre des favoris/raphbery",
+              "source": "edge",
+              "date_added": "2023-12-12T19:03:12.239850Z",
+              "date_modified": null
+            },
+            {
+              "id": "eaddb938e8b6589b5b2f265e1419faab2c21a7b4",
+              "title": "2024-M02 TP6 CDA Java - Tronc commun - Recordings - Tous les documents",
+              "url": "https://rdksolutions.sharepoint.com/sites/2024-M02TP6CDAJava/Documents%20partages/Forms/AllItems.aspx?FolderCTID=0x0120000C73744723832944BD0A772AEFD1CF0D&id=%2Fsites%2F2024-M02TP6CDAJava%2FDocuments%20partages%2FGeneral%2FRecordings",
+              "folder": "Barre des favoris/CDA",
+              "source": "edge",
+              "date_added": "2024-05-24T08:35:45.526804Z",
+              "date_modified": null
+            },
+            {
+              "id": "e51950ade4f80881bf243dba61ce3c95db4eb8f5",
+              "title": "2024-M02 TP6 CDA Java - Tronc commun - Recordings - Tous les documents",
+              "url": "https://rdksolutions.sharepoint.com/sites/2024-M02TP6CDAJava/Documents%20partages/Forms/AllItems.aspx?FolderCTID=0x0120000C73744723832944BD0A772AEFD1CF0D&id=%2Fsites%2F2024%2DM02TP6CDAJava%2FDocuments%20partages%2FGeneral%2FRecordings",
+              "folder": "Barre des favoris/CDA",
+              "source": "edge",
+              "date_added": "2024-05-24T08:36:27.696448Z",
+              "date_modified": null
+            },
+            {
+              "id": "4aae0257a89494ba7b15c15e5c5884236849c3bb",
+              "title": "Online FlowChart & Diagrams Editor - Mermaid Live Editor",
+              "url": "https://mermaid.live/edit#pako:eNrFVktu2zAQvQpBIKha20G71a6N06KLpEbcpTa0NHZYUKRAUQaCwHfpXXqxDj-S6Yiy3VW9IOn5z5sZiq-0VBXQnJaCte2Ss51mdSEJ_hyF3AvYA3n1JPtbrI3mckekqsfERsMpfckMkAqXR8bblskSxkqCQ3eGjTZLqECae8M2AsWgxj9juT0XAlYXhGdctqXmGu5sdpD57X0kwH6pzoB-VAYyuwTewW8xNCuttoDanf4_-Ay6PzYGk-RKLnkjVB3JzEC2wHcS9AMzHDRkYY8z1lDxHejPjUWaM2vIZT4nPoBpBIKxs-kn1Dzol0EbEnzC9DTEuf_kNZBnhH7Mm6FxVWJcrnUzt8bpVrDlkutj9VbouuQNE9mRluiIO9XpNnNrkmuRFlnYj5jFiX93zddYhE-yd4kyKQHWpRIM2zNy4CcQ7BpRA4bOLiSduUhTIGPAOgnlEjadSXK-chn57ste-z3irBnOIGntOll9L3OhZU4TcZD-Q7-My_OlQ6eGy6w_pAvUc1O-WDQf3wBHiom4I7dCMUNq9QJYxzF_oowhvHj2-klN0NJBJwQvxT8V91VFju69ZjgmI7O3yEko3tkekYlbMO1rsHVzQ55AuLhbT_FYFvRTQcliYQ-3tx_wHM9XTtp3_rIPLR0mJtL6mNJqhumYVPDuc8Km5OwhQgklndkILjyGS-eCLz_FZ3wNcn5IjpJO8U1QPdA56T8MZ4T9oOY4UT3uvZOx-2FwBv8D5Y3VAbymYRqjkYb8-T2tEuynejwnpZLOgldPyUzmfyzzFWontfSfSyAYvjcQcceBRx6hMwPs16i66en9FZLOaQ26ZrzC55obqoKaZ3zfFDTHI37WWCdMQQt5QFHWGbV-kSXNje5gTrvGXozhgUfzLRMtUtG0UfohPAHtdvgLFe4X0w",
+              "folder": "Barre des favoris/CDA",
+              "source": "edge",
+              "date_added": "2024-05-27T15:49:19.768617Z",
+              "date_modified": null
+            },
+            {
+              "id": "59c8186de46bdc8dfbe1c8a88bd7f669a27bbec7",
+              "title": "Maven Repository: Central",
+              "url": "https://mvnrepository.com/repos/central",
+              "folder": "Barre des favoris/CDA",
+              "source": "edge",
+              "date_added": "2024-05-30T08:22:29.615462Z",
+              "date_modified": null
+            },
+            {
+              "id": "1c99e7d4869112cefc9692ea996e4ab22a4d1188",
+              "title": "NetYParéo - Bienvenue chez DIGINAMIC",
+              "url": "https://diginamic.ymag.cloud/",
+              "folder": "Barre des favoris/CDA",
+              "source": "edge",
+              "date_added": "2024-03-24T16:37:08.359577Z",
+              "date_modified": null
+            },
+            {
+              "id": "d1e1ff2d025b434666592a33cd736fce865ea5df",
+              "title": "app.js - 3253053-node-js [Codespaces: expert engine] - Visual Studio Code",
+              "url": "https://expert-engine-5p6jqxqw5vxh7749.github.dev/",
+              "folder": "Barre des favoris/CDA",
+              "source": "edge",
+              "date_added": "2024-04-10T08:21:46.917360Z",
+              "date_modified": null
+            },
+            {
+              "id": "7d43ab6e2e51528491ad306e779899d6f768ca5e",
+              "title": "Princesses MYM Leak - Nude Photos & Videos",
+              "url": "https://mm-fans.fr/princesses",
+              "folder": "Barre des favoris",
+              "source": "edge",
+              "date_added": "2023-12-07T18:06:39.709324Z",
+              "date_modified": null
+            },
+            {
+              "id": "3262b4a632fa82d21c8d25f36d67bcd6eddde358",
+              "title": "Google Ateliers Numériques | Coursera",
+              "url": "https://www.coursera.org/programs/google-ateliers-numeriques-o5eca?currentTab=CATALOG",
+              "folder": "Barre des favoris",
+              "source": "edge",
+              "date_added": "2024-01-23T19:25:24.984592Z",
+              "date_modified": null
+            },
+            {
+              "id": "fa4cd8c9ac956554481e5ceef3ed0d47fbd5d52a",
+              "title": "3CX",
+              "url": "https://alias.on3cx.fr/webclient/#/login",
+              "folder": "Barre des favoris/Alias",
+              "source": "edge",
+              "date_added": "2024-08-26T15:14:58.677127Z",
+              "date_modified": null
+            },
+            {
+              "id": "82936efe2cfa6ce40ca4b72d3dda76c68546b06d",
+              "title": "Futurepedia - Find The Best AI Tools & Software",
+              "url": "https://www.futurepedia.io/",
+              "folder": "Barre des favoris",
+              "source": "edge",
+              "date_added": "2024-01-25T10:10:35.921832Z",
+              "date_modified": null
+            },
+            {
+              "id": "43b0fedba7a97c6be5457ca9d2c36e635d6aaae7",
+              "title": "Perplexity",
+              "url": "https://www.perplexity.ai/",
+              "folder": "Barre des favoris/IA",
+              "source": "edge",
+              "date_added": "2024-08-01T10:43:57.224860Z",
+              "date_modified": null
+            },
+            {
+              "id": "00e3de281edb9df635eba8bfc7c98ce8072733d0",
+              "title": "Fondamentaux de la cybersécurité - Discussions | Coursera",
+              "url": "https://www.coursera.org/learn/fondamentaux-de-la-cybersecurite/discussions",
+              "folder": "Barre des favoris/certifact",
+              "source": "edge",
+              "date_added": "2024-01-25T13:59:56.697433Z",
+              "date_modified": null
+            },
+            {
+              "id": "c1b230ee7be1e1bd4e5f12590b48fbcb6ea0424d",
+              "title": "Glossary | CSRC",
+              "url": "https://csrc.nist.gov/glossary",
+              "folder": "Barre des favoris/certifact",
+              "source": "edge",
+              "date_added": "2024-01-25T14:37:32.103023Z",
+              "date_modified": null
+            },
+            {
+              "id": "33d26ed33b45990a22ad7ed7f9c32ac6af5fb95a",
+              "title": "Pika",
+              "url": "https://pika.art/my-library",
+              "folder": "Barre des favoris/certifact",
+              "source": "edge",
+              "date_added": "2024-01-25T16:44:38.394967Z",
+              "date_modified": null
+            },
+            {
+              "id": "82383308e2692f8ef955631339409cc2372d0607",
+              "title": "AI Art Generator - Create Art, Images & More | Leonardo AI",
+              "url": "https://leonardo.ai/",
+              "folder": "Barre des favoris/certifact",
+              "source": "edge",
+              "date_added": "2024-01-25T16:44:45.131426Z",
+              "date_modified": null
+            },
+            {
+              "id": "900073d6972d78c6231bd73aaa1d72f5caded75e",
+              "title": "Artificial Intelligence: Adversarial Machine Learning | NCCoE",
+              "url": "https://www.nccoe.nist.gov/ai/adversarial-machine-learning",
+              "folder": "Barre des favoris/certifact",
+              "source": "edge",
+              "date_added": "2024-01-26T14:02:22.890483Z",
+              "date_modified": null
+            },
+            {
+              "id": "a3b9a2738c251af7399f53ec4a1854dd64f56553",
+              "title": "L'Usine Digitale : l'actualité économique, les infos sur les entreprises et tous les secteurs de l'industrie",
+              "url": "https://www.usine-digitale.fr/",
+              "folder": "Barre des favoris/certifact",
+              "source": "edge",
+              "date_added": "2024-02-07T09:27:51.808840Z",
+              "date_modified": null
+            },
+            {
+              "id": "4c22376a62fef65ac539140bd337a2f1e25f13c7",
+              "title": "cibersecurite",
+              "url": "https://nvd.nist.gov/",
+              "folder": "Barre des favoris/certifact",
+              "source": "edge",
+              "date_added": "2024-02-13T15:45:03.678938Z",
+              "date_modified": null
+            },
+            {
+              "id": "1b6ef01928e36c9b00b00a761a49ba3e8b4cc45c",
+              "title": "(54) J'AI PASSÉ MON ORAL FINAL POUR MON DIPLOME DE DÉVELOPPEUR WEB ! (je vous montre ma présentation..) - YouTube",
+              "url": "https://www.youtube.com/watch?v=rwvewNl9k2c",
+              "folder": "Barre des favoris/certifact",
+              "source": "edge",
+              "date_added": "2024-02-26T18:04:26.322848Z",
+              "date_modified": null
+            },
+            {
+              "id": "abebe4cba3e42ecad6ad293e4d9e68dd7cbcf2ab",
+              "title": "OWASP Top Ten | OWASP Foundation",
+              "url": "https://owasp.org/www-project-top-ten/",
+              "folder": "Barre des favoris/cibersecurite",
+              "source": "edge",
+              "date_added": "2024-02-13T15:46:13.600793Z",
+              "date_modified": null
+            },
+            {
+              "id": "7fcf8c5b637a77d99652470ccac0571df802c72c",
+              "title": "Home - IDPro",
+              "url": "https://idpro.org/",
+              "folder": "Barre des favoris/cibersecurite",
+              "source": "edge",
+              "date_added": "2024-02-13T13:08:24.422732Z",
+              "date_modified": null
+            },
+            {
+              "id": "53a6c1bbd7bf93a89b94706e394ab22a13423746",
+              "title": "Jigsaw | Quiz sur l'hameçonnage",
+              "url": "https://phishingquiz.withgoogle.com/",
+              "folder": "Barre des favoris/cibersecurite",
+              "source": "edge",
+              "date_added": "2024-02-14T09:45:06.368889Z",
+              "date_modified": null
+            },
+            {
+              "id": "06efb3af4f08b38cbf73a3f80772f54cda5ebc91",
+              "title": "Phishing | General Phishing Information and Prevention Tips",
+              "url": "https://www.phishing.org/",
+              "folder": "Barre des favoris/cibersecurite",
+              "source": "edge",
+              "date_added": "2024-02-14T09:45:18.437179Z",
+              "date_modified": null
+            },
+            {
+              "id": "0add2c3857e9e486461bb12e05b8f685bf262c3d",
+              "title": "GTAP | Unifier la réponse mondiale à la cybercriminalité",
+              "url": "https://apwg.org/",
+              "folder": "Barre des favoris/cibersecurite",
+              "source": "edge",
+              "date_added": "2024-02-14T09:45:37.725927Z",
+              "date_modified": null
+            },
+            {
+              "id": "4595e757c685e34e0bd18bf1144b9ad0ecff5dff",
+              "title": "Malware Analysis Introduction | Infosec",
+              "url": "https://www.infosecinstitute.com/skills/courses/malware-analysis-introduction/",
+              "folder": "Barre des favoris/cibersecurite",
+              "source": "edge",
+              "date_added": "2024-02-14T10:10:16.961984Z",
+              "date_modified": null
+            },
+            {
+              "id": "7ad9c5eb24af9b127cfc5f39532b125e9b295467",
+              "title": "NVD - CVE-2021-44228",
+              "url": "https://nvd.nist.gov/vuln/detail/CVE-2021-44228",
+              "folder": "Barre des favoris/cibersecurite",
+              "source": "edge",
+              "date_added": "2024-02-14T11:18:58.664962Z",
+              "date_modified": null
+            },
+            {
+              "id": "04f4febe85d162c209f3e0f2eff60cd29fe92d08",
+              "title": "Hack The Box: Hacking Training For The Best | Individuals & Companies",
+              "url": "https://www.hackthebox.com/",
+              "folder": "Barre des favoris/cibersecurite",
+              "source": "edge",
+              "date_added": "2024-02-14T11:33:47.954813Z",
+              "date_modified": null
+            },
+            {
+              "id": "a3e792759fea477ea2431d136990d576d6c97354",
+              "title": "EssayezHackMe | Formation en cybersécurité",
+              "url": "https://tryhackme.com/",
+              "folder": "Barre des favoris/cibersecurite",
+              "source": "edge",
+              "date_added": "2024-02-14T11:34:03.687040Z",
+              "date_modified": null
+            },
+            {
+              "id": "e79c93157911d89398b2c976f66fc95dc0b89ed7",
+              "title": "Npcap - Recherche Google",
+              "url": "https://www.google.com/search?q=Npcap&sourceid=chrome&ie=UTF-8",
+              "folder": "Barre des favoris/cibersecurite/ressource",
+              "source": "edge",
+              "date_added": "2024-02-15T14:25:45.159803Z",
+              "date_modified": null
+            },
+            {
+              "id": "a8b045dd7cb8e24ec1980595280561141eb3bc1b",
+              "title": "PCAPng e - Recherche Google",
+              "url": "https://www.google.com/search?q=PCAPng+e&sourceid=chrome&ie=UTF-8",
+              "folder": "Barre des favoris/cibersecurite/ressource",
+              "source": "edge",
+              "date_added": "2024-02-15T14:26:16.544865Z",
+              "date_modified": null
+            },
+            {
+              "id": "68f133a6a8d8f4c1a7d1d66c91e4d33858cea80c",
+              "title": "Open EDR - Recherche Google",
+              "url": "https://www.google.com/search?q=Open+EDR&sourceid=chrome&ie=UTF-8",
+              "folder": "Barre des favoris/cibersecurite/ressource",
+              "source": "edge",
+              "date_added": "2024-02-15T14:26:20.644976Z",
+              "date_modified": null
+            },
+            {
+              "id": "7e351212c1f14c133016e3a90fa0bf7fa163d9fc",
+              "title": "Wireshark · Download",
+              "url": "https://www.wireshark.org/download.html",
+              "folder": "Barre des favoris/cibersecurite/ressource",
+              "source": "edge",
+              "date_added": "2024-02-15T14:26:25.145330Z",
+              "date_modified": null
+            },
+            {
+              "id": "fceb27237fd3ef7ee8e6056a2066b2596eedbe01",
+              "title": "tcpdump(1) man page | TCPDUMP & LIBPCAP",
+              "url": "https://www.tcpdump.org/manpages/tcpdump.1.html",
+              "folder": "Barre des favoris/cibersecurite/ressource",
+              "source": "edge",
+              "date_added": "2024-02-15T14:26:30.217656Z",
+              "date_modified": null
+            },
+            {
+              "id": "3d6faf175c229cbd85975f14fa2ef75b657d02c1",
+              "title": "keeper - Recherche Google",
+              "url": "https://www.google.com/search?q=keeper&sca_esv=dc4da4efb85aac0a&sxsrf=ACQVn090Kew-kr8YvKLpOAMl9KWSvdcBKw%3A1708002321351&ei=EQzOZZD8FIfli-gPpMyOyAg&oq=kee&gs_lp=Egxnd3Mtd2l6LXNlcnAiA2tlZSoCCAMyCxAAGIAEGLEDGIMBMgsQABiABBixAxiDATILEAAYgAQYsQMYgwEyCxAAGIAEGLEDGIMBMggQABiABBixAzIIEAAYgAQYsQMyFBAuGIAEGIoFGLEDGIMBGMcBGK8BMggQLhiABBixAzIOEAAYgAQYigUYsQMYgwEyDhAAGIAEGIoFGLEDGIMBSOceUABYzAVwAHgBkAEAmAFjoAGeAqoBATO4AQHIAQD4AQHCAgoQIxiABBiKBRgnwgITEC4YgAQYigUYxwEYrwEYjgUYJ8ICDhAuGIAEGIoFGLEDGIMBwgILEC4YgAQYsQMYgwHCAg4QLhiABBixAxjHARjRA8ICBRAAGIAE&sclient=gws-wiz-serp",
+              "folder": "Barre des favoris/cibersecurite/ressource",
+              "source": "edge",
+              "date_added": "2024-02-15T14:26:33.869440Z",
+              "date_modified": null
+            },
+            {
+              "id": "cc2229fb4d6ebf43ea3d63d3cb195066e3687821",
+              "title": "John the Ripper - Recherche Google",
+              "url": "https://www.google.com/search?q=John+the+Ripper&sourceid=chrome&ie=UTF-8",
+              "folder": "Barre des favoris/cibersecurite/ressource",
+              "source": "edge",
+              "date_added": "2024-02-15T14:26:43.597151Z",
+              "date_modified": null
+            },
+            {
+              "id": "6d592a9cf8e4809e0a2ca4e51a58be9b6e26263f",
+              "title": "VirusTotal - Home",
+              "url": "https://www.virustotal.com/gui/home/upload",
+              "folder": "Barre des favoris/cibersecurite/ressource",
+              "source": "edge",
+              "date_added": "2024-02-15T14:29:09.278774Z",
+              "date_modified": null
+            },
+            {
+              "id": "3386056f949f9008fe2d52a43993d222dcd5d065",
+              "title": "Bienvenue dans Colaboratory - Colaboratory",
+              "url": "https://colab.research.google.com/#",
+              "folder": "Barre des favoris/cibersecurite/ressource",
+              "source": "edge",
+              "date_added": "2024-02-27T11:16:49.033548Z",
+              "date_modified": null
+            },
+            {
+              "id": "b9869d00969f0ea9312d6dea6c543115d41f3df5",
+              "title": "Ai-je été piraté : vérifiez si votre e-mail a été compromis lors d'une violation de données",
+              "url": "https://haveibeenpwned.com/",
+              "folder": "Barre des favoris/cibersecurite",
+              "source": "edge",
+              "date_added": "2024-07-24T10:15:09.758807Z",
+              "date_modified": null
+            },
+            {
+              "id": "59030a94e87e1a39adf5c6ab7f594193d25ba16c",
+              "title": "Home - AV-Comparatives",
+              "url": "https://www.av-comparatives.org/",
+              "folder": "Barre des favoris/cibersecurite",
+              "source": "edge",
+              "date_added": "2024-07-24T10:15:30.579581Z",
+              "date_modified": null
+            },
+            {
+              "id": "7d1bea15f7a6a2ad0434ec8a028bdfd1928e4ac5",
+              "title": "Pentesting Web Applications - Greenbone",
+              "url": "https://www.greenbone.net/en/pentesting-web-applications/#contactrequest",
+              "folder": "Barre des favoris/cibersecurite",
+              "source": "edge",
+              "date_added": "2024-07-24T10:15:50.000367Z",
+              "date_modified": null
+            },
+            {
+              "id": "daf04814874e95df13cba3a748af0dfc5f56cd45",
+              "title": "nikto - Recherche Google",
+              "url": "https://www.google.com/search?q=nikto&oq=nikto&gs_lcrp=EgZjaHJvbWUyEQgAEEUYORhDGLEDGIAEGIoFMgcIARAAGIAEMgcIAhAAGIAEMgwIAxAAGEMYgAQYigUyBwgEEAAYgAQyBwgFEAAYgAQyBwgGEAAYgAQyBwgHEAAYgAQyBwgIEAAYgAQyBwgJEAAYgATSAQgxNDE1ajBqN6gCALACAA&sourceid=chrome&ie=UTF-8#vhid=vTHX0ksPQCFgzM&vssid=l",
+              "folder": "Barre des favoris/cibersecurite",
+              "source": "edge",
+              "date_added": "2024-07-24T10:15:53.736672Z",
+              "date_modified": null
+            },
+            {
+              "id": "4ed52338c36bd6066816c4cc241148c0cc92716f",
+              "title": "Fail2ban Windows - Recherche Google",
+              "url": "https://www.google.com/search?sca_esv=bbda2a020c4763aa&sxsrf=ADLYWIIkKK1_Z0T6qa-YzSEg1NcYOsYK-g:1721817433103&q=Fail2ban+Windows&sa=X&ved=2ahUKEwjq6N7jvb-HAxVjTKQEHWc1DBAQ1QJ6BAhOEAE&biw=1920&bih=911&dpr=1",
+              "folder": "Barre des favoris/cibersecurite",
+              "source": "edge",
+              "date_added": "2024-07-24T10:56:30.692935Z",
+              "date_modified": null
+            },
+            {
+              "id": "3bf7e93769398f602c947e53dcefb294495bb21f",
+              "title": "Vidéo gratuite: Technologie, Machine - Images et vidéos gratuites sur Pixabay - 4764",
+              "url": "https://pixabay.com/fr/videos/technologie-machine-la-construction-4764/",
+              "folder": "Barre des favoris",
+              "source": "edge",
+              "date_added": "2017-10-27T10:30:31.229361Z",
+              "date_modified": null
+            },
+            {
+              "id": "c59dcb98afddddad056e12b257d3e8a28c63b7bf",
+              "title": "VEVOR Onduleur Solaire Hybride 5000VA DC 48V à AC 230V Convertisseur Pur Sinus LCD avec Chargeur Secteur Contrôleur Solaire MPPT pour Appareil à Moteur Voiture Ventilateur Réfrigérateur Climatiseur  | VEVOR FR",
+              "url": "https://www.vevor.fr/onduleurs-solaires-hors-reseau-c_10764/vevor-4000w-onduleur-hybride-solaire-5kva-48v-controleur-de-charge-controle-mppt-p_010485988472",
+              "folder": "Barre des favoris",
+              "source": "edge",
+              "date_added": "2022-10-01T15:54:39.198448Z",
+              "date_modified": null
+            },
+            {
+              "id": "4a4f2dcfd2987f0831bef26a0e29f6432553e22d",
+              "title": "Train Sounds | Free Sound Effects | Train Sound Clips | Sound Bites",
+              "url": "http://soundbible.com/tags-train.html",
+              "folder": "Barre des favoris",
+              "source": "edge",
+              "date_added": "2018-05-02T18:28:40.057704Z",
+              "date_modified": null
+            },
+            {
+              "id": "80787a1eff91fce5444964232ea4212ae5819b9c",
+              "title": "Paralyseur - Shocker électrique POWER 200 - Armes de défense/Paralyseurs - Shockers Électriques - securicount",
+              "url": "http://www.securicount.com/armes-de-defense/arme-shockers-electriques/taser-shocker-electrique-power-200.html",
+              "folder": "Barre des favoris",
+              "source": "edge",
+              "date_added": "2013-02-27T14:15:47.479187Z",
+              "date_modified": null
+            },
+            {
+              "id": "e018ee691b2ff53b037349224965c79ec3aa2d35",
+              "title": "Adobe Acrobat",
+              "url": "https://acrobat.adobe.com/?x_api_client_id=bookmark&x_api_client_location=Reader",
+              "folder": "Barre des favoris",
+              "source": "edge",
+              "date_added": "2023-12-10T13:53:10.798272Z",
+              "date_modified": null
+            },
+            {
+              "id": "5cb09303de39e626d4d840e8bb9426a39a60061b",
+              "title": "Le Club Languedoc Roussillon - SoonNight.com",
+              "url": "http://www.soonnight.com/member/le-club-languedoc-roussillon,23.html",
+              "folder": "Autres favoris",
+              "source": "edge",
+              "date_added": "2012-12-30T16:08:06.844992Z",
+              "date_modified": null
+            },
+            {
+              "id": "ea418a943d4d7a980de61a65eff96fd80956f84a",
+              "title": "Entre coquins : Rencontre echangiste et echangisme",
+              "url": "http://www.entrecoquins.com/",
+              "folder": "Autres favoris",
+              "source": "edge",
+              "date_added": "2012-12-30T16:08:06.852992Z",
+              "date_modified": null
+            },
+            {
+              "id": "ac78e185f9aa78ce10553489eb53349d1f96a966",
+              "title": "Particuliers - La Banque Postale",
+              "url": "https://www.labanquepostale.fr/index/particuliers.html",
+              "folder": "Autres favoris",
+              "source": "edge",
+              "date_added": "2012-12-30T16:08:06.853992Z",
+              "date_modified": null
+            },
+            {
+              "id": "a11b2b2aa9d7def85355dc24013b2024c7efa914",
+              "title": "libertic : le 1er réseau social libertin",
+              "url": "http://www.libertic.com/index.php?",
+              "folder": "Autres favoris",
+              "source": "edge",
+              "date_added": "2012-12-30T16:08:06.853992Z",
+              "date_modified": null
+            },
+            {
+              "id": "76234c6d43e980d5d21ece062f9e6f40a5c8723b",
+              "title": "Rencontre libertine, échangiste et melangiste sur Netechangisme.com, le site libertin de vos rencontres entre adultes!",
+              "url": "http://www.netechangiste.com/index.php",
+              "folder": "Autres favoris",
+              "source": "edge",
+              "date_added": "2012-12-30T16:08:06.853992Z",
+              "date_modified": null
+            },
+            {
+              "id": "35579874838683405759023d8e91cb4d06943e83",
+              "title": "Qare - Téléconsultation médicale en ligne 7j/7",
+              "url": "https://www.qare.fr/?utm_source=google&utm_medium=cpc&utm_campaign=ph_Qare_-_Brand_FR_France&utm_content=Qare_-_Brand&utm_term=qare&mtm_source=google&mtm_medium=cpc&mtm_campaign=ph_Qare_-_Brand_FR_France&mtm_content=Qare_-_Brand&mtm_kwd=qare&gclid=CjwKCAjw3qGYBhBSEiwAcnTRLteJob9ulNK6kMPUAvlt_e1DALSVadrFJLETZCLx_6m1Zqg71GkRMhoCRjEQAvD_BwE",
+              "folder": "Autres favoris",
+              "source": "edge",
+              "date_added": "2022-08-26T10:40:16.984086Z",
+              "date_modified": null
+            },
+            {
+              "id": "841d76ebb0b1a06373cdaa23ea64db70b9a90609",
+              "title": "(296) Symfony6 Techwall #30 Doctrine Repository findBy et exemple de pagination - YouTube",
+              "url": "https://www.youtube.com/watch?v=CO3WihG36Is",
+              "folder": "Autres favoris",
+              "source": "edge",
+              "date_added": "2023-08-07T18:57:23.051295Z",
+              "date_modified": null
+            },
+            {
+              "id": "2de2ba56a980fab50acc4eb551b29bf9c0f2831b",
+              "title": "Mise en place filtres",
+              "url": "https://chat.openai.com/",
+              "folder": "Autres favoris",
+              "source": "edge",
+              "date_added": "2023-08-21T12:52:11.870069Z",
+              "date_modified": null
+            },
+            {
+              "id": "84a8569a498c1daf972b51b556c658a4536db0e2",
+              "title": "Ventilo-convecteur Cassette 600x600 2 Tubes MKD-V400 de Midea | Google Shopping",
+              "url": "https://www.google.com/shopping/product/5631262464080031250?sca_esv=559325667&sxsrf=AB5stBhXi_1WGXuOOrVJgAt984e-edzyUg:1692776311064&q=ventilo-convecteur+%C3%A0+eau&biw=1920&bih=931&dpr=1&prds=eto:14343019619478965011_0,pid:2273470351318910561&sa=X&ved=0ahUKEwj5hNKpo_KAAxWnVaQEHWIRD2UQ8wIIjA4",
+              "folder": "Autres favoris",
+              "source": "edge",
+              "date_added": "2023-08-23T08:05:02.894914Z",
+              "date_modified": null
+            },
+            {
+              "id": "0da96b820d14648210ae92948c09c35fd29f7014",
+              "title": "MSI PRO H510M-B - Carte mère - LDLC",
+              "url": "https://www.ldlc.com/fiche/PB00556077.html",
+              "folder": "Autres favoris",
+              "source": "edge",
+              "date_added": "2024-03-18T13:41:28.880458Z",
+              "date_modified": null
+            },
+            {
+              "id": "7add651a2a74a0c1f5c1e654d038435ce30f131a",
+              "title": "LX 2048 - Streaming Gratuit",
+              "url": "https://streaminggratuit.cc/lx-2048/",
+              "folder": "Favoris de l’appareil mobile",
+              "source": "edge",
+              "date_added": "2021-09-06T10:13:52.585686Z",
+              "date_modified": null
+            },
+            {
+              "id": "409bd28dbcd10e0078de2b5096c42892a0244bee",
+              "title": "Tutoriel vidéo Symfony : Créer un filtre produit | Grafikart",
+              "url": "https://grafikart.fr/tutoriels/filtre-produit-symfony-1211",
+              "folder": "Favoris de l’appareil mobile",
+              "source": "edge",
+              "date_added": "2023-07-29T06:57:54.591432Z",
+              "date_modified": null
+            }
+          ],
+          "extensions_count": 11,
+          "history_entries": 321,
+          "cookies_count": 0
+        }
+      ]
+    },
+    {
+      "name": "Firefox",
+      "version": null,
+      "profiles": []
+    },
+    {
+      "name": "Brave",
+      "version": null,
+      "profiles": []
+    }
+  ]
+}
