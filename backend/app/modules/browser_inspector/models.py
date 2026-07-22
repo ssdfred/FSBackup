@@ -614,7 +614,13 @@ def _sqlite_count_rows(database_path: Path, query: str) -> int:
 
 
 def _count_chromium_bookmarks(bookmarks_path: Path) -> int:
-    return len(_load_chromium_bookmarks(bookmarks_path, source="chromium", profile_identifier=str(bookmarks_path.parent)))
+    return len(
+        _load_chromium_bookmarks(
+            bookmarks_path,
+            source="chromium",
+            profile_identifier=str(bookmarks_path.parent),
+        )
+    )
 
 
 def _load_chromium_bookmarks(
@@ -632,7 +638,7 @@ def _load_chromium_bookmarks(
     except OSError as exc:
         LOGGER.warning("Unable to read Chromium bookmarks %s: %s", bookmarks_path, exc)
         return ()
-    except json.JSONDecodeError as exc:
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
         LOGGER.debug("Invalid Chromium bookmarks JSON in %s: %s", bookmarks_path, exc)
         return ()
 
