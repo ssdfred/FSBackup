@@ -132,3 +132,35 @@ def test_api_returns_bad_request_for_unsafe_path() -> None:
 
     assert response.status_code == 400
     assert "Chemin relatif invalide" in response.json()["detail"]
+
+
+def test_api_builds_manifest_v2() -> None:
+    client = TestClient(app)
+    plan = build_plan(physical_file("Users/Fred/file.txt"))
+
+    response = client.post(
+        "/api/v1/manifests/v2/build",
+        json=plan.model_dump(mode="json"),
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["header"]["format_version"] == 2
+    assert payload["header"]["application"] == "FSBackup"
+    assert payload["header"]["application_version"] == app.version
+    assert payload["execution"]["status"] == "planned"
+    assert payload["files"][0]["relative_path"] == "Users/Fred/file.txt"
+    assert payload["integrity"]["expected_files"] == 1
+
+
+def test_api_v2_returns_bad_request_for_unsafe_path() -> None:
+    client = TestClient(app)
+    plan = build_plan(physical_file("../secret.txt"))
+
+    response = client.post(
+        "/api/v1/manifests/v2/build",
+        json=plan.model_dump(mode="json"),
+    )
+
+    assert response.status_code == 400
+    assert "Chemin relatif invalide" in response.json()["detail"]
