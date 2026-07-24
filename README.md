@@ -18,7 +18,9 @@ FSBackup est une solution open source de sauvegarde, restauration et migration d
 
 ## Qualité
 
-Le backend est contrôlé automatiquement à chaque push et pull request :
+Le backend est contrôlé automatiquement à chaque push et pull request.
+
+Validation rapide :
 
 ```powershell
 cd backend
@@ -26,7 +28,20 @@ python -m ruff check .
 python -m pytest
 ```
 
-La CI utilise Python 3.13 et bloque les régressions détectées par Ruff ou Pytest.
+Validation avec couverture :
+
+```powershell
+cd backend
+python -m pytest --cov=app --cov-branch --cov-report=term-missing --cov-report=html --cov-report=xml
+```
+
+Cette commande produit :
+
+- un rapport détaillé dans le terminal ;
+- un rapport HTML dans `backend/htmlcov/` ;
+- un rapport XML dans `backend/coverage.xml`.
+
+GitHub Actions publie les rapports HTML et XML comme artefacts téléchargeables pendant 14 jours. Le taux observé pendant ce sprint servira de référence avant l'activation progressive d'un seuil minimal bloquant.
 
 ## Architecture du moteur
 
