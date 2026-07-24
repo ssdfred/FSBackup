@@ -81,7 +81,7 @@ def test_build_preserves_execution_summary() -> None:
 
     manifest = ManifestBuilderService().build(plan)
 
-    assert manifest.summary == plan.summary
+    assert manifest.summary.model_dump() == plan.summary.model_dump()
     assert [file.relative_path for file in manifest.files] == ["existing.txt"]
 
 
