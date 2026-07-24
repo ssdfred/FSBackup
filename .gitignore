@@ -10,3 +10,4 @@ backend/htmlcov/
 
 # Ruff
 .ruff_cache/
+.venv/
