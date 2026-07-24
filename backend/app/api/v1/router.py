@@ -7,6 +7,7 @@ from app.modules.copy_engine.api import router as copy_engine_router
 from app.modules.execution_planner.api import (
     router as execution_planner_router,
 )
+from app.modules.restore_engine.api import router as restore_engine_router
 from app.modules.source_discovery.api import router as source_discovery_router
 
 router = APIRouter(prefix="/api/v1")
@@ -17,6 +18,7 @@ router.include_router(execution_planner_router)
 router.include_router(backup_planner_router)
 router.include_router(copy_engine_router)
 router.include_router(archive_engine_router)
+router.include_router(restore_engine_router)
 
 
 @router.get("/test")
