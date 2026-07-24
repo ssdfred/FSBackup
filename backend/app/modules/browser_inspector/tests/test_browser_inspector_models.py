@@ -9,13 +9,10 @@ from pathlib import Path
 
 import pytest
 
-from app.modules.browser_inspector import models
 from app.modules.browser_inspector.models import (
-    BraveBrowser,
     BrowserProfileRecord,
     BrowserSnapshot,
     ChromeBrowser,
-    EdgeBrowser,
     FirefoxBrowser,
     ProfileStorageStats,
     _chromium_profile_active_time,
@@ -29,7 +26,7 @@ from app.modules.browser_inspector.models import (
 from app.modules.browser_inspector.service import BrowserDiscoveryEngine
 
 
-class TestChromeBrowser(ChromeBrowser):
+class StubChromeBrowser(ChromeBrowser):
     """Chrome implementation with controlled roots and executable paths."""
 
     def __init__(self, root: Path, executable: Path | None = None) -> None:
@@ -76,7 +73,7 @@ def test_find_executable_returns_first_existing_candidate(tmp_path: Path) -> Non
     missing = tmp_path / "missing.exe"
     existing = tmp_path / "browser.exe"
     existing.write_bytes(b"")
-    browser = TestChromeBrowser(tmp_path)
+    browser = StubChromeBrowser(tmp_path)
     browser.executable_candidates = lambda: (missing, existing)  # type: ignore[method-assign]
 
     assert browser.find_executable() == existing
@@ -85,7 +82,7 @@ def test_find_executable_returns_first_existing_candidate(tmp_path: Path) -> Non
 def test_discover_marks_browser_installed_when_profiles_exist(tmp_path: Path) -> None:
     (tmp_path / "Default").mkdir()
 
-    snapshot = TestChromeBrowser(tmp_path).discover()
+    snapshot = StubChromeBrowser(tmp_path).discover()
 
     assert snapshot.installed is True
     assert snapshot.version is None
@@ -110,14 +107,14 @@ def test_profile_size_ignores_cache_directories(tmp_path: Path) -> None:
     cache.mkdir()
     (cache / "large.bin").write_bytes(b"x" * 100)
 
-    stats = TestChromeBrowser(tmp_path).profile_storage_stats(profile)
+    stats = StubChromeBrowser(tmp_path).profile_storage_stats(profile)
 
     assert stats.size_bytes == 4
     assert stats.latest_mtime is not None
 
 
 def test_profile_size_human_formats_expected_units(tmp_path: Path) -> None:
-    browser = TestChromeBrowser(tmp_path)
+    browser = StubChromeBrowser(tmp_path)
 
     assert browser.profile_size_human(0) == "0 B"
     assert browser.profile_size_human(1024) == "1.00 KB"
@@ -129,7 +126,7 @@ def test_profile_last_used_keeps_latest_candidate(tmp_path: Path, monkeypatch: p
     profile.mkdir()
     older = datetime(2025, 1, 1, tzinfo=UTC)
     newer = datetime(2026, 1, 1, tzinfo=UTC)
-    browser = TestChromeBrowser(tmp_path)
+    browser = StubChromeBrowser(tmp_path)
     monkeypatch.setattr(browser, "last_used_candidates", lambda *_: (older, newer, None))
 
     result = browser.profile_last_used(
