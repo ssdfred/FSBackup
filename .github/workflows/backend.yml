@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   quality:
-    name: Ruff et Pytest
+    name: Ruff, Pytest et couverture
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -43,5 +43,27 @@ jobs:
       - name: Vérifier le code avec Ruff
         run: python -m ruff check .
 
-      - name: Exécuter les tests
-        run: python -m pytest
+      - name: Exécuter les tests avec couverture
+        run: >-
+          python -m pytest
+          --cov=app
+          --cov-branch
+          --cov-report=term-missing
+          --cov-report=html
+          --cov-report=xml
+
+      - name: Publier le rapport HTML de couverture
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage-html
+          path: backend/htmlcov
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Publier le rapport XML de couverture
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage-xml
+          path: backend/coverage.xml
+          if-no-files-found: error
+          retention-days: 14
