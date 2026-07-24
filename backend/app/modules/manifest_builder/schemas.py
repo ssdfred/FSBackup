@@ -10,7 +10,7 @@ class ManifestFile(BaseModel):
     """Physical file referenced by a backup manifest."""
 
     relative_path: str
-    size: int
+    size: int = Field(ge=0)
     mandatory: bool
     potentially_locked: bool
     required_by: list[str] = Field(default_factory=list)
@@ -42,19 +42,19 @@ class ManifestHeader(BaseModel):
     """Identity and version information for a Manifest V2 document."""
 
     format_version: Literal[2] = 2
-    manifest_id: str
+    manifest_id: str = Field(min_length=1)
     created_at: datetime
     application: str = "FSBackup"
-    application_version: str
+    application_version: str = Field(min_length=1)
 
 
 class SourceInfo(BaseModel):
     """Description of a logical source included in the backup."""
 
-    source_id: str
-    provider: str
-    source_type: str
-    display_name: str
+    source_id: str = Field(min_length=1)
+    provider: str = Field(min_length=1)
+    source_type: str = Field(min_length=1)
+    display_name: str = Field(min_length=1)
     original_path: str | None = None
     required: bool = False
     metadata: dict[str, Any] = Field(default_factory=dict)
@@ -63,7 +63,7 @@ class SourceInfo(BaseModel):
 class BrowserInfo(BaseModel):
     """Browser-specific information persisted when applicable."""
 
-    name: str
+    name: str = Field(min_length=1)
     version: str | None = None
     profile_names: list[str] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)
@@ -72,7 +72,7 @@ class BrowserInfo(BaseModel):
 class ExecutionInfo(BaseModel):
     """Execution context used to create the backup."""
 
-    execution_id: str
+    execution_id: str = Field(min_length=1)
     started_at: datetime
     completed_at: datetime | None = None
     status: Literal["planned", "running", "completed", "partial", "failed"] = "planned"
@@ -85,27 +85,27 @@ class ExecutionInfo(BaseModel):
 class Statistics(BaseModel):
     """Aggregated backup statistics."""
 
-    source_count: int = 0
-    logical_items: int = 0
-    physical_files: int = 0
-    copied_files: int = 0
-    missing_files: int = 0
-    skipped_files: int = 0
-    failed_files: int = 0
-    total_size_bytes: int = 0
-    copied_size_bytes: int = 0
-    duration_seconds: float | None = None
+    source_count: int = Field(default=0, ge=0)
+    logical_items: int = Field(default=0, ge=0)
+    physical_files: int = Field(default=0, ge=0)
+    copied_files: int = Field(default=0, ge=0)
+    missing_files: int = Field(default=0, ge=0)
+    skipped_files: int = Field(default=0, ge=0)
+    failed_files: int = Field(default=0, ge=0)
+    total_size_bytes: int = Field(default=0, ge=0)
+    copied_size_bytes: int = Field(default=0, ge=0)
+    duration_seconds: float | None = Field(default=None, ge=0)
 
 
 class IntegrityInfo(BaseModel):
     """Integrity strategy and verification result for a backup."""
 
-    algorithm: str = "sha256"
+    algorithm: str = Field(default="sha256", min_length=1)
     checked: bool = False
     verified_at: datetime | None = None
-    expected_files: int = 0
-    verified_files: int = 0
-    failed_files: int = 0
+    expected_files: int = Field(default=0, ge=0)
+    verified_files: int = Field(default=0, ge=0)
+    failed_files: int = Field(default=0, ge=0)
     report_path: str | None = None
 
 
