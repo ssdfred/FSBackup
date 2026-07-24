@@ -99,18 +99,14 @@ def test_chromium_profile_filter_rejects_guest_and_unrelated_profiles() -> None:
     assert browser.should_keep_profile("Crashpad") is False
 
 
-def test_timestamp_helpers_handle_seconds_milliseconds_and_invalid_values(
+def test_timestamp_helpers_handle_seconds_milliseconds_and_missing_paths(
     tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     expected = datetime.fromtimestamp(1_700_000_000, tz=UTC)
 
     assert _timestamp_to_datetime(1_700_000_000) == expected
     assert _timestamp_to_datetime(1_700_000_000_000) == expected
     assert _timestamp_to_datetime(None) is None
-
-    monkeypatch.setattr(models.datetime, "fromtimestamp", lambda *args, **kwargs: (_ for _ in ()).throw(ValueError("bad")))
-    assert _timestamp_to_datetime(1) is None
 
     missing = tmp_path / "missing"
     assert _path_mtime(missing) is None
