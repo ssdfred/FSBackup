@@ -63,11 +63,11 @@ class ManifestBuilderService:
         posix_path = PurePosixPath(candidate)
 
         if (
-            not candidate
+            candidate in {"", ".", ".."}
             or windows_path.is_absolute()
             or windows_path.drive
             or posix_path.is_absolute()
-            or any(part in {"", ".", ".."} for part in posix_path.parts)
+            or any(part == ".." for part in posix_path.parts)
         ):
             raise ManifestBuilderError(
                 f"Chemin relatif invalide dans le plan d'exécution : {value!r}"
