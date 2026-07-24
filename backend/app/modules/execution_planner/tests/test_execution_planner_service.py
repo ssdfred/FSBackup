@@ -19,6 +19,7 @@ from app.modules.execution_planner.resolver import (
     DependencyResolver,
     FileDependency,
 )
+from app.modules.execution_planner.schemas import ExecutionItem, PhysicalFile
 from app.modules.execution_planner.service import (
     ExecutionPlannerError,
     ExecutionPlannerService,
@@ -47,6 +48,34 @@ class StaticResolver:
 
     def resolve(self, **_: object) -> list[tuple[Path, FileDependency]]:
         return self.dependencies
+
+
+class CategoryResolver:
+    """Return dependencies selected by logical category."""
+
+    def __init__(
+        self,
+        dependencies: dict[str, list[tuple[Path, FileDependency]]],
+    ) -> None:
+        self.dependencies = dependencies
+
+    def resolve(
+        self,
+        *,
+        category: str,
+        **_: object,
+    ) -> list[tuple[Path, FileDependency]]:
+        return self.dependencies.get(category, [])
+
+
+class UnresolvablePath:
+    """Path-like test double whose resolution always fails."""
+
+    def resolve(self, *, strict: bool = False) -> Path:
+        raise OSError("accès refusé")
+
+    def __str__(self) -> str:
+        return "unresolvable.db"
 
 
 def make_item(
@@ -145,6 +174,18 @@ def test_dependency_resolver_uses_profile_root_for_firefox(
     ]
 
 
+def test_dependency_resolver_returns_empty_list_for_unknown_category(
+    tmp_path: Path,
+) -> None:
+    result = DependencyResolver().resolve(
+        application_key="chrome",
+        category="unknown",
+        profile_path=tmp_path / "Default",
+    )
+
+    assert result == []
+
+
 def test_build_plan_selects_only_default_selected_items(
     tmp_path: Path,
 ) -> None:
@@ -203,6 +244,24 @@ def test_explicit_selection_is_deduplicated_and_sorted(
         "chrome.default.bookmarks",
         "chrome.default.preferences",
     ]
+
+
+def test_empty_explicit_selection_builds_empty_plan(tmp_path: Path) -> None:
+    profile = tmp_path / "Default"
+    profile.mkdir()
+    plan = make_plan(
+        tmp_path,
+        profile,
+        [make_item("chrome.default.bookmarks", "bookmarks")],
+    )
+
+    result = make_service(plan).build_plan(tmp_path, selected_item_ids=[])
+
+    assert result.items == []
+    assert result.physical_files == []
+    assert result.warnings == []
+    assert result.summary.logical_items == 0
+    assert result.summary.physical_files == 0
 
 
 def test_unknown_selected_item_raises_clear_error(tmp_path: Path) -> None:
@@ -290,6 +349,72 @@ def test_shared_physical_file_is_deduplicated_between_items(
     assert result.summary.deduplicated_files == 1
 
 
+def test_duplicate_file_merges_mandatory_and_locked_flags(
+    tmp_path: Path,
+) -> None:
+    profile = tmp_path / "Default"
+    profile.mkdir()
+    shared = profile / "shared.db"
+    shared.write_bytes(b"data")
+    plan = make_plan(
+        tmp_path,
+        profile,
+        [
+            make_item("browser.default.first", "first"),
+            make_item("browser.default.second", "second"),
+        ],
+    )
+    resolver = CategoryResolver(
+        {
+            "first": [(shared, FileDependency("shared.db"))],
+            "second": [
+                (
+                    shared,
+                    FileDependency(
+                        "shared.db",
+                        mandatory=True,
+                        potentially_locked=True,
+                    ),
+                )
+            ],
+        }
+    )
+
+    result = make_service(plan, resolver).build_plan(tmp_path)
+
+    physical_file = result.physical_files[0]
+    assert physical_file.required_by == [
+        "browser.default.first",
+        "browser.default.second",
+    ]
+    assert physical_file.mandatory is True
+    assert physical_file.potentially_locked is True
+    assert result.summary.deduplicated_files == 1
+
+
+def test_duplicate_dependency_within_one_item_keeps_unique_file_path(
+    tmp_path: Path,
+) -> None:
+    profile = tmp_path / "Default"
+    profile.mkdir()
+    shared = profile / "shared.db"
+    shared.write_bytes(b"data")
+    plan = make_plan(
+        tmp_path,
+        profile,
+        [make_item("browser.default.first", "first")],
+    )
+    dependency = FileDependency("shared.db", mandatory=True)
+    resolver = StaticResolver([(shared, dependency), (shared, dependency)])
+
+    result = make_service(plan, resolver).build_plan(tmp_path)
+
+    assert len(result.physical_files) == 1
+    assert result.items[0].files == [str(shared.resolve())]
+    assert result.physical_files[0].required_by == ["browser.default.first"]
+    assert result.summary.deduplicated_files == 1
+
+
 def test_summary_counts_encrypted_items_and_unique_sizes(
     tmp_path: Path,
 ) -> None:
@@ -343,6 +468,33 @@ def test_dependency_outside_source_root_is_ignored(tmp_path: Path) -> None:
     assert "hors de la source" in result.warnings[0]
 
 
+def test_unresolvable_dependency_is_ignored_with_warning(
+    tmp_path: Path,
+) -> None:
+    profile = tmp_path / "Default"
+    profile.mkdir()
+    plan = make_plan(
+        tmp_path,
+        profile,
+        [make_item("browser.default.passwords", "passwords")],
+    )
+    resolver = StaticResolver(
+        [
+            (
+                UnresolvablePath(),  # type: ignore[arg-type]
+                FileDependency("unresolvable.db", mandatory=True),
+            )
+        ]
+    )
+
+    result = make_service(plan, resolver).build_plan(tmp_path)
+
+    assert result.physical_files == []
+    assert result.summary.warnings == 1
+    assert "Impossible de résoudre le chemin" in result.warnings[0]
+    assert "accès refusé" in result.warnings[0]
+
+
 def test_directory_dependency_size_is_measured_recursively(
     tmp_path: Path,
 ) -> None:
@@ -367,3 +519,63 @@ def test_directory_dependency_size_is_measured_recursively(
     )
     assert extension_directory.size_bytes == 8
     assert result.summary.estimated_size_bytes == 8
+
+
+def test_measure_path_returns_zero_for_missing_path(tmp_path: Path) -> None:
+    assert ExecutionPlannerService._measure_path(tmp_path / "missing") == 0
+
+
+def test_is_inside_root_accepts_descendants_and_rejects_siblings(
+    tmp_path: Path,
+) -> None:
+    root = tmp_path / "source"
+
+    assert ExecutionPlannerService._is_inside_root(root, root / "file.db")
+    assert not ExecutionPlannerService._is_inside_root(
+        root,
+        tmp_path / "source-copy" / "file.db",
+    )
+
+
+def test_build_summary_ignores_missing_file_sizes() -> None:
+    execution_items = [
+        ExecutionItem(
+            logical_id="item.encrypted",
+            category="passwords",
+            application_key="chrome",
+            application_name="Chrome",
+            user_name="Alice",
+            profile_name="Default",
+            encrypted=True,
+        )
+    ]
+    physical_files = [
+        PhysicalFile(
+            source_path="existing.db",
+            relative_path="existing.db",
+            size_bytes=10,
+            exists=True,
+        ),
+        PhysicalFile(
+            source_path="missing.db",
+            relative_path="missing.db",
+            size_bytes=999,
+            exists=False,
+            mandatory=True,
+        ),
+    ]
+
+    summary = ExecutionPlannerService._build_summary(
+        execution_items=execution_items,
+        physical_files=physical_files,
+        deduplicated_files=3,
+        warnings=["warning"],
+    )
+
+    assert summary.logical_items == 1
+    assert summary.physical_files == 2
+    assert summary.missing_files == 1
+    assert summary.encrypted_items == 1
+    assert summary.estimated_size_bytes == 10
+    assert summary.deduplicated_files == 3
+    assert summary.warnings == 1
