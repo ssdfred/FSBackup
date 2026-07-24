@@ -1,0 +1,36 @@
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+    "app",
+]
+
+addopts = [
+    "--cov=app",
+    "--cov-branch",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["app"]
+
+omit = [
+    "app/**/tests/*",
+    "app/**/tests/**",
+    "tests/*",
+    "tests/**",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+precision = 2
+fail_under = 45
+
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "if __name__ == .__main__.:",
+]

@@ -12,3 +12,21 @@ FSBackup est une solution open source de sauvegarde, restauration et migration d
 - Rapports
 
 Développé avec Python et FastAPI.
+
+## Architecture
+
+```text
+Source Discovery
+        ↓
+Backup Planner
+        ↓
+Execution Planner
+        ↓
+Manifest Builder
+        ↓
+Copy Engine
+        ↓
+Archive Engine
+        ↓
+Restore Engine
+```
