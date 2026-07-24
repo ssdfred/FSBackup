@@ -1,2 +1,12 @@
 __pycache__/
 *.py[cod]
+# Coverage
+backend/.coverage
+backend/coverage.xml
+backend/htmlcov/
+
+# Pytest
+.pytest_cache/
+
+# Ruff
+.ruff_cache/
