@@ -1,8 +1,7 @@
 """API routes for manifest generation."""
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Request, status
 
-from app.main import app
 from app.modules.execution_planner.schemas import ExecutionPlan
 
 from .schemas import Manifest, ManifestV2
@@ -41,13 +40,16 @@ def build_manifest(execution_plan: ExecutionPlan) -> Manifest:
     response_model=ManifestV2,
     status_code=status.HTTP_200_OK,
 )
-def build_manifest_v2(execution_plan: ExecutionPlan) -> ManifestV2:
+def build_manifest_v2(
+    execution_plan: ExecutionPlan,
+    request: Request,
+) -> ManifestV2:
     """Build the versioned Manifest V2 execution contract."""
 
     try:
-        return ManifestV2Builder(application_version=str(app.version)).build(
-            execution_plan
-        )
+        return ManifestV2Builder(
+            application_version=str(request.app.version),
+        ).build(execution_plan)
     except ManifestBuilderError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
