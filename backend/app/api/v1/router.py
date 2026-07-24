@@ -8,6 +8,7 @@ from app.modules.execution_planner.api import (
     router as execution_planner_router,
 )
 from app.modules.integrity_engine.api import router as integrity_engine_router
+from app.modules.manifest_builder.api import router as manifest_builder_router
 from app.modules.restore_engine.api import router as restore_engine_router
 from app.modules.source_discovery.api import router as source_discovery_router
 
@@ -17,6 +18,7 @@ router.include_router(browser_inspector_router)
 router.include_router(source_discovery_router)
 router.include_router(execution_planner_router)
 router.include_router(backup_planner_router)
+router.include_router(manifest_builder_router)
 router.include_router(copy_engine_router)
 router.include_router(archive_engine_router)
 router.include_router(restore_engine_router)
