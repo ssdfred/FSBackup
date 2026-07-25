@@ -114,7 +114,7 @@ def test_create_embeds_metadata_and_manifest(tmp_path: Path) -> None:
     assert metadata["format"] == "FSB"
     assert metadata["format_version"] == 1
     assert metadata["application"] == "FSBackup"
-    assert metadata["application_version"] == "0.5.0"
+    assert metadata["application_version"] == "0.6.0"
     assert metadata["created_at"]
     assert metadata["platform"]
     assert metadata["compression_method"] == "deflated"
