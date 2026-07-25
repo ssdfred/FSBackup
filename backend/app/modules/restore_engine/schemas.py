@@ -1,10 +1,11 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, SecretStr
 
 
 class RestoreRequest(BaseModel):
     archive_path: str
     destination_directory: str
     overwrite: bool = False
+    password: SecretStr | None = None
 
 
 class RestoreReport(BaseModel):
