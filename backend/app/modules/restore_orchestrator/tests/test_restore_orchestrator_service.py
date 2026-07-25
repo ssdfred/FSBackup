@@ -22,7 +22,11 @@ def build_archive(tmp_path: Path, encrypted: bool = False) -> tuple[Path, Secret
         summary=ManifestSummary(
             logical_items=1,
             physical_files=1,
+            missing_files=0,
+            encrypted_items=0,
+            deduplicated_files=0,
             estimated_size_bytes=source_file.stat().st_size,
+            warnings=0,
         ),
         files=[
             ManifestFile(
