@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from app.modules.archive_engine.api import router as archive_engine_router
+from app.modules.backup_orchestrator.api import router as backup_orchestrator_router
 from app.modules.backup_planner.api import router as backup_planner_router
 from app.modules.browser_inspector.api import router as browser_inspector_router
 from app.modules.copy_engine.api import router as copy_engine_router
@@ -21,6 +22,7 @@ router.include_router(backup_planner_router)
 router.include_router(manifest_builder_router)
 router.include_router(copy_engine_router)
 router.include_router(archive_engine_router)
+router.include_router(backup_orchestrator_router)
 router.include_router(restore_engine_router)
 router.include_router(integrity_engine_router)
 
