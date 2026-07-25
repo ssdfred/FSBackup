@@ -15,20 +15,33 @@ class CopyEngineService:
     @staticmethod
     def execute(request: CopyRequest) -> CopyReport:
         execution_started_at = perf_counter()
-
-        source_root = Path(request.manifest.source_root)
-        destination_root = Path(request.destination_root)
-
+        destination_root = Path(request.destination_root).resolve()
         results: list[CopyFileResult] = []
 
-        for manifest_file in request.manifest.files:
+        for physical_file in request.execution_plan.physical_files:
             file_started_at = perf_counter()
+            source = Path(physical_file.source_path)
 
-            relative_path = Path(manifest_file.relative_path)
-            source = source_root / relative_path
-            destination = destination_root / relative_path
+            try:
+                destination = CopyEngineService._safe_destination(
+                    destination_root=destination_root,
+                    relative_path=physical_file.relative_path,
+                )
+            except ValueError as exc:
+                results.append(
+                    CopyFileResult(
+                        source=str(source),
+                        destination=str(destination_root),
+                        status=CopyStatus.ERROR,
+                        duration_ms=CopyEngineService._duration_ms(
+                            file_started_at
+                        ),
+                        error=str(exc),
+                    )
+                )
+                continue
 
-            if not source.is_file():
+            if not physical_file.exists or not source.is_file():
                 results.append(
                     CopyFileResult(
                         source=str(source),
@@ -43,15 +56,9 @@ class CopyEngineService:
                 continue
 
             try:
-                destination.parent.mkdir(
-                    parents=True,
-                    exist_ok=True,
-                )
+                destination.parent.mkdir(parents=True, exist_ok=True)
 
-                if CopyEngineService._is_identical(
-                    source=source,
-                    destination=destination,
-                ):
+                if CopyEngineService._is_identical(source, destination):
                     results.append(
                         CopyFileResult(
                             source=str(source),
@@ -66,7 +73,6 @@ class CopyEngineService:
                     continue
 
                 copy2(source, destination)
-
                 source_size = source.stat().st_size
                 destination_size = destination.stat().st_size
 
@@ -86,7 +92,6 @@ class CopyEngineService:
                         ),
                     )
                 )
-
             except OSError as exc:
                 results.append(
                     CopyFileResult(
@@ -111,13 +116,19 @@ class CopyEngineService:
         )
 
     @staticmethod
-    def _is_identical(
-        source: Path,
-        destination: Path,
-    ) -> bool:
+    def _safe_destination(
+        destination_root: Path,
+        relative_path: str,
+    ) -> Path:
+        candidate = (destination_root / relative_path).resolve()
+        if not candidate.is_relative_to(destination_root):
+            raise ValueError("Destination path escapes destination root.")
+        return candidate
+
+    @staticmethod
+    def _is_identical(source: Path, destination: Path) -> bool:
         if not destination.is_file():
             return False
-
         return source.stat().st_size == destination.stat().st_size
 
     @staticmethod
@@ -128,20 +139,16 @@ class CopyEngineService:
         return CopySummary(
             total_files=len(results),
             copied=sum(
-                result.status == CopyStatus.COPIED
-                for result in results
+                result.status == CopyStatus.COPIED for result in results
             ),
             skipped=sum(
-                result.status == CopyStatus.SKIPPED
-                for result in results
+                result.status == CopyStatus.SKIPPED for result in results
             ),
             missing=sum(
-                result.status == CopyStatus.MISSING
-                for result in results
+                result.status == CopyStatus.MISSING for result in results
             ),
             errors=sum(
-                result.status == CopyStatus.ERROR
-                for result in results
+                result.status == CopyStatus.ERROR for result in results
             ),
             total_bytes=sum(
                 result.size
