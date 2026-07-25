@@ -13,7 +13,7 @@
       <a class="active" data-view="dashboard" href="#dashboard">Tableau de bord</a>
       <a data-view="backup" href="#backup">Nouvelle sauvegarde</a>
       <a data-view="archives" href="#archives">Mes sauvegardes</a>
-      <a href="#restore">Restauration</a>
+      <a data-view="restore" href="#restore">Restauration</a>
       <a href="#retention">Rétention</a>
     </nav>
     <div class="sidebar-footer"><span id="api-dot" class="status-dot"></span><span id="api-status">Connexion au moteur…</span></div>
@@ -52,6 +52,17 @@
       <div id="catalog-message" class="message hidden" role="status" aria-live="polite"></div>
       <section id="catalog-summary" class="stats catalog-stats hidden" aria-label="Résumé du catalogue"><article><span>Archives</span><strong id="catalog-total">0</strong><small id="catalog-size">0 octet</small></article><article><span>Valides</span><strong id="catalog-valid">0</strong><small>Prêtes à être restaurées</small></article><article><span>À contrôler</span><strong id="catalog-alerts">0</strong><small>Invalides ou verrouillées</small></article></section>
       <section id="catalog-list" class="archive-list" aria-live="polite"><div class="empty-state"><strong>Aucun dossier analysé</strong><p>Indiquez le dossier contenant vos fichiers .fsb ou .fsbe.</p></div></section>
+    </section>
+
+    <section id="restore-view" class="view" aria-labelledby="restore-title">
+      <header class="topbar"><div><p class="eyebrow">Restauration sécurisée</p><h1 id="restore-title">Restaurer une sauvegarde</h1><p>L’archive est vérifiée avant toute extraction.</p></div><button type="button" data-view="archives">Voir mes sauvegardes</button></header>
+      <form id="restore-form" class="form-panel">
+        <div class="form-grid"><label>Archive à restaurer<input id="restore-archive" required placeholder="D:\Sauvegardes\archive.fsb"></label><label>Dossier de destination<input id="restore-destination" required placeholder="D:\Restauration"></label><label>Mot de passe éventuel<input id="restore-password" type="password" autocomplete="current-password" placeholder="Laisser vide si non chiffrée"></label></div>
+        <div class="option-list"><label class="check-row"><input id="restore-overwrite" type="checkbox"><span><strong>Remplacer les fichiers existants</strong><small>Activez uniquement si vous acceptez l’écrasement dans le dossier choisi.</small></span></label></div>
+        <div id="restore-message" class="message hidden" role="status" aria-live="polite"></div>
+        <section id="restore-report" class="report-panel hidden"><div class="report-heading"><div><p class="eyebrow">Rapport</p><h2>Restauration terminée</h2></div><span class="report-badge">Succès</span></div><dl class="report-grid"><div><dt>Destination</dt><dd id="restore-report-destination">—</dd></div><div><dt>Fichiers restaurés</dt><dd id="restore-report-files">0</dd></div><div><dt>Fichiers ignorés</dt><dd id="restore-report-skipped">0</dd></div><div><dt>Intégrité</dt><dd id="restore-report-integrity">Validée</dd></div></dl></section>
+        <div class="form-actions"><button type="button" class="secondary-action" data-view="archives">Annuler</button><button id="submit-restore" class="submit-action" type="submit">Vérifier et restaurer</button></div>
+      </form>
     </section>
   </main>
   <script src="/app/app.js" defer></script>
