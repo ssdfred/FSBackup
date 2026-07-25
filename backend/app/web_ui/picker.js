@@ -2,7 +2,7 @@ const pickerBindings=[
   {target:"custom-source-root",kind:"directory",mode:"source-mode",modeValue:"custom_folder"},
   {target:"backup-destination-custom",kind:"directory",mode:"backup-destination-mode",modeValue:"custom"},
   {target:"catalog-custom-directory",kind:"directory",mode:"catalog-location-mode",modeValue:"custom"},
-  {target:"restore-archive-relative",resultTarget:"restore-archive-custom",kind:"archive",mode:"restore-archive-mode",modeValue:"custom"},
+  {target:"restore-archive-custom",kind:"archive",mode:"restore-archive-mode",modeValue:"custom"},
   {target:"restore-destination-custom",kind:"directory",mode:"restore-destination-mode",modeValue:"custom"},
   {target:"retention-custom-directory",kind:"directory",mode:"retention-location-mode",modeValue:"custom"}
 ];
@@ -16,8 +16,7 @@ function pickerMessage(text,type=""){
 
 async function openNativePicker(binding,button){
   const target=document.querySelector(`#${binding.target}`);
-  const resultTarget=document.querySelector(`#${binding.resultTarget??binding.target}`);
-  if(!target||!resultTarget)return;
+  if(!target)return;
   button.disabled=true;
   const previous=button.textContent;
   button.textContent="Ouverture…";
@@ -25,7 +24,7 @@ async function openNativePicker(binding,button){
     const response=await fetch(`/api/v1/system/picker/${binding.kind}`,{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({initial_path:resultTarget.value.trim()||target.value.trim()||null})
+      body:JSON.stringify({initial_path:target.value.trim()||null})
     });
     const report=await response.json();
     if(!response.ok)throw new Error(report.error?.message??"Le sélecteur n’a pas pu être ouvert.");
@@ -37,9 +36,9 @@ async function openNativePicker(binding,button){
       mode.value=binding.modeValue;
       mode.dispatchEvent(new Event("change",{bubbles:true}));
     }
-    resultTarget.value=report.path;
-    resultTarget.dispatchEvent(new Event("input",{bubbles:true}));
-    resultTarget.dispatchEvent(new Event("change",{bubbles:true}));
+    target.value=report.path;
+    target.dispatchEvent(new Event("input",{bubbles:true}));
+    target.dispatchEvent(new Event("change",{bubbles:true}));
   }catch(error){
     pickerMessage(error.message,"error");
   }finally{
