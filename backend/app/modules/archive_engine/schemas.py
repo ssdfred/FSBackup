@@ -24,8 +24,8 @@ class ArchiveMetadata(BaseModel):
     application_version: str = "0.5.0"
     created_at: datetime
     platform: str
-    compression_method: CompressionMethod
-    compression_level: int
+    compression_method: CompressionMethod = CompressionMethod.DEFLATED
+    compression_level: int = 6
 
 
 class ArchiveReport(BaseModel):
