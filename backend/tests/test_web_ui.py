@@ -67,10 +67,24 @@ def test_restore_screen_is_served() -> None:
     assert "/app/restore.js" in response.text
 
 
+def test_retention_screen_is_served() -> None:
+    response = client.get("/app/")
+
+    assert response.status_code == 200
+    assert 'id="retention-view"' in response.text
+    assert 'id="retention-form"' in response.text
+    assert 'id="retention-directory"' in response.text
+    assert 'id="retention-summary"' in response.text
+    assert 'id="retention-confirmation"' in response.text
+    assert 'id="execute-retention"' in response.text
+    assert "/app/retention.js" in response.text
+
+
 def test_dashboard_assets_are_served() -> None:
     stylesheet = client.get("/app/styles.css")
     script = client.get("/app/app.js")
     restore_script = client.get("/app/restore.js")
+    retention_script = client.get("/app/retention.js")
 
     assert stylesheet.status_code == 200
     assert "capability-grid" in stylesheet.text
@@ -92,3 +106,8 @@ def test_dashboard_assets_are_served() -> None:
     assert "/api/v1/restore/run" in restore_script.text
     assert "integrity_report" in restore_script.text
     assert "restored_files" in restore_script.text
+    assert retention_script.status_code == 200
+    assert "/api/v1/backups/retention/simulate" in retention_script.text
+    assert "/api/v1/backups/retention/execute" in retention_script.text
+    assert "SUPPRIMER LES SAUVEGARDES SÉLECTIONNÉES" in retention_script.text
+    assert "reclaimable_bytes" in retention_script.text
