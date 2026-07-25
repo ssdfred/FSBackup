@@ -51,10 +51,20 @@
 
     <section id="archives-view" class="view" aria-labelledby="archives-title">
       <header class="topbar"><div><p class="eyebrow">Catalogue local</p><h1 id="archives-title">Mes sauvegardes</h1><p>Parcourez et contrôlez les archives disponibles sur ce poste.</p></div><button type="button" data-view="dashboard">Retour au tableau de bord</button></header>
-      <form id="catalog-form" class="form-panel catalog-toolbar"><label>Dossier des sauvegardes<input id="catalog-directory" required placeholder="D:\Sauvegardes"></label><label class="inline-check"><input id="catalog-recursive" type="checkbox"> Inclure les sous-dossiers</label><button id="scan-catalog" class="submit-action" type="submit">Analyser le dossier</button></form>
+      <form id="catalog-form" class="form-panel">
+        <div class="form-grid">
+          <label>Type d’emplacement<select id="catalog-location-mode"><option value="drive">Lecteur détecté</option><option value="custom">Chemin personnalisé</option></select></label>
+          <label id="catalog-drive-field">Lecteur<select id="catalog-drive"><option value="">Détection des lecteurs…</option></select></label>
+          <label id="catalog-subdirectory-field">Sous-dossier facultatif<input id="catalog-subdirectory" placeholder="Sauvegardes ou FSBackup\TestsRetention"><small>Laissez vide pour analyser la racine du lecteur.</small></label>
+          <label id="catalog-custom-field" class="hidden">Chemin personnalisé<input id="catalog-custom-directory" placeholder="H:\FSBackup\TestsRetention"></label>
+        </div>
+        <input id="catalog-directory" type="hidden">
+        <div class="option-list"><label class="check-row"><input id="catalog-recursive" type="checkbox"><span><strong>Inclure les sous-dossiers</strong><small>Recherche également les archives dans les dossiers enfants.</small></span></label></div>
+        <div class="form-actions"><button id="scan-catalog" class="submit-action" type="submit">Analyser le dossier</button></div>
+      </form>
       <div id="catalog-message" class="message hidden" role="status" aria-live="polite"></div>
       <section id="catalog-summary" class="stats catalog-stats hidden" aria-label="Résumé du catalogue"><article><span>Archives</span><strong id="catalog-total">0</strong><small id="catalog-size">0 octet</small></article><article><span>Valides</span><strong id="catalog-valid">0</strong><small>Prêtes à être restaurées</small></article><article><span>À contrôler</span><strong id="catalog-alerts">0</strong><small>Invalides ou verrouillées</small></article></section>
-      <section id="catalog-list" class="archive-list" aria-live="polite"><div class="empty-state"><strong>Aucun dossier analysé</strong><p>Indiquez le dossier contenant vos fichiers .fsb ou .fsbe.</p></div></section>
+      <section id="catalog-list" class="archive-list" aria-live="polite"><div class="empty-state"><strong>Aucun dossier analysé</strong><p>Choisissez le lecteur et, si nécessaire, le sous-dossier contenant vos fichiers .fsb ou .fsbe.</p></div></section>
     </section>
 
     <section id="restore-view" class="view" aria-labelledby="restore-title">
