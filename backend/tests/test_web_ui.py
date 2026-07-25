@@ -26,8 +26,17 @@ def test_new_backup_form_is_served() -> None:
 
     assert response.status_code == 200
     assert 'id="backup-form"' in response.text
+    assert 'id="source-mode"' in response.text
+    assert 'value="windows_disk"' in response.text
+    assert 'value="custom_folder"' in response.text
     assert 'id="source-root"' in response.text
+    assert 'id="custom-source-root"' in response.text
+    assert 'id="backup-destination-mode"' in response.text
+    assert 'id="backup-destination-drive"' in response.text
+    assert 'id="backup-destination-subdirectory"' in response.text
+    assert 'id="backup-destination-custom"' in response.text
     assert 'id="destination-directory"' in response.text
+    assert "/app/drives.js" in response.text
     assert 'id="enable-encryption"' in response.text
     assert 'id="verify-integrity"' in response.text
 
@@ -49,6 +58,10 @@ def test_backup_catalog_screen_is_served() -> None:
     assert response.status_code == 200
     assert 'id="archives-view"' in response.text
     assert 'id="catalog-form"' in response.text
+    assert 'id="catalog-location-mode"' in response.text
+    assert 'id="catalog-drive"' in response.text
+    assert 'id="catalog-subdirectory"' in response.text
+    assert 'id="catalog-custom-directory"' in response.text
     assert 'id="catalog-directory"' in response.text
     assert 'id="catalog-summary"' in response.text
     assert 'id="catalog-list"' in response.text
@@ -60,17 +73,42 @@ def test_restore_screen_is_served() -> None:
     assert response.status_code == 200
     assert 'id="restore-view"' in response.text
     assert 'id="restore-form"' in response.text
+    assert 'id="restore-archive-mode"' in response.text
+    assert 'id="restore-archive-drive"' in response.text
+    assert 'id="restore-archive-relative"' in response.text
     assert 'id="restore-archive"' in response.text
+    assert 'id="restore-destination-mode"' in response.text
+    assert 'id="restore-destination-drive"' in response.text
+    assert 'id="restore-destination-subdirectory"' in response.text
     assert 'id="restore-destination"' in response.text
     assert 'id="restore-overwrite"' in response.text
     assert 'id="restore-report"' in response.text
     assert "/app/restore.js" in response.text
 
 
+def test_retention_screen_is_served() -> None:
+    response = client.get("/app/")
+
+    assert response.status_code == 200
+    assert 'id="retention-view"' in response.text
+    assert 'id="retention-form"' in response.text
+    assert 'id="retention-location-mode"' in response.text
+    assert 'id="retention-drive"' in response.text
+    assert 'id="retention-subdirectory"' in response.text
+    assert 'id="retention-custom-directory"' in response.text
+    assert 'id="retention-directory"' in response.text
+    assert 'id="retention-summary"' in response.text
+    assert 'id="retention-confirmation"' in response.text
+    assert 'id="execute-retention"' in response.text
+    assert "/app/retention.js" in response.text
+
+
 def test_dashboard_assets_are_served() -> None:
     stylesheet = client.get("/app/styles.css")
     script = client.get("/app/app.js")
+    drives_script = client.get("/app/drives.js")
     restore_script = client.get("/app/restore.js")
+    retention_script = client.get("/app/retention.js")
 
     assert stylesheet.status_code == 200
     assert "capability-grid" in stylesheet.text
@@ -83,12 +121,28 @@ def test_dashboard_assets_are_served() -> None:
     assert "/api/v1/dashboard/summary" in script.text
     assert "/api/v1/backup/run" in script.text
     assert "/api/v1/backups/catalog" in script.text
+    assert "source_mode" in script.text
+    assert "custom_folder" in script.text
     assert "verify_integrity" in script.text
     assert "setProgress" in script.text
     assert "renderReport" in script.text
     assert "renderCatalog" in script.text
     assert "formatBytes" in script.text
+    assert drives_script.status_code == 200
+    assert "/api/v1/sources/drives" in drives_script.text
+    assert "systemDrive" in drives_script.text
+    assert "bindLocation" in drives_script.text
+    assert "backup-destination-drive" in drives_script.text
+    assert "catalog-drive" in drives_script.text
+    assert "restore-archive-drive" in drives_script.text
+    assert "restore-destination-drive" in drives_script.text
+    assert "retention-drive" in drives_script.text
     assert restore_script.status_code == 200
     assert "/api/v1/restore/run" in restore_script.text
     assert "integrity_report" in restore_script.text
     assert "restored_files" in restore_script.text
+    assert retention_script.status_code == 200
+    assert "/api/v1/backups/retention/simulate" in retention_script.text
+    assert "/api/v1/backups/retention/execute" in retention_script.text
+    assert "SUPPRIMER LES SAUVEGARDES SÉLECTIONNÉES" in retention_script.text
+    assert "reclaimable_bytes" in retention_script.text

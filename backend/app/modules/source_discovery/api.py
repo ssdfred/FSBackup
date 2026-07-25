@@ -2,13 +2,29 @@
 
 from fastapi import APIRouter, HTTPException, status
 
-from .schemas import SourceDiscoveryReport, SourceDiscoveryRequest
+from .drives import list_available_drives
+from .schemas import (
+    AvailableDrivesReport,
+    SourceDiscoveryReport,
+    SourceDiscoveryRequest,
+)
 from .service import SourceDiscoveryError, discover_source
 
 router = APIRouter(
     prefix="/sources",
     tags=["Source Discovery"],
 )
+
+
+@router.get(
+    "/drives",
+    response_model=AvailableDrivesReport,
+    status_code=status.HTTP_200_OK,
+)
+def get_available_drives() -> AvailableDrivesReport:
+    """List mounted drive roots available as backup sources."""
+
+    return list_available_drives()
 
 
 @router.post(

@@ -14,7 +14,7 @@
       <a data-view="backup" href="#backup">Nouvelle sauvegarde</a>
       <a data-view="archives" href="#archives">Mes sauvegardes</a>
       <a data-view="restore" href="#restore">Restauration</a>
-      <a href="#retention">Rétention</a>
+      <a data-view="retention" href="#retention">Rétention</a>
     </nav>
     <div class="sidebar-footer"><span id="api-dot" class="status-dot"></span><span id="api-status">Connexion au moteur…</span></div>
   </aside>
@@ -32,7 +32,18 @@
     <section id="backup-view" class="view" aria-labelledby="backup-title">
       <header class="topbar"><div><p class="eyebrow">Nouvelle sauvegarde</p><h1 id="backup-title">Créer une archive</h1><p>Configurez puis lancez une sauvegarde locale sécurisée.</p></div><button type="button" data-view="dashboard">Retour au tableau de bord</button></header>
       <form id="backup-form" class="form-panel">
-        <div class="form-grid"><label>Source à sauvegarder<input id="source-root" name="source_root" required placeholder="C:\Users\Frederic"></label><label>Dossier de destination<input id="destination-directory" name="destination_directory" required placeholder="D:\Sauvegardes"></label><label>Nom de l’archive<input id="archive-name" name="archive_name" required value="sauvegarde-poste"></label><label>Niveau de compression<select id="compression-level" name="compression_level"><option value="0">Aucune</option><option value="3">Rapide</option><option value="6" selected>Équilibrée</option><option value="9">Maximum</option></select></label></div>
+        <div class="form-grid">
+          <label>Type de source<select id="source-mode"><option value="windows_disk">Disque Windows complet</option><option value="custom_folder">Dossier personnalisé</option></select><small>Choisissez entre un disque complet et un dossier précis.</small></label>
+          <label id="source-drive-field">Disque source<select id="source-root"><option value="">Détection des lecteurs…</option></select><small>Choisissez le disque Windows à analyser et sauvegarder.</small></label>
+          <label id="source-folder-field" class="hidden">Dossier source<input id="custom-source-root" placeholder="H:\FSBackup\TestSource"><small>Le dossier et ses sous-dossiers seront sauvegardés.</small></label>
+          <label>Type de destination<select id="backup-destination-mode"><option value="drive">Lecteur détecté</option><option value="custom">Chemin personnalisé</option></select></label>
+          <label id="backup-destination-drive-field">Lecteur de destination<select id="backup-destination-drive"><option value="">Détection des lecteurs…</option></select></label>
+          <label id="backup-destination-subdirectory-field">Sous-dossier de destination<input id="backup-destination-subdirectory" value="Sauvegardes" placeholder="Sauvegardes"></label>
+          <label id="backup-destination-custom-field" class="hidden">Destination personnalisée<input id="backup-destination-custom" placeholder="H:\FSBackup\TestsRetention"></label>
+          <input id="destination-directory" type="hidden">
+          <label>Nom de l’archive<input id="archive-name" name="archive_name" required value="sauvegarde-poste"></label>
+          <label>Niveau de compression<select id="compression-level" name="compression_level"><option value="0">Aucune</option><option value="3">Rapide</option><option value="6" selected>Équilibrée</option><option value="9">Maximum</option></select></label>
+        </div>
         <div class="option-list"><label class="check-row"><input id="verify-integrity" type="checkbox" checked><span><strong>Vérifier l’intégrité</strong><small>Contrôle automatique de l’archive après création.</small></span></label><label class="check-row"><input id="enable-encryption" type="checkbox"><span><strong>Chiffrer la sauvegarde</strong><small>Protège l’archive avec un mot de passe.</small></span></label></div>
         <div id="password-fields" class="form-grid hidden"><label>Mot de passe<input id="encryption-password" type="password" minlength="8" autocomplete="new-password"></label><label>Confirmer le mot de passe<input id="encryption-confirmation" type="password" minlength="8" autocomplete="new-password"></label></div>
         <section id="backup-progress" class="progress-panel hidden" aria-live="polite"><div class="progress-heading"><strong id="progress-title">Préparation</strong><span id="progress-state">En attente</span></div><div class="progress-track"><span id="progress-bar"></span></div><ol class="progress-steps"><li data-step="prepare">Préparation</li><li data-step="copy">Copie des fichiers</li><li data-step="archive">Création de l’archive</li><li data-step="verify">Vérification</li></ol></section>
@@ -44,28 +55,72 @@
 
     <section id="archives-view" class="view" aria-labelledby="archives-title">
       <header class="topbar"><div><p class="eyebrow">Catalogue local</p><h1 id="archives-title">Mes sauvegardes</h1><p>Parcourez et contrôlez les archives disponibles sur ce poste.</p></div><button type="button" data-view="dashboard">Retour au tableau de bord</button></header>
-      <form id="catalog-form" class="form-panel catalog-toolbar">
-        <label>Dossier des sauvegardes<input id="catalog-directory" required placeholder="D:\Sauvegardes"></label>
-        <label class="inline-check"><input id="catalog-recursive" type="checkbox"> Inclure les sous-dossiers</label>
-        <button id="scan-catalog" class="submit-action" type="submit">Analyser le dossier</button>
+      <form id="catalog-form" class="form-panel">
+        <div class="form-grid">
+          <label>Type d’emplacement<select id="catalog-location-mode"><option value="drive">Lecteur détecté</option><option value="custom">Chemin personnalisé</option></select></label>
+          <label id="catalog-drive-field">Lecteur<select id="catalog-drive"><option value="">Détection des lecteurs…</option></select></label>
+          <label id="catalog-subdirectory-field">Sous-dossier facultatif<input id="catalog-subdirectory" placeholder="Sauvegardes ou FSBackup\TestsRetention"><small>Laissez vide pour analyser la racine du lecteur.</small></label>
+          <label id="catalog-custom-field" class="hidden">Chemin personnalisé<input id="catalog-custom-directory" placeholder="H:\FSBackup\TestsRetention"></label>
+        </div>
+        <input id="catalog-directory" type="hidden">
+        <div class="option-list"><label class="check-row"><input id="catalog-recursive" type="checkbox"><span><strong>Inclure les sous-dossiers</strong><small>Recherche également les archives dans les dossiers enfants.</small></span></label></div>
+        <div class="form-actions"><button id="scan-catalog" class="submit-action" type="submit">Analyser le dossier</button></div>
       </form>
       <div id="catalog-message" class="message hidden" role="status" aria-live="polite"></div>
       <section id="catalog-summary" class="stats catalog-stats hidden" aria-label="Résumé du catalogue"><article><span>Archives</span><strong id="catalog-total">0</strong><small id="catalog-size">0 octet</small></article><article><span>Valides</span><strong id="catalog-valid">0</strong><small>Prêtes à être restaurées</small></article><article><span>À contrôler</span><strong id="catalog-alerts">0</strong><small>Invalides ou verrouillées</small></article></section>
-      <section id="catalog-list" class="archive-list" aria-live="polite"><div class="empty-state"><strong>Aucun dossier analysé</strong><p>Indiquez le dossier contenant vos fichiers .fsb ou .fsbe.</p></div></section>
+      <section id="catalog-list" class="archive-list" aria-live="polite"><div class="empty-state"><strong>Aucun dossier analysé</strong><p>Choisissez le lecteur et, si nécessaire, le sous-dossier contenant vos fichiers .fsb ou .fsbe.</p></div></section>
     </section>
 
     <section id="restore-view" class="view" aria-labelledby="restore-title">
       <header class="topbar"><div><p class="eyebrow">Restauration sécurisée</p><h1 id="restore-title">Restaurer une sauvegarde</h1><p>L’archive est vérifiée avant toute extraction.</p></div><button type="button" data-view="archives">Voir mes sauvegardes</button></header>
       <form id="restore-form" class="form-panel">
-        <div class="form-grid"><label>Archive à restaurer<input id="restore-archive" required placeholder="D:\Sauvegardes\archive.fsb"></label><label>Dossier de destination<input id="restore-destination" required placeholder="D:\Restauration"></label><label>Mot de passe éventuel<input id="restore-password" type="password" autocomplete="current-password" placeholder="Laisser vide si non chiffrée"></label></div>
+        <div class="form-grid">
+          <label>Emplacement de l’archive<select id="restore-archive-mode"><option value="drive">Lecteur détecté</option><option value="custom">Chemin personnalisé</option></select></label>
+          <label id="restore-archive-drive-field">Lecteur de l’archive<select id="restore-archive-drive"><option value="">Détection des lecteurs…</option></select></label>
+          <label id="restore-archive-relative-field">Chemin de l’archive<input id="restore-archive-relative" placeholder="Sauvegardes\archive.fsb"></label>
+          <label id="restore-archive-custom-field" class="hidden">Archive personnalisée<input id="restore-archive-custom" placeholder="H:\Sauvegardes\archive.fsb"></label>
+          <input id="restore-archive" type="hidden">
+          <label>Type de destination<select id="restore-destination-mode"><option value="drive">Lecteur détecté</option><option value="custom">Chemin personnalisé</option></select></label>
+          <label id="restore-destination-drive-field">Lecteur de destination<select id="restore-destination-drive"><option value="">Détection des lecteurs…</option></select></label>
+          <label id="restore-destination-subdirectory-field">Sous-dossier de destination<input id="restore-destination-subdirectory" value="Restauration" placeholder="Restauration"></label>
+          <label id="restore-destination-custom-field" class="hidden">Destination personnalisée<input id="restore-destination-custom" placeholder="H:\Restauration"></label>
+          <input id="restore-destination" type="hidden">
+          <label>Mot de passe éventuel<input id="restore-password" type="password" autocomplete="current-password" placeholder="Laisser vide si non chiffrée"></label>
+        </div>
         <div class="option-list"><label class="check-row"><input id="restore-overwrite" type="checkbox"><span><strong>Remplacer les fichiers existants</strong><small>Activez uniquement si vous acceptez l’écrasement dans le dossier choisi.</small></span></label></div>
         <div id="restore-message" class="message hidden" role="status" aria-live="polite"></div>
         <section id="restore-report" class="report-panel hidden"><div class="report-heading"><div><p class="eyebrow">Rapport</p><h2>Restauration terminée</h2></div><span class="report-badge">Succès</span></div><dl class="report-grid"><div><dt>Destination</dt><dd id="restore-report-destination">—</dd></div><div><dt>Fichiers restaurés</dt><dd id="restore-report-files">0</dd></div><div><dt>Fichiers ignorés</dt><dd id="restore-report-skipped">0</dd></div><div><dt>Intégrité</dt><dd id="restore-report-integrity">Validée</dd></div></dl></section>
         <div class="form-actions"><button type="button" class="secondary-action" data-view="archives">Annuler</button><button id="submit-restore" class="submit-action" type="submit">Vérifier et restaurer</button></div>
       </form>
     </section>
+
+    <section id="retention-view" class="view" aria-labelledby="retention-title">
+      <header class="topbar"><div><p class="eyebrow">Gestion de l’espace</p><h1 id="retention-title">Politique de rétention</h1><p>Simulez toujours les décisions avant d’autoriser une suppression.</p></div><button type="button" data-view="archives">Voir mes sauvegardes</button></header>
+      <form id="retention-form" class="form-panel">
+        <div class="form-grid">
+          <label>Type d’emplacement<select id="retention-location-mode"><option value="drive">Lecteur détecté</option><option value="custom">Chemin personnalisé</option></select></label>
+          <label id="retention-drive-field">Lecteur<select id="retention-drive"><option value="">Détection des lecteurs…</option></select></label>
+          <label id="retention-subdirectory-field">Sous-dossier des sauvegardes<input id="retention-subdirectory" value="Sauvegardes" placeholder="Sauvegardes"></label>
+          <label id="retention-custom-field" class="hidden">Chemin personnalisé<input id="retention-custom-directory" placeholder="H:\FSBackup\TestsRetention"></label>
+          <input id="retention-directory" type="hidden">
+          <label>Dernières sauvegardes à conserver<input id="retention-last" type="number" min="0" max="1000" value="3" required></label>
+          <label>Conservation quotidienne (jours)<input id="retention-daily" type="number" min="0" max="3650" value="7" required></label>
+          <label>Conservation hebdomadaire (semaines)<input id="retention-weekly" type="number" min="0" max="520" value="4" required></label>
+          <label>Conservation mensuelle (mois)<input id="retention-monthly" type="number" min="0" max="1200" value="12" required></label>
+        </div>
+        <div class="option-list"><label class="check-row"><input id="retention-recursive" type="checkbox"><span><strong>Inclure les sous-dossiers</strong><small>Recherche également les archives dans les dossiers enfants.</small></span></label></div>
+        <div id="retention-message" class="message hidden" role="status" aria-live="polite"></div>
+        <div class="form-actions"><button type="button" class="secondary-action" data-view="dashboard">Annuler</button><button id="simulate-retention" class="submit-action" type="submit">Simuler la rétention</button></div>
+      </form>
+      <section id="retention-summary" class="stats hidden" aria-label="Résumé de la rétention"><article><span>Conservées</span><strong id="retention-keep">0</strong><small>Archives maintenues</small></article><article><span>Supprimables</span><strong id="retention-delete">0</strong><small id="retention-reclaimable">0 octet récupérable</small></article><article><span>Protégées</span><strong id="retention-protect">0</strong><small>Archives non supprimées</small></article></section>
+      <section id="retention-list" class="archive-list" aria-live="polite"></section>
+      <section id="retention-execution" class="report-panel hidden" aria-labelledby="retention-execution-title"><div class="report-heading"><div><p class="eyebrow">Action sensible</p><h2 id="retention-execution-title">Confirmer la suppression</h2></div><span class="archive-status invalid">Irréversible</span></div><p>Saisissez exactement <strong>SUPPRIMER LES SAUVEGARDES SÉLECTIONNÉES</strong> pour supprimer uniquement les archives classées « Supprimer ».</p><div class="form-grid"><label>Phrase de confirmation<input id="retention-confirmation" autocomplete="off"></label></div><div id="retention-execution-message" class="message hidden" role="status" aria-live="polite"></div><div class="form-actions"><button id="execute-retention" class="submit-action" type="button" disabled>Supprimer les archives sélectionnées</button></div></section>
+    </section>
   </main>
   <script src="/app/app.js" defer></script>
+  <script src="/app/drives.js" defer></script>
+  <script src="/app/picker.js" defer></script>
   <script src="/app/restore.js" defer></script>
+  <script src="/app/retention.js" defer></script>
 </body>
 </html>

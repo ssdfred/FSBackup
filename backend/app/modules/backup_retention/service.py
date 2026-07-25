@@ -20,7 +20,7 @@ class BackupRetentionService:
         keep_paths: dict[str, str] = {}
 
         for item in valid[: request.policy.keep_last]:
-            keep_paths[item.path] = "Among the most recent backups."
+            keep_paths[item.path] = "Parmi les sauvegardes les plus récentes."
 
         now = datetime.now(UTC)
         BackupRetentionService._keep_bucketed(
@@ -28,14 +28,14 @@ class BackupRetentionService:
             keep_paths,
             now - timedelta(days=request.policy.keep_daily_days),
             lambda value: value.date().isoformat(),
-            "Daily retention point.",
+            "Point de conservation quotidien.",
         )
         BackupRetentionService._keep_bucketed(
             valid,
             keep_paths,
             now - timedelta(weeks=request.policy.keep_weekly_weeks),
             lambda value: f"{value.isocalendar().year}-W{value.isocalendar().week:02d}",
-            "Weekly retention point.",
+            "Point de conservation hebdomadaire.",
         )
         month_limit = BackupRetentionService._subtract_months(
             now, request.policy.keep_monthly_months
@@ -45,20 +45,20 @@ class BackupRetentionService:
             keep_paths,
             month_limit,
             lambda value: f"{value.year:04d}-{value.month:02d}",
-            "Monthly retention point.",
+            "Point de conservation mensuel.",
         )
 
         decisions: list[RetentionArchiveDecision] = []
         for item in archives:
             if item.status != BackupArchiveStatus.VALID:
                 decision = RetentionDecision.PROTECT
-                reason = "Archive cannot be safely evaluated."
+                reason = "Cette archive ne peut pas être évaluée en toute sécurité."
             elif item.path in keep_paths:
                 decision = RetentionDecision.KEEP
                 reason = keep_paths[item.path]
             else:
                 decision = RetentionDecision.DELETE
-                reason = "Outside the configured retention windows."
+                reason = "En dehors des périodes de conservation configurées."
             decisions.append(
                 RetentionArchiveDecision(
                     path=item.path,

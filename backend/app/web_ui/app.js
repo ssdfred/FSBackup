@@ -1,7 +1,7 @@
 const descriptions={backup:"Créer une archive complète, compressée et éventuellement chiffrée.",catalog:"Parcourir et contrôler les archives disponibles sur ce poste.",restore:"Vérifier puis restaurer une sauvegarde dans un dossier choisi.",retention_simulation:"Prévisualiser les archives à conserver ou à supprimer.",retention_execution:"Supprimer uniquement les archives confirmées par l’utilisateur."};
 const icons={backup:"↥",catalog:"▣",restore:"↺",retention_simulation:"◷",retention_execution:"!"};
 const labels={backup:"Nouvelle sauvegarde",catalog:"Mes sauvegardes",restore:"Restaurer",retention_simulation:"Simuler la rétention",retention_execution:"Exécuter la rétention"};
-const views={backup:"backup",catalog:"archives"};
+const views={backup:"backup",catalog:"archives",restore:"restore",retention_simulation:"retention",retention_execution:"retention"};
 
 function showView(name){
   document.querySelectorAll(".view").forEach(view=>view.classList.toggle("active-view",view.id===`${name}-view`));
@@ -85,7 +85,17 @@ function resetBackupResult(){
 function bindBackupForm(){
   const encryption=document.querySelector("#enable-encryption");
   const passwordFields=document.querySelector("#password-fields");
+  const sourceMode=document.querySelector("#source-mode");
+  const driveField=document.querySelector("#source-drive-field");
+  const folderField=document.querySelector("#source-folder-field");
+  const customSource=document.querySelector("#custom-source-root");
   encryption.addEventListener("change",()=>passwordFields.classList.toggle("hidden",!encryption.checked));
+  sourceMode.addEventListener("change",()=>{
+    const custom=sourceMode.value==="custom_folder";
+    driveField.classList.toggle("hidden",custom);
+    folderField.classList.toggle("hidden",!custom);
+    customSource.required=custom;
+  });
   document.querySelector("#new-backup").addEventListener("click",()=>{resetBackupResult();document.querySelector("#backup-form").scrollIntoView({behavior:"smooth"});});
   document.querySelector("#backup-form").addEventListener("submit",async event=>{
     event.preventDefault();
@@ -97,7 +107,10 @@ function bindBackupForm(){
     if(encryption.checked&&password.length<8){setMessage("Le mot de passe doit contenir au moins 8 caractères.","error");return;}
     const level=Number(document.querySelector("#compression-level").value);
     const verify=document.querySelector("#verify-integrity").checked;
-    const payload={source_root:document.querySelector("#source-root").value.trim(),destination_directory:document.querySelector("#destination-directory").value.trim(),archive_name:document.querySelector("#archive-name").value.trim(),compression:{method:level===0?"stored":"deflated",level},encryption:encryption.checked?{password}:null,verify_integrity:verify};
+    const mode=sourceMode.value;
+    const sourceRoot=(mode==="custom_folder"?customSource.value:document.querySelector("#source-root").value).trim();
+    if(!sourceRoot){setMessage("Sélectionnez une source à sauvegarder.","error");return;}
+    const payload={source_root:sourceRoot,source_mode:mode,destination_directory:document.querySelector("#destination-directory").value.trim(),archive_name:document.querySelector("#archive-name").value.trim(),compression:{method:level===0?"stored":"deflated",level},encryption:encryption.checked?{password}:null,verify_integrity:verify};
     submit.disabled=true;
     submit.textContent="Sauvegarde en cours…";
     setProgress("prepare","Analyse de la demande",12);
@@ -178,4 +191,4 @@ bindBackupForm();
 bindCatalogForm();
 loadDashboard();
 const initial=window.location.hash.slice(1);
-if(["backup","archives"].includes(initial))showView(initial);
+if(["backup","archives","restore","retention"].includes(initial))showView(initial);
