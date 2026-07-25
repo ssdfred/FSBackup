@@ -65,4 +65,8 @@ function bindNativePickers(){
   });
 }
 
-document.addEventListener("DOMContentLoaded",bindNativePickers);
+if(document.readyState==="loading"){
+  document.addEventListener("DOMContentLoaded",bindNativePickers);
+}else{
+  bindNativePickers();
+}
