@@ -1,9 +1,13 @@
+from datetime import UTC, datetime
 from pathlib import Path
 from shutil import copy2
 from time import perf_counter
+from uuid import uuid4
 
 from .schemas import (
     CopyFileResult,
+    CopyIssue,
+    CopyIssueSeverity,
     CopyReport,
     CopyRequest,
     CopyStatus,
@@ -14,6 +18,8 @@ from .schemas import (
 class CopyEngineService:
     @staticmethod
     def execute(request: CopyRequest) -> CopyReport:
+        execution_id = uuid4()
+        started_at = datetime.now(UTC)
         execution_started_at = perf_counter()
         destination_root = Path(request.destination_root).resolve()
         results: list[CopyFileResult] = []
@@ -105,14 +111,27 @@ class CopyEngineService:
                     )
                 )
 
+        duration_ms = CopyEngineService._duration_ms(execution_started_at)
+        finished_at = datetime.now(UTC)
+        summary = CopyEngineService._build_summary(results, duration_ms)
+        warnings, errors = CopyEngineService._build_issues(results)
+
         return CopyReport(
-            summary=CopyEngineService._build_summary(
-                results=results,
-                duration_ms=CopyEngineService._duration_ms(
-                    execution_started_at
-                ),
-            ),
+            execution_id=execution_id,
+            started_at=started_at,
+            finished_at=finished_at,
+            duration_ms=duration_ms,
+            success=summary.missing == 0 and summary.errors == 0,
+            summary=summary,
             files=results,
+            warnings=warnings,
+            errors=errors,
+            metadata={
+                "destination_root": str(destination_root),
+                "planned_files": len(
+                    request.execution_plan.physical_files
+                ),
+            },
         )
 
     @staticmethod
@@ -157,6 +176,37 @@ class CopyEngineService:
             ),
             duration_ms=duration_ms,
         )
+
+    @staticmethod
+    def _build_issues(
+        results: list[CopyFileResult],
+    ) -> tuple[list[CopyIssue], list[CopyIssue]]:
+        warnings: list[CopyIssue] = []
+        errors: list[CopyIssue] = []
+
+        for result in results:
+            if result.status == CopyStatus.MISSING:
+                warnings.append(
+                    CopyIssue(
+                        severity=CopyIssueSeverity.WARNING,
+                        code="source_missing",
+                        message=result.error or "Source file is missing.",
+                        source=result.source,
+                        destination=result.destination,
+                    )
+                )
+            elif result.status == CopyStatus.ERROR:
+                errors.append(
+                    CopyIssue(
+                        severity=CopyIssueSeverity.ERROR,
+                        code="copy_failed",
+                        message=result.error or "File copy failed.",
+                        source=result.source,
+                        destination=result.destination,
+                    )
+                )
+
+        return warnings, errors
 
     @staticmethod
     def _duration_ms(started_at: float) -> int:
