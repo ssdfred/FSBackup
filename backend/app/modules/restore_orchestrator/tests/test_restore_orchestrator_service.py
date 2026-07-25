@@ -33,6 +33,7 @@ def build_archive(tmp_path: Path, encrypted: bool = False) -> tuple[Path, Secret
                 relative_path="document.txt",
                 size=source_file.stat().st_size,
                 mandatory=True,
+                potentially_locked=False,
                 required_by=["documents.document"],
             )
         ],
