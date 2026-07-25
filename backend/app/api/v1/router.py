@@ -11,6 +11,7 @@ from app.modules.execution_planner.api import (
 from app.modules.integrity_engine.api import router as integrity_engine_router
 from app.modules.manifest_builder.api import router as manifest_builder_router
 from app.modules.restore_engine.api import router as restore_engine_router
+from app.modules.restore_orchestrator.api import router as restore_orchestrator_router
 from app.modules.source_discovery.api import router as source_discovery_router
 
 router = APIRouter(prefix="/api/v1")
@@ -24,6 +25,7 @@ router.include_router(copy_engine_router)
 router.include_router(archive_engine_router)
 router.include_router(backup_orchestrator_router)
 router.include_router(restore_engine_router)
+router.include_router(restore_orchestrator_router)
 router.include_router(integrity_engine_router)
 
 
