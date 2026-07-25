@@ -85,7 +85,17 @@ function resetBackupResult(){
 function bindBackupForm(){
   const encryption=document.querySelector("#enable-encryption");
   const passwordFields=document.querySelector("#password-fields");
+  const sourceMode=document.querySelector("#source-mode");
+  const driveField=document.querySelector("#source-drive-field");
+  const folderField=document.querySelector("#source-folder-field");
+  const customSource=document.querySelector("#custom-source-root");
   encryption.addEventListener("change",()=>passwordFields.classList.toggle("hidden",!encryption.checked));
+  sourceMode.addEventListener("change",()=>{
+    const custom=sourceMode.value==="custom_folder";
+    driveField.classList.toggle("hidden",custom);
+    folderField.classList.toggle("hidden",!custom);
+    customSource.required=custom;
+  });
   document.querySelector("#new-backup").addEventListener("click",()=>{resetBackupResult();document.querySelector("#backup-form").scrollIntoView({behavior:"smooth"});});
   document.querySelector("#backup-form").addEventListener("submit",async event=>{
     event.preventDefault();
@@ -97,7 +107,10 @@ function bindBackupForm(){
     if(encryption.checked&&password.length<8){setMessage("Le mot de passe doit contenir au moins 8 caractères.","error");return;}
     const level=Number(document.querySelector("#compression-level").value);
     const verify=document.querySelector("#verify-integrity").checked;
-    const payload={source_root:document.querySelector("#source-root").value.trim(),destination_directory:document.querySelector("#destination-directory").value.trim(),archive_name:document.querySelector("#archive-name").value.trim(),compression:{method:level===0?"stored":"deflated",level},encryption:encryption.checked?{password}:null,verify_integrity:verify};
+    const mode=sourceMode.value;
+    const sourceRoot=(mode==="custom_folder"?customSource.value:document.querySelector("#source-root").value).trim();
+    if(!sourceRoot){setMessage("Sélectionnez une source à sauvegarder.","error");return;}
+    const payload={source_root:sourceRoot,source_mode:mode,destination_directory:document.querySelector("#destination-directory").value.trim(),archive_name:document.querySelector("#archive-name").value.trim(),compression:{method:level===0?"stored":"deflated",level},encryption:encryption.checked?{password}:null,verify_integrity:verify};
     submit.disabled=true;
     submit.textContent="Sauvegarde en cours…";
     setProgress("prepare","Analyse de la demande",12);
