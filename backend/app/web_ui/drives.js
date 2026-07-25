@@ -11,47 +11,45 @@ function joinWindowsPath(root,subdirectory){
   return cleanSubdirectory?`${cleanRoot}\\${cleanSubdirectory}`:`${cleanRoot}\\`;
 }
 
-function syncCatalogDirectory(){
-  const target=document.querySelector("#catalog-directory");
-  const mode=document.querySelector("#catalog-location-mode");
-  if(!target||!mode)return;
+function bindLocation(config){
+  const mode=document.querySelector(`#${config.mode}`);
+  const target=document.querySelector(`#${config.target}`);
+  if(!mode||!target)return;
 
-  if(mode.value==="custom"){
-    target.value=document.querySelector("#catalog-custom-directory").value.trim();
-    return;
-  }
+  const drive=document.querySelector(`#${config.drive}`);
+  const relative=document.querySelector(`#${config.relative}`);
+  const custom=document.querySelector(`#${config.custom}`);
+  const driveField=document.querySelector(`#${config.driveField}`);
+  const relativeField=document.querySelector(`#${config.relativeField}`);
+  const customField=document.querySelector(`#${config.customField}`);
 
-  const root=document.querySelector("#catalog-drive").value;
-  const subdirectory=document.querySelector("#catalog-subdirectory").value;
-  target.value=root?joinWindowsPath(root,subdirectory):"";
-}
-
-function bindCatalogLocation(){
-  const mode=document.querySelector("#catalog-location-mode");
-  if(!mode)return;
-
-  const driveField=document.querySelector("#catalog-drive-field");
-  const subdirectoryField=document.querySelector("#catalog-subdirectory-field");
-  const customField=document.querySelector("#catalog-custom-field");
-  const refresh=()=>{
-    const custom=mode.value==="custom";
-    driveField.classList.toggle("hidden",custom);
-    subdirectoryField.classList.toggle("hidden",custom);
-    customField.classList.toggle("hidden",!custom);
-    syncCatalogDirectory();
+  const sync=()=>{
+    const customMode=mode.value==="custom";
+    driveField.classList.toggle("hidden",customMode);
+    relativeField.classList.toggle("hidden",customMode);
+    customField.classList.toggle("hidden",!customMode);
+    target.value=customMode?custom.value.trim():(drive.value?joinWindowsPath(drive.value,relative.value):"");
   };
 
-  mode.addEventListener("change",refresh);
-  document.querySelector("#catalog-drive").addEventListener("change",syncCatalogDirectory);
-  document.querySelector("#catalog-subdirectory").addEventListener("input",syncCatalogDirectory);
-  document.querySelector("#catalog-custom-directory").addEventListener("input",syncCatalogDirectory);
-  refresh();
+  mode.addEventListener("change",sync);
+  drive.addEventListener("change",sync);
+  relative.addEventListener("input",sync);
+  custom.addEventListener("input",sync);
+  sync();
+  return sync;
 }
 
+const locationConfigs=[
+  {mode:"backup-destination-mode",target:"destination-directory",drive:"backup-destination-drive",relative:"backup-destination-subdirectory",custom:"backup-destination-custom",driveField:"backup-destination-drive-field",relativeField:"backup-destination-subdirectory-field",customField:"backup-destination-custom-field"},
+  {mode:"catalog-location-mode",target:"catalog-directory",drive:"catalog-drive",relative:"catalog-subdirectory",custom:"catalog-custom-directory",driveField:"catalog-drive-field",relativeField:"catalog-subdirectory-field",customField:"catalog-custom-field"},
+  {mode:"restore-archive-mode",target:"restore-archive",drive:"restore-archive-drive",relative:"restore-archive-relative",custom:"restore-archive-custom",driveField:"restore-archive-drive-field",relativeField:"restore-archive-relative-field",customField:"restore-archive-custom-field"},
+  {mode:"restore-destination-mode",target:"restore-destination",drive:"restore-destination-drive",relative:"restore-destination-subdirectory",custom:"restore-destination-custom",driveField:"restore-destination-drive-field",relativeField:"restore-destination-subdirectory-field",customField:"restore-destination-custom-field"},
+  {mode:"retention-location-mode",target:"retention-directory",drive:"retention-drive",relative:"retention-subdirectory",custom:"retention-custom-directory",driveField:"retention-drive-field",relativeField:"retention-subdirectory-field",customField:"retention-custom-field"}
+];
+
 async function loadAvailableDrives(){
-  const sourceSelect=document.querySelector("#source-root");
-  const catalogSelect=document.querySelector("#catalog-drive");
-  const selects=[sourceSelect,catalogSelect].filter(Boolean);
+  const selectIds=["source-root","backup-destination-drive","catalog-drive","restore-archive-drive","restore-destination-drive","retention-drive"];
+  const selects=selectIds.map(id=>document.querySelector(`#${id}`)).filter(Boolean);
   if(!selects.length)return;
 
   selects.forEach(select=>{
@@ -70,13 +68,19 @@ async function loadAvailableDrives(){
 
     const options=driveOptions(data.drives);
     selects.forEach(select=>select.innerHTML=options);
-    const systemDrive=data.drives.find(drive=>drive.system);
-    if(systemDrive&&sourceSelect)sourceSelect.value=systemDrive.root;
-    if(catalogSelect){
-      const preferred=data.drives.find(drive=>drive.root.toUpperCase().startsWith("H:"))??systemDrive??data.drives[0];
-      catalogSelect.value=preferred.root;
-      syncCatalogDirectory();
-    }
+    const systemDrive=data.drives.find(drive=>drive.system)??data.drives[0];
+    const preferred=data.drives.find(drive=>drive.root.toUpperCase().startsWith("H:"))??systemDrive;
+
+    const source=document.querySelector("#source-root");
+    if(source)source.value=systemDrive.root;
+    ["backup-destination-drive","catalog-drive","restore-archive-drive","restore-destination-drive","retention-drive"].forEach(id=>{
+      const select=document.querySelector(`#${id}`);
+      if(select)select.value=preferred.root;
+    });
+    locationConfigs.forEach(config=>{
+      const element=document.querySelector(`#${config.drive}`);
+      if(element)element.dispatchEvent(new Event("change"));
+    });
   }catch(error){
     selects.forEach(select=>select.innerHTML='<option value="">Détection impossible</option>');
     const message=document.querySelector("#backup-message");
@@ -90,6 +94,6 @@ async function loadAvailableDrives(){
 }
 
 document.addEventListener("DOMContentLoaded",()=>{
-  bindCatalogLocation();
+  locationConfigs.forEach(bindLocation);
   loadAvailableDrives();
 });
