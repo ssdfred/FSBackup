@@ -93,7 +93,17 @@ async function loadAvailableDrives(){
   }
 }
 
+function loadNativePickerScript(){
+  if(document.querySelector('script[data-native-picker]'))return;
+  const script=document.createElement("script");
+  script.src="/app/picker.js";
+  script.defer=true;
+  script.dataset.nativePicker="true";
+  document.head.appendChild(script);
+}
+
 document.addEventListener("DOMContentLoaded",()=>{
   locationConfigs.forEach(bindLocation);
   loadAvailableDrives();
+  loadNativePickerScript();
 });
