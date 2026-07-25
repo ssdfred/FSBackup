@@ -14,7 +14,7 @@
       <a data-view="backup" href="#backup">Nouvelle sauvegarde</a>
       <a data-view="archives" href="#archives">Mes sauvegardes</a>
       <a data-view="restore" href="#restore">Restauration</a>
-      <a href="#retention">Rétention</a>
+      <a data-view="retention" href="#retention">Rétention</a>
     </nav>
     <div class="sidebar-footer"><span id="api-dot" class="status-dot"></span><span id="api-status">Connexion au moteur…</span></div>
   </aside>
@@ -64,8 +64,34 @@
         <div class="form-actions"><button type="button" class="secondary-action" data-view="archives">Annuler</button><button id="submit-restore" class="submit-action" type="submit">Vérifier et restaurer</button></div>
       </form>
     </section>
+
+    <section id="retention-view" class="view" aria-labelledby="retention-title">
+      <header class="topbar"><div><p class="eyebrow">Gestion de l’espace</p><h1 id="retention-title">Politique de rétention</h1><p>Simulez toujours les décisions avant d’autoriser une suppression.</p></div><button type="button" data-view="archives">Voir mes sauvegardes</button></header>
+      <form id="retention-form" class="form-panel">
+        <div class="form-grid">
+          <label>Dossier des sauvegardes<input id="retention-directory" required placeholder="D:\Sauvegardes"></label>
+          <label>Dernières sauvegardes à conserver<input id="retention-last" type="number" min="0" max="1000" value="3" required></label>
+          <label>Conservation quotidienne (jours)<input id="retention-daily" type="number" min="0" max="3650" value="7" required></label>
+          <label>Conservation hebdomadaire (semaines)<input id="retention-weekly" type="number" min="0" max="520" value="4" required></label>
+          <label>Conservation mensuelle (mois)<input id="retention-monthly" type="number" min="0" max="1200" value="12" required></label>
+        </div>
+        <div class="option-list"><label class="check-row"><input id="retention-recursive" type="checkbox"><span><strong>Inclure les sous-dossiers</strong><small>Recherche également les archives dans les dossiers enfants.</small></span></label></div>
+        <div id="retention-message" class="message hidden" role="status" aria-live="polite"></div>
+        <div class="form-actions"><button type="button" class="secondary-action" data-view="dashboard">Annuler</button><button id="simulate-retention" class="submit-action" type="submit">Simuler la rétention</button></div>
+      </form>
+      <section id="retention-summary" class="stats hidden" aria-label="Résumé de la rétention"><article><span>Conservées</span><strong id="retention-keep">0</strong><small>Archives maintenues</small></article><article><span>Supprimables</span><strong id="retention-delete">0</strong><small id="retention-reclaimable">0 octet récupérable</small></article><article><span>Protégées</span><strong id="retention-protect">0</strong><small>Archives non supprimées</small></article></section>
+      <section id="retention-list" class="archive-list" aria-live="polite"></section>
+      <section id="retention-execution" class="report-panel hidden" aria-labelledby="retention-execution-title">
+        <div class="report-heading"><div><p class="eyebrow">Action sensible</p><h2 id="retention-execution-title">Confirmer la suppression</h2></div><span class="archive-status invalid">Irréversible</span></div>
+        <p>Saisissez exactement <strong>SUPPRIMER LES SAUVEGARDES SÉLECTIONNÉES</strong> pour supprimer uniquement les archives classées « Supprimer ».</p>
+        <div class="form-grid"><label>Phrase de confirmation<input id="retention-confirmation" autocomplete="off"></label></div>
+        <div id="retention-execution-message" class="message hidden" role="status" aria-live="polite"></div>
+        <div class="form-actions"><button id="execute-retention" class="submit-action" type="button" disabled>Supprimer les archives sélectionnées</button></div>
+      </section>
+    </section>
   </main>
   <script src="/app/app.js" defer></script>
   <script src="/app/restore.js" defer></script>
+  <script src="/app/retention.js" defer></script>
 </body>
 </html>
