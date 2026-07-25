@@ -131,7 +131,7 @@ def test_api_returns_bad_request_for_unsafe_path() -> None:
     )
 
     assert response.status_code == 400
-    assert "Chemin relatif invalide" in response.json()["detail"]
+    assert "Chemin relatif invalide" in response.json()["error"]["message"]
 
 
 def test_api_builds_manifest_v2() -> None:
@@ -163,4 +163,4 @@ def test_api_v2_returns_bad_request_for_unsafe_path() -> None:
     )
 
     assert response.status_code == 400
-    assert "Chemin relatif invalide" in response.json()["detail"]
+    assert "Chemin relatif invalide" in response.json()["error"]["message"]

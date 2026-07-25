@@ -18,9 +18,11 @@ from app.modules.manifest_builder.api import router as manifest_builder_router
 from app.modules.restore_engine.api import router as restore_engine_router
 from app.modules.restore_orchestrator.api import router as restore_orchestrator_router
 from app.modules.source_discovery.api import router as source_discovery_router
+from app.modules.ui_dashboard.api import router as ui_dashboard_router
 
 router = APIRouter(prefix="/api/v1")
 
+router.include_router(ui_dashboard_router)
 router.include_router(browser_inspector_router)
 router.include_router(source_discovery_router)
 router.include_router(execution_planner_router)
