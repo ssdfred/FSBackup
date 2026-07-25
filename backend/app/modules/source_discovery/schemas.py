@@ -14,6 +14,20 @@ class SourceType(StrEnum):
     WINDOWS_DISK = "windows_disk"
 
 
+class AvailableDrive(BaseModel):
+    """A mounted filesystem root available as a backup source."""
+
+    root: str
+    label: str
+    system: bool = False
+
+
+class AvailableDrivesReport(BaseModel):
+    """Mounted filesystem roots detected by FSBackup."""
+
+    drives: list[AvailableDrive] = Field(default_factory=list)
+
+
 class DataAvailability(BaseModel):
     """Availability of useful browser data inside a profile."""
 
