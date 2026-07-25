@@ -63,7 +63,7 @@ def test_encrypted_archive_complete_workflow(tmp_path: Path) -> None:
     assert archive_report.success is True
     assert archive_report.encrypted is True
     assert archive_report.archive_path.endswith(".fsbe")
-    assert Path(archive_report.archive_path).read_bytes().startswith(b"FSBE1")
+    assert Path(archive_report.archive_path).read_bytes().startswith(b"FSBE2")
 
     integrity_report = IntegrityEngineService.verify(
         IntegrityRequest(archive_path=archive_report.archive_path, password=password)
