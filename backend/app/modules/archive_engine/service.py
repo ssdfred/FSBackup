@@ -3,7 +3,10 @@ import platform
 from datetime import UTC, datetime
 from pathlib import Path
 from time import perf_counter
-from zipfile import ZIP_DEFLATED, ZipFile
+from zipfile import ZipFile
+
+from app.modules.compression_engine.schemas import CompressionSettings
+from app.modules.compression_engine.service import CompressionEngineService
 
 from .schemas import ArchiveMetadata, ArchiveReport, ArchiveRequest
 
@@ -23,24 +26,26 @@ class ArchiveEngineService:
             return ArchiveEngineService._failure_report(
                 archive_path=archive_path,
                 started_at=started_at,
+                settings=request.compression,
                 error="Source directory does not exist.",
             )
 
         try:
             destination_directory.mkdir(parents=True, exist_ok=True)
 
-            metadata = ArchiveEngineService._create_metadata()
+            metadata = ArchiveEngineService._create_metadata(
+                request.compression
+            )
             files = sorted(
                 path
                 for path in source_directory.rglob("*")
                 if path.is_file()
             )
+            zip_options = CompressionEngineService.zip_options(
+                request.compression
+            )
 
-            with ZipFile(
-                archive_path,
-                mode="w",
-                compression=ZIP_DEFLATED,
-            ) as archive:
+            with ZipFile(archive_path, mode="w", **zip_options) as archive:
                 ArchiveEngineService._add_metadata(
                     archive=archive,
                     metadata=metadata,
@@ -55,11 +60,27 @@ class ArchiveEngineService:
                     source_directory=source_directory,
                     files=files,
                 )
+                original_size = sum(
+                    entry.file_size for entry in archive.infolist()
+                )
+                compressed_size = sum(
+                    entry.compress_size for entry in archive.infolist()
+                )
 
+            metrics = CompressionEngineService.build_metrics(
+                settings=request.compression,
+                original_size=original_size,
+                compressed_size=compressed_size,
+            )
             return ArchiveReport(
                 archive_path=str(archive_path),
                 file_count=len(files),
                 archive_size=archive_path.stat().st_size,
+                original_size=metrics.original_size,
+                saved_bytes=metrics.saved_bytes,
+                compression_ratio=metrics.ratio,
+                compression_method=metrics.method,
+                compression_level=metrics.level,
                 duration_ms=ArchiveEngineService._duration_ms(started_at),
                 success=True,
             )
@@ -71,14 +92,19 @@ class ArchiveEngineService:
             return ArchiveEngineService._failure_report(
                 archive_path=archive_path,
                 started_at=started_at,
+                settings=request.compression,
                 error=str(exc),
             )
 
     @staticmethod
-    def _create_metadata() -> ArchiveMetadata:
+    def _create_metadata(
+        settings: CompressionSettings,
+    ) -> ArchiveMetadata:
         return ArchiveMetadata(
             created_at=datetime.now(UTC),
             platform=platform.system(),
+            compression_method=settings.method,
+            compression_level=settings.level,
         )
 
     @staticmethod
@@ -141,12 +167,15 @@ class ArchiveEngineService:
     def _failure_report(
         archive_path: Path,
         started_at: float,
+        settings: CompressionSettings,
         error: str,
     ) -> ArchiveReport:
         return ArchiveReport(
             archive_path=str(archive_path),
             file_count=0,
             archive_size=0,
+            compression_method=settings.method,
+            compression_level=settings.level,
             duration_ms=ArchiveEngineService._duration_ms(started_at),
             success=False,
             error=error,
