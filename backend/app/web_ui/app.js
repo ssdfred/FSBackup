@@ -1,7 +1,7 @@
 const descriptions={backup:"Créer une archive complète, compressée et éventuellement chiffrée.",catalog:"Parcourir et contrôler les archives disponibles sur ce poste.",restore:"Vérifier puis restaurer une sauvegarde dans un dossier choisi.",retention_simulation:"Prévisualiser les archives à conserver ou à supprimer.",retention_execution:"Supprimer uniquement les archives confirmées par l’utilisateur."};
 const icons={backup:"↥",catalog:"▣",restore:"↺",retention_simulation:"◷",retention_execution:"!"};
 const labels={backup:"Nouvelle sauvegarde",catalog:"Mes sauvegardes",restore:"Restaurer",retention_simulation:"Simuler la rétention",retention_execution:"Exécuter la rétention"};
-const views={backup:"backup",catalog:"archives"};
+const views={backup:"backup",catalog:"archives",restore:"restore",retention_simulation:"retention",retention_execution:"retention"};
 
 function showView(name){
   document.querySelectorAll(".view").forEach(view=>view.classList.toggle("active-view",view.id===`${name}-view`));
@@ -178,4 +178,4 @@ bindBackupForm();
 bindCatalogForm();
 loadDashboard();
 const initial=window.location.hash.slice(1);
-if(["backup","archives"].includes(initial))showView(initial);
+if(["backup","archives","restore","retention"].includes(initial))showView(initial);
