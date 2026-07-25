@@ -56,5 +56,5 @@ class CopyEventBus:
         for listener in tuple(self._listeners):
             try:
                 listener(event)
-            except Exception as exc:  # noqa: BLE001
+            except Exception as exc:
                 self._listener_errors.append(exc)
