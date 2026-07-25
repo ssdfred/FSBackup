@@ -12,7 +12,7 @@
     <nav aria-label="Navigation principale">
       <a class="active" data-view="dashboard" href="#dashboard">Tableau de bord</a>
       <a data-view="backup" href="#backup">Nouvelle sauvegarde</a>
-      <a href="#archives">Mes sauvegardes</a>
+      <a data-view="archives" href="#archives">Mes sauvegardes</a>
       <a href="#restore">Restauration</a>
       <a href="#retention">Rétention</a>
     </nav>
@@ -21,67 +21,37 @@
 
   <main>
     <section id="dashboard-view" class="view active-view">
-      <header class="topbar">
-        <div><p class="eyebrow">Vue d’ensemble</p><h1>Bonjour Frédéric</h1><p>Vos sauvegardes et outils de restauration au même endroit.</p></div>
-        <button id="refresh" type="button">Actualiser</button>
-      </header>
-      <section class="hero" id="dashboard">
-        <div><span class="hero-badge">Protection locale</span><h2>Votre poste est prêt à être sauvegardé</h2><p>Créez une archive vérifiée et chiffrée en quelques étapes.</p></div>
-        <a class="primary-action" data-view="backup" href="#backup">Créer une sauvegarde</a>
-      </section>
-      <section class="stats" aria-label="Indicateurs">
-        <article><span>État du moteur</span><strong id="engine-state">Chargement…</strong><small id="api-version">API</small></article>
-        <article><span>Fonctionnalités disponibles</span><strong id="capability-count">—</strong><small>Sauvegarde, restauration et rétention</small></article>
-        <article><span>Actions sensibles</span><strong id="destructive-count">—</strong><small>Confirmation obligatoire</small></article>
-      </section>
+      <header class="topbar"><div><p class="eyebrow">Vue d’ensemble</p><h1>Bonjour Frédéric</h1><p>Vos sauvegardes et outils de restauration au même endroit.</p></div><button id="refresh" type="button">Actualiser</button></header>
+      <section class="hero" id="dashboard"><div><span class="hero-badge">Protection locale</span><h2>Votre poste est prêt à être sauvegardé</h2><p>Créez une archive vérifiée et chiffrée en quelques étapes.</p></div><a class="primary-action" data-view="backup" href="#backup">Créer une sauvegarde</a></section>
+      <section class="stats" aria-label="Indicateurs"><article><span>État du moteur</span><strong id="engine-state">Chargement…</strong><small id="api-version">API</small></article><article><span>Fonctionnalités disponibles</span><strong id="capability-count">—</strong><small>Sauvegarde, restauration et rétention</small></article><article><span>Actions sensibles</span><strong id="destructive-count">—</strong><small>Confirmation obligatoire</small></article></section>
       <section class="section-heading"><div><p class="eyebrow">Actions rapides</p><h2>Que souhaitez-vous faire ?</h2></div></section>
       <section id="capabilities" class="capability-grid" aria-live="polite"><p class="loading">Chargement des fonctionnalités…</p></section>
-      <section class="info-panel">
-        <div><p class="eyebrow">Sécurité</p><h2>Une restauration toujours contrôlée</h2><p>FSBackup vérifie l’intégrité de chaque archive avant d’autoriser son extraction.</p></div>
-        <div class="security-list"><span>✓ Contrôle d’intégrité</span><span>✓ Chiffrement pris en charge</span><span>✓ Suppression avec confirmation</span></div>
-      </section>
+      <section class="info-panel"><div><p class="eyebrow">Sécurité</p><h2>Une restauration toujours contrôlée</h2><p>FSBackup vérifie l’intégrité de chaque archive avant d’autoriser son extraction.</p></div><div class="security-list"><span>✓ Contrôle d’intégrité</span><span>✓ Chiffrement pris en charge</span><span>✓ Suppression avec confirmation</span></div></section>
     </section>
 
     <section id="backup-view" class="view" aria-labelledby="backup-title">
-      <header class="topbar">
-        <div><p class="eyebrow">Nouvelle sauvegarde</p><h1 id="backup-title">Créer une archive</h1><p>Configurez puis lancez une sauvegarde locale sécurisée.</p></div>
-        <button type="button" data-view="dashboard">Retour au tableau de bord</button>
-      </header>
+      <header class="topbar"><div><p class="eyebrow">Nouvelle sauvegarde</p><h1 id="backup-title">Créer une archive</h1><p>Configurez puis lancez une sauvegarde locale sécurisée.</p></div><button type="button" data-view="dashboard">Retour au tableau de bord</button></header>
       <form id="backup-form" class="form-panel">
-        <div class="form-grid">
-          <label>Source à sauvegarder<input id="source-root" name="source_root" required placeholder="C:\Users\Frederic"></label>
-          <label>Dossier de destination<input id="destination-directory" name="destination_directory" required placeholder="D:\Sauvegardes"></label>
-          <label>Nom de l’archive<input id="archive-name" name="archive_name" required value="sauvegarde-poste"></label>
-          <label>Niveau de compression<select id="compression-level" name="compression_level"><option value="0">Aucune</option><option value="3">Rapide</option><option value="6" selected>Équilibrée</option><option value="9">Maximum</option></select></label>
-        </div>
-        <div class="option-list">
-          <label class="check-row"><input id="verify-integrity" type="checkbox" checked><span><strong>Vérifier l’intégrité</strong><small>Contrôle automatique de l’archive après création.</small></span></label>
-          <label class="check-row"><input id="enable-encryption" type="checkbox"><span><strong>Chiffrer la sauvegarde</strong><small>Protège l’archive avec un mot de passe.</small></span></label>
-        </div>
-        <div id="password-fields" class="form-grid hidden">
-          <label>Mot de passe<input id="encryption-password" type="password" minlength="8" autocomplete="new-password"></label>
-          <label>Confirmer le mot de passe<input id="encryption-confirmation" type="password" minlength="8" autocomplete="new-password"></label>
-        </div>
-        <section id="backup-progress" class="progress-panel hidden" aria-live="polite">
-          <div class="progress-heading"><strong id="progress-title">Préparation</strong><span id="progress-state">En attente</span></div>
-          <div class="progress-track"><span id="progress-bar"></span></div>
-          <ol class="progress-steps">
-            <li data-step="prepare">Préparation</li><li data-step="copy">Copie des fichiers</li><li data-step="archive">Création de l’archive</li><li data-step="verify">Vérification</li>
-          </ol>
-        </section>
+        <div class="form-grid"><label>Source à sauvegarder<input id="source-root" name="source_root" required placeholder="C:\Users\Frederic"></label><label>Dossier de destination<input id="destination-directory" name="destination_directory" required placeholder="D:\Sauvegardes"></label><label>Nom de l’archive<input id="archive-name" name="archive_name" required value="sauvegarde-poste"></label><label>Niveau de compression<select id="compression-level" name="compression_level"><option value="0">Aucune</option><option value="3">Rapide</option><option value="6" selected>Équilibrée</option><option value="9">Maximum</option></select></label></div>
+        <div class="option-list"><label class="check-row"><input id="verify-integrity" type="checkbox" checked><span><strong>Vérifier l’intégrité</strong><small>Contrôle automatique de l’archive après création.</small></span></label><label class="check-row"><input id="enable-encryption" type="checkbox"><span><strong>Chiffrer la sauvegarde</strong><small>Protège l’archive avec un mot de passe.</small></span></label></div>
+        <div id="password-fields" class="form-grid hidden"><label>Mot de passe<input id="encryption-password" type="password" minlength="8" autocomplete="new-password"></label><label>Confirmer le mot de passe<input id="encryption-confirmation" type="password" minlength="8" autocomplete="new-password"></label></div>
+        <section id="backup-progress" class="progress-panel hidden" aria-live="polite"><div class="progress-heading"><strong id="progress-title">Préparation</strong><span id="progress-state">En attente</span></div><div class="progress-track"><span id="progress-bar"></span></div><ol class="progress-steps"><li data-step="prepare">Préparation</li><li data-step="copy">Copie des fichiers</li><li data-step="archive">Création de l’archive</li><li data-step="verify">Vérification</li></ol></section>
         <div id="backup-message" class="message hidden" role="status" aria-live="polite"></div>
-        <section id="backup-report" class="report-panel hidden" aria-labelledby="report-title">
-          <div class="report-heading"><div><p class="eyebrow">Rapport</p><h2 id="report-title">Sauvegarde terminée</h2></div><span id="report-badge" class="report-badge">Succès</span></div>
-          <dl class="report-grid">
-            <div><dt>Archive</dt><dd id="report-path">—</dd></div>
-            <div><dt>Fichiers copiés</dt><dd id="report-files">0</dd></div>
-            <div><dt>Intégrité</dt><dd id="report-integrity">Non vérifiée</dd></div>
-            <div><dt>Avertissements</dt><dd id="report-warnings">0</dd></div>
-          </dl>
-          <div class="report-actions"><button id="new-backup" type="button" class="secondary-action">Créer une autre sauvegarde</button></div>
-        </section>
+        <section id="backup-report" class="report-panel hidden" aria-labelledby="report-title"><div class="report-heading"><div><p class="eyebrow">Rapport</p><h2 id="report-title">Sauvegarde terminée</h2></div><span id="report-badge" class="report-badge">Succès</span></div><dl class="report-grid"><div><dt>Archive</dt><dd id="report-path">—</dd></div><div><dt>Fichiers copiés</dt><dd id="report-files">0</dd></div><div><dt>Intégrité</dt><dd id="report-integrity">Non vérifiée</dd></div><div><dt>Avertissements</dt><dd id="report-warnings">0</dd></div></dl><div class="report-actions"><button id="new-backup" type="button" class="secondary-action">Créer une autre sauvegarde</button></div></section>
         <div class="form-actions"><button type="button" class="secondary-action" data-view="dashboard">Annuler</button><button id="submit-backup" class="submit-action" type="submit">Lancer la sauvegarde</button></div>
       </form>
+    </section>
+
+    <section id="archives-view" class="view" aria-labelledby="archives-title">
+      <header class="topbar"><div><p class="eyebrow">Catalogue local</p><h1 id="archives-title">Mes sauvegardes</h1><p>Parcourez et contrôlez les archives disponibles sur ce poste.</p></div><button type="button" data-view="dashboard">Retour au tableau de bord</button></header>
+      <form id="catalog-form" class="form-panel catalog-toolbar">
+        <label>Dossier des sauvegardes<input id="catalog-directory" required placeholder="D:\Sauvegardes"></label>
+        <label class="inline-check"><input id="catalog-recursive" type="checkbox"> Inclure les sous-dossiers</label>
+        <button id="scan-catalog" class="submit-action" type="submit">Analyser le dossier</button>
+      </form>
+      <div id="catalog-message" class="message hidden" role="status" aria-live="polite"></div>
+      <section id="catalog-summary" class="stats catalog-stats hidden" aria-label="Résumé du catalogue"><article><span>Archives</span><strong id="catalog-total">0</strong><small id="catalog-size">0 octet</small></article><article><span>Valides</span><strong id="catalog-valid">0</strong><small>Prêtes à être restaurées</small></article><article><span>À contrôler</span><strong id="catalog-alerts">0</strong><small>Invalides ou verrouillées</small></article></section>
+      <section id="catalog-list" class="archive-list" aria-live="polite"><div class="empty-state"><strong>Aucun dossier analysé</strong><p>Indiquez le dossier contenant vos fichiers .fsb ou .fsbe.</p></div></section>
     </section>
   </main>
   <script src="/app/app.js" defer></script>

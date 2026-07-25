@@ -43,6 +43,17 @@ def test_backup_progress_and_report_are_served() -> None:
     assert 'id="report-integrity"' in response.text
 
 
+def test_backup_catalog_screen_is_served() -> None:
+    response = client.get("/app/")
+
+    assert response.status_code == 200
+    assert 'id="archives-view"' in response.text
+    assert 'id="catalog-form"' in response.text
+    assert 'id="catalog-directory"' in response.text
+    assert 'id="catalog-summary"' in response.text
+    assert 'id="catalog-list"' in response.text
+
+
 def test_dashboard_assets_are_served() -> None:
     stylesheet = client.get("/app/styles.css")
     script = client.get("/app/app.js")
@@ -52,9 +63,14 @@ def test_dashboard_assets_are_served() -> None:
     assert "form-panel" in stylesheet.text
     assert "progress-panel" in stylesheet.text
     assert "report-panel" in stylesheet.text
+    assert "archive-list" in stylesheet.text
+    assert "archive-status" in stylesheet.text
     assert script.status_code == 200
     assert "/api/v1/dashboard/summary" in script.text
     assert "/api/v1/backup/run" in script.text
+    assert "/api/v1/backups/catalog" in script.text
     assert "verify_integrity" in script.text
     assert "setProgress" in script.text
     assert "renderReport" in script.text
+    assert "renderCatalog" in script.text
+    assert "formatBytes" in script.text
