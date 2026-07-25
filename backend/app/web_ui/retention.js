@@ -34,9 +34,12 @@ function renderRetention(simulation){
   }).join(""):'<div class="empty-state"><strong>Aucune décision</strong><p>Aucune archive n’a été trouvée dans ce dossier.</p></div>';
 
   const execution=document.querySelector("#retention-execution");
+  const confirmation=document.querySelector("#retention-confirmation");
   execution.classList.toggle("hidden",simulation.summary.delete===0);
-  document.querySelector("#retention-confirmation").value="";
+  confirmation.value="";
+  confirmation.disabled=false;
   document.querySelector("#execute-retention").disabled=true;
+  document.querySelector("#execute-retention").textContent="Supprimer les archives sélectionnées";
   executionMessage("","hidden");
 }
 
@@ -120,6 +123,8 @@ function bindRetention(){
       execute.textContent="Supprimer les archives sélectionnées";
     }
   });
+
+  if(window.location.hash==="#retention")showView("retention");
 }
 
 document.addEventListener("DOMContentLoaded",bindRetention);
