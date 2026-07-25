@@ -56,6 +56,10 @@ def test_backup_catalog_screen_is_served() -> None:
     assert response.status_code == 200
     assert 'id="archives-view"' in response.text
     assert 'id="catalog-form"' in response.text
+    assert 'id="catalog-location-mode"' in response.text
+    assert 'id="catalog-drive"' in response.text
+    assert 'id="catalog-subdirectory"' in response.text
+    assert 'id="catalog-custom-directory"' in response.text
     assert 'id="catalog-directory"' in response.text
     assert 'id="catalog-summary"' in response.text
     assert 'id="catalog-list"' in response.text
@@ -115,6 +119,10 @@ def test_dashboard_assets_are_served() -> None:
     assert drives_script.status_code == 200
     assert "/api/v1/sources/drives" in drives_script.text
     assert "systemDrive" in drives_script.text
+    assert "catalog-drive" in drives_script.text
+    assert "catalog-subdirectory" in drives_script.text
+    assert "catalog-custom-directory" in drives_script.text
+    assert "syncCatalogDirectory" in drives_script.text
     assert restore_script.status_code == 200
     assert "/api/v1/restore/run" in restore_script.text
     assert "integrity_report" in restore_script.text
