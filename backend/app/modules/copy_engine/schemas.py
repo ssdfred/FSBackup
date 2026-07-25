@@ -2,7 +2,7 @@ from enum import StrEnum
 
 from pydantic import BaseModel, Field
 
-from app.modules.manifest_builder.schemas import Manifest
+from app.modules.execution_planner.schemas import ExecutionPlan
 
 
 class CopyStatus(StrEnum):
@@ -13,8 +13,8 @@ class CopyStatus(StrEnum):
 
 
 class CopyRequest(BaseModel):
-    manifest: Manifest
-    destination_root: str
+    execution_plan: ExecutionPlan
+    destination_root: str = Field(min_length=1)
 
 
 class CopyFileResult(BaseModel):
