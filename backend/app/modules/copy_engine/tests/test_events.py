@@ -1,4 +1,5 @@
 from pathlib import Path
+from uuid import uuid4
 
 from app.modules.copy_engine.events import (
     CopyEvent,
@@ -51,10 +52,6 @@ def test_event_bus_subscribe_unsubscribe_and_order() -> None:
         received.append(event.event_type)
 
     bus.subscribe(listener)
-    execution_id = CopyEngineService.execute.__annotations__
-    del execution_id
-    from uuid import uuid4
-
     identifier = uuid4()
     bus.publish(
         CopyEvent(
@@ -91,9 +88,6 @@ def test_listener_failure_is_isolated() -> None:
 
     bus.subscribe(failing_listener)
     bus.subscribe(lambda event: received.append(event.event_type))
-
-    from uuid import uuid4
-
     bus.publish(
         CopyEvent(
             event_type=CopyEventType.COPY_STARTED,
@@ -187,5 +181,7 @@ def test_listener_failure_does_not_change_copy_result(tmp_path: Path) -> None:
 
     assert report.success is True
     assert report.summary.copied == 1
-    assert (destination_root / "data.txt").read_text(encoding="utf-8") == "content"
+    assert (destination_root / "data.txt").read_text(
+        encoding="utf-8"
+    ) == "content"
     assert len(bus.listener_errors) == 4
