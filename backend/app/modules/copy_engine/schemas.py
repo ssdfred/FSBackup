@@ -1,4 +1,6 @@
+from datetime import datetime
 from enum import StrEnum
+from uuid import UUID
 
 from pydantic import BaseModel, Field
 
@@ -9,6 +11,11 @@ class CopyStatus(StrEnum):
     COPIED = "copied"
     SKIPPED = "skipped"
     MISSING = "missing"
+    ERROR = "error"
+
+
+class CopyIssueSeverity(StrEnum):
+    WARNING = "warning"
     ERROR = "error"
 
 
@@ -26,6 +33,14 @@ class CopyFileResult(BaseModel):
     error: str | None = None
 
 
+class CopyIssue(BaseModel):
+    severity: CopyIssueSeverity
+    code: str
+    message: str
+    source: str | None = None
+    destination: str | None = None
+
+
 class CopySummary(BaseModel):
     total_files: int
     copied: int
@@ -37,5 +52,13 @@ class CopySummary(BaseModel):
 
 
 class CopyReport(BaseModel):
+    execution_id: UUID
+    started_at: datetime
+    finished_at: datetime
+    duration_ms: int
+    success: bool
     summary: CopySummary
     files: list[CopyFileResult] = Field(default_factory=list)
+    warnings: list[CopyIssue] = Field(default_factory=list)
+    errors: list[CopyIssue] = Field(default_factory=list)
+    metadata: dict[str, str | int | bool] = Field(default_factory=dict)

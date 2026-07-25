@@ -1,4 +1,5 @@
 from pathlib import Path
+from uuid import UUID
 
 from app.modules.copy_engine.schemas import CopyRequest, CopyStatus
 from app.modules.copy_engine.service import CopyEngineService
@@ -69,6 +70,13 @@ def test_execute_copies_file(tmp_path: Path) -> None:
     assert report.summary.copied == 1
     assert report.summary.errors == 0
     assert report.files[0].status == CopyStatus.COPIED
+    assert report.success is True
+    assert isinstance(report.execution_id, UUID)
+    assert report.started_at <= report.finished_at
+    assert report.duration_ms == report.summary.duration_ms
+    assert report.warnings == []
+    assert report.errors == []
+    assert report.metadata["planned_files"] == 1
 
 
 def test_execute_reports_missing_file(tmp_path: Path) -> None:
@@ -84,6 +92,10 @@ def test_execute_reports_missing_file(tmp_path: Path) -> None:
     assert report.summary.missing == 1
     assert report.summary.copied == 0
     assert report.files[0].status == CopyStatus.MISSING
+    assert report.success is False
+    assert len(report.warnings) == 1
+    assert report.warnings[0].code == "source_missing"
+    assert report.errors == []
 
 
 def test_execute_skips_existing_file_with_same_size(
@@ -104,6 +116,7 @@ def test_execute_skips_existing_file_with_same_size(
     assert report.summary.skipped == 1
     assert report.summary.copied == 0
     assert report.files[0].status == CopyStatus.SKIPPED
+    assert report.success is True
 
 
 def test_execute_continues_after_missing_file(tmp_path: Path) -> None:
@@ -120,6 +133,7 @@ def test_execute_continues_after_missing_file(tmp_path: Path) -> None:
     assert report.summary.total_files == 2
     assert report.summary.missing == 1
     assert report.summary.copied == 1
+    assert report.success is False
     assert (destination_root / "existing.txt").read_text(
         encoding="utf-8"
     ) == "content"
@@ -156,4 +170,8 @@ def test_execute_rejects_path_outside_destination(tmp_path: Path) -> None:
 
     assert report.summary.errors == 1
     assert report.files[0].status == CopyStatus.ERROR
+    assert report.success is False
+    assert len(report.errors) == 1
+    assert report.errors[0].code == "copy_failed"
+    assert report.warnings == []
     assert not (tmp_path / "secret.txt").exists()
