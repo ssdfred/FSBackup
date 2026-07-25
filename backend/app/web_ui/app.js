@@ -46,37 +46,86 @@ function setMessage(text,type=""){
   message.className=`message ${type}`;
 }
 
+function setProgress(step,title,percent,state="En cours"){
+  const panel=document.querySelector("#backup-progress");
+  panel.classList.remove("hidden");
+  document.querySelector("#progress-title").textContent=title;
+  document.querySelector("#progress-state").textContent=state;
+  document.querySelector("#progress-bar").style.width=`${percent}%`;
+  const order=["prepare","copy","archive","verify"];
+  const current=order.indexOf(step);
+  document.querySelectorAll(".progress-steps li").forEach((item,index)=>{
+    item.classList.toggle("done",index<current);
+    item.classList.toggle("active",index===current);
+  });
+}
+
+function renderReport(data,verified){
+  const report=document.querySelector("#backup-report");
+  report.classList.remove("hidden");
+  document.querySelector("#report-path").textContent=data.archive_path??"Archive créée";
+  document.querySelector("#report-files").textContent=data.copied_files??0;
+  document.querySelector("#report-integrity").textContent=verified?(data.integrity_report?.valid===false?"Échec":"Validée"):"Non demandée";
+  document.querySelector("#report-warnings").textContent=data.warnings?.length??0;
+}
+
+function resetBackupResult(){
+  document.querySelector("#backup-progress").classList.add("hidden");
+  document.querySelector("#backup-report").classList.add("hidden");
+  document.querySelector("#backup-message").className="message hidden";
+  document.querySelector("#progress-bar").style.width="0%";
+}
+
 function bindBackupForm(){
   const encryption=document.querySelector("#enable-encryption");
   const passwordFields=document.querySelector("#password-fields");
   encryption.addEventListener("change",()=>passwordFields.classList.toggle("hidden",!encryption.checked));
+  document.querySelector("#new-backup").addEventListener("click",()=>{
+    resetBackupResult();
+    document.querySelector("#backup-form").scrollIntoView({behavior:"smooth"});
+  });
   document.querySelector("#backup-form").addEventListener("submit",async event=>{
     event.preventDefault();
+    resetBackupResult();
     const submit=document.querySelector("#submit-backup");
     const password=document.querySelector("#encryption-password").value;
     const confirmation=document.querySelector("#encryption-confirmation").value;
     if(encryption.checked&&password!==confirmation){setMessage("Les mots de passe ne correspondent pas.","error");return;}
     if(encryption.checked&&password.length<8){setMessage("Le mot de passe doit contenir au moins 8 caractères.","error");return;}
     const level=Number(document.querySelector("#compression-level").value);
+    const verify=document.querySelector("#verify-integrity").checked;
     const payload={
       source_root:document.querySelector("#source-root").value.trim(),
       destination_directory:document.querySelector("#destination-directory").value.trim(),
       archive_name:document.querySelector("#archive-name").value.trim(),
       compression:{method:level===0?"stored":"deflated",level},
       encryption:encryption.checked?{password}:null,
-      verify_integrity:document.querySelector("#verify-integrity").checked
+      verify_integrity:verify
     };
     submit.disabled=true;
     submit.textContent="Sauvegarde en cours…";
-    setMessage("Préparation et création de l’archive…");
+    setProgress("prepare","Analyse de la demande",12);
+    const copyTimer=setTimeout(()=>setProgress("copy","Copie des fichiers",38),180);
+    const archiveTimer=setTimeout(()=>setProgress("archive","Création de l’archive",66),650);
+    const verifyTimer=setTimeout(()=>setProgress("verify",verify?"Vérification de l’intégrité":"Finalisation",86),1200);
     try{
       const response=await fetch("/api/v1/backup/run",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
       const data=await response.json();
       if(!response.ok)throw new Error(data.error?.message??"La requête a échoué.");
       if(!data.success)throw new Error(data.error??"La sauvegarde n’a pas pu être créée.");
-      setMessage(`Sauvegarde terminée : ${data.archive_path??"archive créée"}. ${data.copied_files} fichier(s) copié(s).`,"success");
-    }catch(error){setMessage(error.message,"error");}
-    finally{submit.disabled=false;submit.textContent="Lancer la sauvegarde";}
+      setProgress("verify","Sauvegarde terminée",100,"Terminée");
+      document.querySelectorAll(".progress-steps li").forEach(item=>{item.classList.add("done");item.classList.remove("active");});
+      setMessage("La sauvegarde a été créée avec succès.","success");
+      renderReport(data,verify);
+    }catch(error){
+      document.querySelector("#progress-state").textContent="Échec";
+      document.querySelector("#backup-progress").classList.add("failed");
+      setMessage(error.message,"error");
+    }finally{
+      [copyTimer,archiveTimer,verifyTimer].forEach(clearTimeout);
+      submit.disabled=false;
+      submit.textContent="Lancer la sauvegarde";
+    }
   });
 }
 
