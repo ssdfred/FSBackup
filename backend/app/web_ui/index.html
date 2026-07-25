@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FSBackup</title>
+  <link rel="stylesheet" href="/app/styles.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark">FS</span><div><strong>FSBackup</strong><small>Centre de sauvegarde</small></div></div>
+    <nav aria-label="Navigation principale">
+      <a class="active" href="#dashboard">Tableau de bord</a>
+      <a href="#backup">Nouvelle sauvegarde</a>
+      <a href="#archives">Mes sauvegardes</a>
+      <a href="#restore">Restauration</a>
+      <a href="#retention">Rétention</a>
+    </nav>
+    <div class="sidebar-footer"><span id="api-dot" class="status-dot"></span><span id="api-status">Connexion au moteur…</span></div>
+  </aside>
+
+  <main>
+    <header class="topbar">
+      <div><p class="eyebrow">Vue d’ensemble</p><h1>Bonjour Frédéric</h1><p>Vos sauvegardes et outils de restauration au même endroit.</p></div>
+      <button id="refresh" type="button">Actualiser</button>
+    </header>
+
+    <section class="hero" id="dashboard">
+      <div><span class="hero-badge">Protection locale</span><h2>Votre poste est prêt à être sauvegardé</h2><p>Créez une archive vérifiée et chiffrée en quelques étapes.</p></div>
+      <a class="primary-action" href="#backup">Créer une sauvegarde</a>
+    </section>
+
+    <section class="stats" aria-label="Indicateurs">
+      <article><span>État du moteur</span><strong id="engine-state">Chargement…</strong><small id="api-version">API</small></article>
+      <article><span>Fonctionnalités disponibles</span><strong id="capability-count">—</strong><small>Sauvegarde, restauration et rétention</small></article>
+      <article><span>Actions sensibles</span><strong id="destructive-count">—</strong><small>Confirmation obligatoire</small></article>
+    </section>
+
+    <section class="section-heading"><div><p class="eyebrow">Actions rapides</p><h2>Que souhaitez-vous faire ?</h2></div></section>
+    <section id="capabilities" class="capability-grid" aria-live="polite"><p class="loading">Chargement des fonctionnalités…</p></section>
+
+    <section class="info-panel">
+      <div><p class="eyebrow">Sécurité</p><h2>Une restauration toujours contrôlée</h2><p>FSBackup vérifie l’intégrité de chaque archive avant d’autoriser son extraction.</p></div>
+      <div class="security-list"><span>✓ Contrôle d’intégrité</span><span>✓ Chiffrement pris en charge</span><span>✓ Suppression avec confirmation</span></div>
+    </section>
+  </main>
+  <script src="/app/app.js" defer></script>
+</body>
+</html>
