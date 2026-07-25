@@ -26,8 +26,13 @@ def test_new_backup_form_is_served() -> None:
 
     assert response.status_code == 200
     assert 'id="backup-form"' in response.text
+    assert 'id="source-mode"' in response.text
+    assert 'value="windows_disk"' in response.text
+    assert 'value="custom_folder"' in response.text
     assert 'id="source-root"' in response.text
+    assert 'id="custom-source-root"' in response.text
     assert "Disque source" in response.text
+    assert "Dossier personnalisé" in response.text
     assert "/app/drives.js" in response.text
     assert 'id="destination-directory"' in response.text
     assert 'id="enable-encryption"' in response.text
@@ -100,6 +105,8 @@ def test_dashboard_assets_are_served() -> None:
     assert "/api/v1/dashboard/summary" in script.text
     assert "/api/v1/backup/run" in script.text
     assert "/api/v1/backups/catalog" in script.text
+    assert "source_mode" in script.text
+    assert "custom_folder" in script.text
     assert "verify_integrity" in script.text
     assert "setProgress" in script.text
     assert "renderReport" in script.text
