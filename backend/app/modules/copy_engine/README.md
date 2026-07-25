@@ -1,11 +1,13 @@
 # Copy Engine
 
-Le module `copy_engine` exécute la copie physique des fichiers décrits par un manifeste de sauvegarde vers un répertoire de destination.
+Le module `copy_engine` exécute la copie physique des fichiers décrits par un `ExecutionPlan` vers un répertoire de destination.
 
 ## Responsabilités
 
-- résoudre chaque chemin source à partir de `Manifest.source_root` ;
-- reproduire l'arborescence relative dans le répertoire cible ;
+- consommer les fichiers physiques produits par l'Execution Planner ;
+- utiliser `PhysicalFile.source_path` comme source officielle ;
+- reproduire chaque `relative_path` dans le répertoire cible ;
+- refuser tout chemin qui sortirait du répertoire de destination ;
 - copier les fichiers avec `shutil.copy2` afin de conserver les métadonnées disponibles ;
 - ignorer les fichiers déjà présents lorsque leur taille correspond ;
 - poursuivre l'exécution lorsqu'un fichier est absent ou qu'une erreur d'entrée/sortie survient ;
@@ -28,7 +30,7 @@ La version actuelle reste volontairement locale et séquentielle. Elle ne prend 
 POST /api/v1/copy/execute
 ```
 
-La requête contient un `Manifest` V1 et un `destination_root`. La réponse est un `CopyReport` composé d'un résumé et du résultat de chaque fichier.
+La requête contient un `ExecutionPlan` et un `destination_root`. La réponse est un `CopyReport` composé d'un résumé et du résultat de chaque fichier.
 
 ## Position dans le pipeline
 
@@ -36,17 +38,17 @@ La requête contient un `Manifest` V1 et un `destination_root`. La réponse est 
 Execution Planner
         |
         v
-Manifest Builder
+Copy Engine
         |
         v
-Copy Engine
+Manifest Builder V2
         |
         v
 Archive / Integrity / Restore
 ```
 
-Le Copy Engine ne découvre pas les sources, ne modifie pas le manifeste et ne crée pas d'archive. Il consomme un contrat préparé en amont et restitue uniquement le résultat de l'exécution physique.
+Le Copy Engine ne découvre pas les sources, ne recalcule pas le plan et ne crée pas d'archive. Il consomme un contrat préparé en amont et restitue uniquement le résultat de l'exécution physique.
 
-## Évolution prévue
+## Évolutions prévues
 
-La prochaine évolution fera converger le moteur vers le contrat Manifest V2 et enrichira le rapport d'exécution avec des horodatages, des erreurs structurées et des statistiques directement réutilisables par le Manifest V2.
+Les prochains incréments enrichiront le rapport avec des horodatages, des erreurs structurées et des événements internes réutilisables par l'observabilité et l'interface utilisateur.
