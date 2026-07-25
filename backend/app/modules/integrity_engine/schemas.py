@@ -1,8 +1,9 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, SecretStr
 
 
 class IntegrityRequest(BaseModel):
     archive_path: str
+    password: SecretStr | None = None
 
 
 class IntegrityReport(BaseModel):
