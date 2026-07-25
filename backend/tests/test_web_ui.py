@@ -27,6 +27,8 @@ def test_new_backup_form_is_served() -> None:
     assert response.status_code == 200
     assert 'id="backup-form"' in response.text
     assert 'id="source-root"' in response.text
+    assert "Disque source" in response.text
+    assert "/app/drives.js" in response.text
     assert 'id="destination-directory"' in response.text
     assert 'id="enable-encryption"' in response.text
     assert 'id="verify-integrity"' in response.text
@@ -83,6 +85,7 @@ def test_retention_screen_is_served() -> None:
 def test_dashboard_assets_are_served() -> None:
     stylesheet = client.get("/app/styles.css")
     script = client.get("/app/app.js")
+    drives_script = client.get("/app/drives.js")
     restore_script = client.get("/app/restore.js")
     retention_script = client.get("/app/retention.js")
 
@@ -102,6 +105,9 @@ def test_dashboard_assets_are_served() -> None:
     assert "renderReport" in script.text
     assert "renderCatalog" in script.text
     assert "formatBytes" in script.text
+    assert drives_script.status_code == 200
+    assert "/api/v1/sources/drives" in drives_script.text
+    assert "systemDrive" in drives_script.text
     assert restore_script.status_code == 200
     assert "/api/v1/restore/run" in restore_script.text
     assert "integrity_report" in restore_script.text
