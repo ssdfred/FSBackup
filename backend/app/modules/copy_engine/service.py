@@ -2,8 +2,9 @@ from datetime import UTC, datetime
 from pathlib import Path
 from shutil import copy2
 from time import perf_counter
-from uuid import uuid4
+from uuid import UUID, uuid4
 
+from .events import CopyEvent, CopyEventBus, CopyEventType
 from .schemas import (
     CopyFileResult,
     CopyIssue,
@@ -17,16 +18,39 @@ from .schemas import (
 
 class CopyEngineService:
     @staticmethod
-    def execute(request: CopyRequest) -> CopyReport:
+    def execute(
+        request: CopyRequest,
+        event_bus: CopyEventBus | None = None,
+    ) -> CopyReport:
         execution_id = uuid4()
         started_at = datetime.now(UTC)
         execution_started_at = perf_counter()
         destination_root = Path(request.destination_root).resolve()
         results: list[CopyFileResult] = []
 
+        CopyEngineService._publish(
+            event_bus,
+            CopyEvent(
+                event_type=CopyEventType.COPY_STARTED,
+                execution_id=execution_id,
+                metadata={
+                    "destination_root": str(destination_root),
+                    "planned_files": len(request.execution_plan.physical_files),
+                },
+            ),
+        )
+
         for physical_file in request.execution_plan.physical_files:
             file_started_at = perf_counter()
             source = Path(physical_file.source_path)
+            CopyEngineService._publish(
+                event_bus,
+                CopyEvent(
+                    event_type=CopyEventType.FILE_STARTED,
+                    execution_id=execution_id,
+                    source=str(source),
+                ),
+            )
 
             try:
                 destination = CopyEngineService._safe_destination(
@@ -34,30 +58,34 @@ class CopyEngineService:
                     relative_path=physical_file.relative_path,
                 )
             except ValueError as exc:
-                results.append(
-                    CopyFileResult(
-                        source=str(source),
-                        destination=str(destination_root),
-                        status=CopyStatus.ERROR,
-                        duration_ms=CopyEngineService._duration_ms(
-                            file_started_at
-                        ),
-                        error=str(exc),
-                    )
+                result = CopyFileResult(
+                    source=str(source),
+                    destination=str(destination_root),
+                    status=CopyStatus.ERROR,
+                    duration_ms=CopyEngineService._duration_ms(file_started_at),
+                    error=str(exc),
+                )
+                results.append(result)
+                CopyEngineService._publish_file_event(
+                    event_bus,
+                    execution_id,
+                    result,
                 )
                 continue
 
             if not physical_file.exists or not source.is_file():
-                results.append(
-                    CopyFileResult(
-                        source=str(source),
-                        destination=str(destination),
-                        status=CopyStatus.MISSING,
-                        duration_ms=CopyEngineService._duration_ms(
-                            file_started_at
-                        ),
-                        error="Source file does not exist.",
-                    )
+                result = CopyFileResult(
+                    source=str(source),
+                    destination=str(destination),
+                    status=CopyStatus.MISSING,
+                    duration_ms=CopyEngineService._duration_ms(file_started_at),
+                    error="Source file does not exist.",
+                )
+                results.append(result)
+                CopyEngineService._publish_file_event(
+                    event_bus,
+                    execution_id,
+                    result,
                 )
                 continue
 
@@ -65,16 +93,18 @@ class CopyEngineService:
                 destination.parent.mkdir(parents=True, exist_ok=True)
 
                 if CopyEngineService._is_identical(source, destination):
-                    results.append(
-                        CopyFileResult(
-                            source=str(source),
-                            destination=str(destination),
-                            status=CopyStatus.SKIPPED,
-                            size=source.stat().st_size,
-                            duration_ms=CopyEngineService._duration_ms(
-                                file_started_at
-                            ),
-                        )
+                    result = CopyFileResult(
+                        source=str(source),
+                        destination=str(destination),
+                        status=CopyStatus.SKIPPED,
+                        size=source.stat().st_size,
+                        duration_ms=CopyEngineService._duration_ms(file_started_at),
+                    )
+                    results.append(result)
+                    CopyEngineService._publish_file_event(
+                        event_bus,
+                        execution_id,
+                        result,
                     )
                     continue
 
@@ -87,36 +117,39 @@ class CopyEngineService:
                         "Copied file size does not match source file size."
                     )
 
-                results.append(
-                    CopyFileResult(
-                        source=str(source),
-                        destination=str(destination),
-                        status=CopyStatus.COPIED,
-                        size=destination_size,
-                        duration_ms=CopyEngineService._duration_ms(
-                            file_started_at
-                        ),
-                    )
+                result = CopyFileResult(
+                    source=str(source),
+                    destination=str(destination),
+                    status=CopyStatus.COPIED,
+                    size=destination_size,
+                    duration_ms=CopyEngineService._duration_ms(file_started_at),
+                )
+                results.append(result)
+                CopyEngineService._publish_file_event(
+                    event_bus,
+                    execution_id,
+                    result,
                 )
             except OSError as exc:
-                results.append(
-                    CopyFileResult(
-                        source=str(source),
-                        destination=str(destination),
-                        status=CopyStatus.ERROR,
-                        duration_ms=CopyEngineService._duration_ms(
-                            file_started_at
-                        ),
-                        error=str(exc),
-                    )
+                result = CopyFileResult(
+                    source=str(source),
+                    destination=str(destination),
+                    status=CopyStatus.ERROR,
+                    duration_ms=CopyEngineService._duration_ms(file_started_at),
+                    error=str(exc),
+                )
+                results.append(result)
+                CopyEngineService._publish_file_event(
+                    event_bus,
+                    execution_id,
+                    result,
                 )
 
         duration_ms = CopyEngineService._duration_ms(execution_started_at)
         finished_at = datetime.now(UTC)
         summary = CopyEngineService._build_summary(results, duration_ms)
         warnings, errors = CopyEngineService._build_issues(results)
-
-        return CopyReport(
+        report = CopyReport(
             execution_id=execution_id,
             started_at=started_at,
             finished_at=finished_at,
@@ -128,10 +161,61 @@ class CopyEngineService:
             errors=errors,
             metadata={
                 "destination_root": str(destination_root),
-                "planned_files": len(
-                    request.execution_plan.physical_files
-                ),
+                "planned_files": len(request.execution_plan.physical_files),
             },
+        )
+
+        CopyEngineService._publish(
+            event_bus,
+            CopyEvent(
+                event_type=CopyEventType.COPY_FINISHED,
+                execution_id=execution_id,
+                duration_ms=duration_ms,
+                metadata={
+                    "success": report.success,
+                    "total_files": summary.total_files,
+                    "copied": summary.copied,
+                    "skipped": summary.skipped,
+                    "missing": summary.missing,
+                    "errors": summary.errors,
+                    "total_bytes": summary.total_bytes,
+                },
+            ),
+        )
+        return report
+
+    @staticmethod
+    def _publish(
+        event_bus: CopyEventBus | None,
+        event: CopyEvent,
+    ) -> None:
+        if event_bus is not None:
+            event_bus.publish(event)
+
+    @staticmethod
+    def _publish_file_event(
+        event_bus: CopyEventBus | None,
+        execution_id: UUID,
+        result: CopyFileResult,
+    ) -> None:
+        event_types = {
+            CopyStatus.COPIED: CopyEventType.FILE_COPIED,
+            CopyStatus.SKIPPED: CopyEventType.FILE_SKIPPED,
+            CopyStatus.MISSING: CopyEventType.FILE_MISSING,
+            CopyStatus.ERROR: CopyEventType.FILE_ERROR,
+        }
+        CopyEngineService._publish(
+            event_bus,
+            CopyEvent(
+                event_type=event_types[result.status],
+                execution_id=execution_id,
+                source=result.source,
+                destination=result.destination,
+                file_status=result.status,
+                size=result.size,
+                duration_ms=result.duration_ms,
+                message=result.error,
+            ),
         )
 
     @staticmethod
