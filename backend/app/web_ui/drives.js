@@ -6,7 +6,7 @@ function driveOptions(drives){
 }
 
 function joinWindowsPath(root,subdirectory){
-  const cleanRoot=root.replace(/[\\/]+$/,“”);
+  const cleanRoot=root.replace(/[\\/]+$/,"");
   const cleanSubdirectory=subdirectory.trim().replace(/^[\\/]+|[\\/]+$/g,"");
   return cleanSubdirectory?`${cleanRoot}\\${cleanSubdirectory}`:`${cleanRoot}\\`;
 }
