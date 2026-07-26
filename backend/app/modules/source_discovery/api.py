@@ -2,6 +2,8 @@
 
 from fastapi import APIRouter, HTTPException, status
 
+from .diagnostic import diagnose_windows_source
+from .diagnostic_schemas import WindowsDiagnosticReport, WindowsDiagnosticRequest
 from .drives import list_available_drives
 from .schemas import (
     AvailableDrivesReport,
@@ -39,6 +41,25 @@ def discover_windows_source(
 
     try:
         return discover_source(payload.source_root)
+    except SourceDiscoveryError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
+
+
+@router.post(
+    "/diagnostic",
+    response_model=WindowsDiagnosticReport,
+    status_code=status.HTTP_200_OK,
+)
+def diagnose_selected_windows_source(
+    payload: WindowsDiagnosticRequest,
+) -> WindowsDiagnosticReport:
+    """Estimate recoverable personal data without modifying the source disk."""
+
+    try:
+        return diagnose_windows_source(payload.source_root)
     except SourceDiscoveryError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
