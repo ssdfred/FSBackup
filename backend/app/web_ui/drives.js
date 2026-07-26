@@ -105,7 +105,7 @@ async function loadAvailableDrives(){
   }
 }
 
-const UI_MODULE_VERSION="10.7.2";
+const UI_MODULE_VERSION="10.7.3";
 
 function loadOptionalModule(src,attribute){
   const alreadyLoaded=[...document.scripts].some(script=>{
