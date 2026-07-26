@@ -6,12 +6,22 @@ function inventoryFormatBytes(value){
   return `${(value/(1024**index)).toLocaleString("fr-FR",{maximumFractionDigits:index?1:0})} ${units[index]}`;
 }
 
+const inventoryState={selectable:[],selected:new Set()};
 const inventoryLabels={
   "données_personnelles":"Données personnelles à la racine",
   "à_examiner":"Dossiers et projets à examiner",
   "système_non_inclus":"Éléments système non inclus",
   "ancienne_installation_windows":"Ancienne installation Windows"
 };
+
+window.getSelectedAdditionalPaths=()=>[...inventoryState.selected];
+window.getSelectedAdditionalSize=()=>inventoryState.selectable
+  .filter(item=>inventoryState.selected.has(item.path))
+  .reduce((total,item)=>total+Number(item.size_bytes??0),0);
+
+function notifyInventorySelection(){
+  window.dispatchEvent(new CustomEvent("fsbackup:plan-selection-changed"));
+}
 
 function ensureRootInventoryPanel(){
   let panel=document.querySelector("#root-inventory");
@@ -29,38 +39,47 @@ function ensureRootInventoryPanel(){
       .root-inventory-panel{margin-top:1rem}.inventory-warning{padding:1rem;border:1px solid #efc66f;border-radius:14px;background:#fff8e8;margin-bottom:1rem}
       .inventory-group{margin-top:1rem}.inventory-group h3{margin-bottom:.6rem}.inventory-entry{padding:.8rem 0;border-top:1px solid #e2e5ef}
       .inventory-entry-head{display:flex;justify-content:space-between;gap:1rem}.inventory-path{font-family:ui-monospace,monospace;word-break:break-all;font-size:.84rem}
-      .inventory-old{padding:.8rem;margin-top:.7rem;background:#fff;border:1px solid #e6e8f1;border-radius:12px}
+      .inventory-old{padding:.8rem;margin-top:.7rem;background:#fff;border:1px solid #e6e8f1;border-radius:12px}.inventory-select{display:flex;gap:.7rem;align-items:flex-start}.inventory-select input{margin-top:.25rem}
     `;
     document.head.appendChild(style);
   }
   return panel;
 }
 
+function selectableEntry(item){
+  return item.category==="à_examiner"||item.category==="données_personnelles";
+}
+
+function renderInventoryEntry(item){
+  const details=`<div><div class="inventory-entry-head"><b>${item.name}</b><span>${inventoryFormatBytes(item.size_bytes)}</span></div><div class="inventory-path">${item.path}</div><small>${item.reason}${item.file_count!==null&&item.file_count!==undefined?` · ${Number(item.file_count).toLocaleString("fr-FR")} fichiers`:""}</small></div>`;
+  if(!selectableEntry(item))return `<div class="inventory-entry">${details}</div>`;
+  return `<label class="inventory-entry inventory-select"><input type="checkbox" data-inventory-path="${encodeURIComponent(item.path)}"><span>${details}</span></label>`;
+}
+
 function renderRootInventory(report){
   const panel=ensureRootInventoryPanel();
   if(!panel)return;
+  inventoryState.selected.clear();
+  inventoryState.selectable=(report.entries??[]).filter(selectableEntry);
   const groups={};
-  (report.entries??[]).forEach(item=>{
-    (groups[item.category]??=[]).push(item);
-  });
+  (report.entries??[]).forEach(item=>(groups[item.category]??=[]).push(item));
   const order=["données_personnelles","à_examiner","ancienne_installation_windows","système_non_inclus"];
   panel.innerHTML=`
-    <p class="eyebrow">Périmètre du disque</p>
-    <h2>Inventaire des dossiers à la racine</h2>
-    <div class="inventory-warning"><strong>Ces dossiers ne sont pas automatiquement ajoutés.</strong><p>FSBackup les affiche pour éviter qu’un projet, une base de données ou une ancienne installation Windows soit oublié.</p></div>
+    <p class="eyebrow">Périmètre du disque</p><h2>Inventaire des dossiers à la racine</h2>
+    <div class="inventory-warning"><strong>Les projets sont facultatifs et décochés par défaut.</strong><p>Les dossiers personnels standards sont déjà inclus par le plan Windows. Cochez uniquement les projets supplémentaires à ajouter.</p></div>
     <div class="diagnostic-grid">
-      <article class="diagnostic-card"><span>Dossiers à examiner</span><strong>${(groups["à_examiner"]??[]).length}</strong><small>${inventoryFormatBytes(report.review_size_bytes)} · ${Number(report.review_file_count??0).toLocaleString("fr-FR")} fichiers</small></article>
-      <article class="diagnostic-card"><span>Anciennes installations</span><strong>${(groups["ancienne_installation_windows"]??[]).length}</strong><small>${(report.old_windows_profiles??[]).length} profil(s) utilisateur trouvé(s)</small></article>
-      <article class="diagnostic-card"><span>Éléments système</span><strong>${(groups["système_non_inclus"]??[]).length}</strong><small>Affichés, mais non inclus par défaut</small></article>
+      <article class="diagnostic-card"><span>Dossiers sélectionnables</span><strong>${inventoryState.selectable.length}</strong><small>${inventoryFormatBytes(report.review_size_bytes)} détectés</small></article>
+      <article class="diagnostic-card"><span>Anciennes installations</span><strong>${(groups["ancienne_installation_windows"]??[]).length}</strong><small>${(report.old_windows_profiles??[]).length} profil(s) trouvé(s)</small></article>
+      <article class="diagnostic-card"><span>Éléments système</span><strong>${(groups["système_non_inclus"]??[]).length}</strong><small>Non sélectionnables</small></article>
     </div>
-    ${order.map(category=>{
-      const entries=groups[category]??[];
-      if(!entries.length)return "";
-      return `<div class="inventory-group"><h3>${inventoryLabels[category]}</h3>${entries.map(item=>`<div class="inventory-entry"><div class="inventory-entry-head"><b>${item.name}</b><span>${inventoryFormatBytes(item.size_bytes)}</span></div><div class="inventory-path">${item.path}</div><small>${item.reason}${item.file_count!==null&&item.file_count!==undefined?` · ${Number(item.file_count).toLocaleString("fr-FR")} fichiers`:""}</small></div>`).join("")}</div>`;
-    }).join("")}
-    ${(report.old_windows_profiles??[]).length?`<div class="inventory-group"><h3>Profils récupérables dans Windows.old</h3>${report.old_windows_profiles.map(profile=>`<div class="inventory-old"><b>${profile.name}</b><div class="inventory-path">${profile.path}</div><small>${inventoryFormatBytes(profile.personal_size_bytes)} · ${Number(profile.personal_file_count).toLocaleString("fr-FR")} fichiers personnels repérés</small></div>`).join("")}</div>`:""}
-    ${(report.warnings??[]).length?`<p class="diagnostic-error"><small>${report.warnings.length} avertissement(s) pendant cet inventaire.</small></p>`:""}
-  `;
+    ${order.map(category=>{const entries=groups[category]??[];if(!entries.length)return "";return `<div class="inventory-group"><h3>${inventoryLabels[category]}</h3>${entries.map(renderInventoryEntry).join("")}</div>`;}).join("")}
+    ${(report.old_windows_profiles??[]).length?`<div class="inventory-group"><h3>Profils repérés dans Windows.old</h3>${report.old_windows_profiles.map(profile=>`<div class="inventory-old"><b>${profile.name}</b><div class="inventory-path">${profile.path}</div><small>${inventoryFormatBytes(profile.personal_size_bytes)} · ${Number(profile.personal_file_count).toLocaleString("fr-FR")} fichiers personnels repérés</small></div>`).join("")}</div>`:""}`;
+  panel.querySelectorAll("[data-inventory-path]").forEach(input=>input.addEventListener("change",()=>{
+    const path=decodeURIComponent(input.dataset.inventoryPath);
+    if(input.checked)inventoryState.selected.add(path);else inventoryState.selected.delete(path);
+    notifyInventorySelection();
+  }));
+  notifyInventorySelection();
 }
 
 async function runRootInventory(){
@@ -85,5 +104,4 @@ function initRootInventory(){
   setTimeout(runRootInventory,0);
 }
 
-if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",initRootInventory);
-else initRootInventory();
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",initRootInventory);else initRootInventory();
