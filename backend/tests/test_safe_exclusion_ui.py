@@ -41,8 +41,10 @@ def test_capacity_ui_distinguishes_disk_recovery_scope_and_plan() -> None:
     assert "Capacité du lecteur source" in script
     assert "Dossiers standards inclus" in script
     assert "Compléments de profils détectés" in script
+    assert "Plan avant exclusions" in script
+    assert "Exclusions applicables" in script
+    assert "Plan final estimé" in script
     assert "Total récupérable visible" in script
-    assert "Plan actuellement sélectionné" in script
     assert "Windows et les programmes installés restent exclus" in script
 
 
