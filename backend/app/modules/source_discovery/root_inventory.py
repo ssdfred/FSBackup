@@ -61,14 +61,12 @@ def _classify(name: str) -> tuple[RootEntryCategory, str]:
     if normalized == "windows.old":
         return (
             RootEntryCategory.OLD_WINDOWS,
-            "Ancienne installation Windows à analyser séparément avant "
-            "toute récupération.",
+            "Ancienne installation Windows complète, facultative et à examiner avant récupération.",
         )
     if normalized in SYSTEM_ROOTS:
         return (
             RootEntryCategory.SYSTEM,
-            "Élément système ou technique non inclus automatiquement "
-            "dans une sauvegarde de données.",
+            "Élément système ou technique non inclus automatiquement dans une sauvegarde de données.",
         )
     if normalized in PERSONAL_ROOTS:
         return (
@@ -77,8 +75,7 @@ def _classify(name: str) -> tuple[RootEntryCategory, str]:
         )
     return (
         RootEntryCategory.REVIEW,
-        "Dossier applicatif, projet ou donnée personnalisée à examiner "
-        "manuellement.",
+        "Dossier applicatif, projet ou donnée personnalisée à examiner manuellement.",
     )
 
 
@@ -136,6 +133,43 @@ def _windows_profiles(
         profiles.append(report)
         warnings.extend(report.warnings)
     return profiles, warnings
+
+
+def _programdata_entries(programdata_root: Path) -> tuple[list[RootInventoryEntry], list[str]]:
+    """Inventory direct ProgramData children without selecting the whole tree."""
+
+    entries: list[RootInventoryEntry] = []
+    warnings: list[str] = []
+    try:
+        candidates = sorted(programdata_root.iterdir(), key=lambda item: item.name.casefold())
+    except OSError as exc:
+        return entries, [f"Impossible de lire {programdata_root} : {exc}"]
+
+    for candidate in candidates:
+        try:
+            if candidate.is_symlink() or not candidate.is_dir():
+                continue
+        except OSError as exc:
+            warnings.append(f"Impossible d'inspecter {candidate} : {exc}")
+            continue
+        size_bytes, file_count, local_warnings = _safe_directory_estimate(candidate)
+        entries.append(
+            RootInventoryEntry(
+                name=f"ProgramData\\{candidate.name}",
+                path=str(candidate),
+                category=RootEntryCategory.PROGRAM_DATA,
+                reason=(
+                    "Données partagées d'application. À sélectionner seulement si leur "
+                    "configuration ou leur contenu doit être conservé."
+                ),
+                included_by_default=False,
+                size_bytes=size_bytes,
+                file_count=file_count,
+                warnings=local_warnings,
+            )
+        )
+        warnings.extend(local_warnings)
+    return entries, warnings
 
 
 def inventory_root(source_root: str | Path) -> RootInventoryReport:
@@ -202,6 +236,10 @@ def inventory_root(source_root: str | Path) -> RootInventoryReport:
                 warnings=local_warnings,
             )
         )
+
+    programdata_entries, programdata_warnings = _programdata_entries(root / "ProgramData")
+    entries.extend(programdata_entries)
+    warnings.extend(programdata_warnings)
 
     entries.sort(key=lambda item: (item.category, item.name.casefold()))
     recoverable_profiles = current_profiles + old_profiles
