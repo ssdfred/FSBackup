@@ -12,6 +12,7 @@ class RootEntryCategory(StrEnum):
 
     PERSONAL = "données_personnelles"
     REVIEW = "à_examiner"
+    PROGRAM_DATA = "programdata_à_examiner"
     SYSTEM = "système_non_inclus"
     OLD_WINDOWS = "ancienne_installation_windows"
 
