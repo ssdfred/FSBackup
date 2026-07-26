@@ -1,4 +1,4 @@
-const capacityState={diagnostic:null,loading:false,initialized:false};
+const capacityState={diagnostic:null,loading:false,initialized:false,sourceRoot:"",requestId:0};
 
 function capacityFormatBytes(value){
   if(!value)return "0 octet";
@@ -12,10 +12,24 @@ function normalizeDriveRoot(value){
   return match?`${match[1].toUpperCase()}\\`:"";
 }
 
+function normalizeCapacitySource(value){
+  return String(value??"").trim().replace(/[\\/]+$/g,"").toLowerCase();
+}
+
 function selectedDestinationDrive(){
   const destination=document.querySelector("#destination-directory")?.value??"";
   const root=normalizeDriveRoot(destination);
   return (window.fsbackupDrives??[]).find(drive=>drive.root.toUpperCase()===root.toUpperCase())??null;
+}
+
+function selectedSourceMatchesCapacity(){
+  const selected=normalizeCapacitySource(document.querySelector("#source-root")?.value);
+  return Boolean(selected&&selected===capacityState.sourceRoot);
+}
+
+function inventoryMatchesCapacitySource(){
+  const inventoryRoot=normalizeCapacitySource(window.getInventorySourceRoot?.()??"");
+  return Boolean(inventoryRoot&&inventoryRoot===capacityState.sourceRoot&&selectedSourceMatchesCapacity());
 }
 
 function ensureCapacityPanel(){
@@ -60,14 +74,15 @@ function clarifyDiagnosticSummary(){
 function renderCapacityDiagnostic(){
   const panel=ensureCapacityPanel();
   const data=capacityState.diagnostic;
-  if(!panel||!data)return;
+  if(!panel||!data||!selectedSourceMatchesCapacity())return;
   const disk=data.disk??{};
   const estimate=data.estimate??{};
   const destination=selectedDestinationDrive();
   const defaultPlanned=Number(estimate.planned_size_bytes??0);
-  const additionalSize=Number(window.getSelectedAdditionalSize?.()??0);
-  const recoverySize=Number(window.getSelectedRecoverySize?.()??0);
-  const detectedRecoverySize=Number(window.getDetectedRecoverableProfileSize?.()??0);
+  const sameInventory=inventoryMatchesCapacitySource();
+  const additionalSize=sameInventory?Number(window.getSelectedAdditionalSize?.()??0):0;
+  const recoverySize=sameInventory?Number(window.getSelectedRecoverySize?.()??0):0;
+  const detectedRecoverySize=sameInventory?Number(window.getDetectedRecoverableProfileSize?.()??0):0;
   const planned=defaultPlanned+additionalSize+recoverySize;
   const maximumDetected=defaultPlanned+detectedRecoverySize+additionalSize;
   const usedBytes=Number(disk.used_bytes??0);
@@ -87,7 +102,7 @@ function renderCapacityDiagnostic(){
     <div class="capacity-grid">
       <article class="capacity-card"><span>Capacité du lecteur source</span><strong>${capacityFormatBytes(disk.total_bytes)}</strong><small>${capacityFormatBytes(usedBytes)} utilisés · ${capacityFormatBytes(disk.free_bytes)} libres</small></article>
       <article class="capacity-card"><span>Dossiers standards inclus</span><strong>${capacityFormatBytes(estimate.total_size_bytes)}</strong><small>${Number(estimate.total_file_count??0).toLocaleString("fr-FR")} fichiers personnels</small></article>
-      <article class="capacity-card"><span>Compléments de profils détectés</span><strong>${capacityFormatBytes(detectedRecoverySize)}</strong><small>AppData et autres fichiers accessibles, facultatifs</small></article>
+      <article class="capacity-card"><span>Compléments de profils détectés</span><strong>${capacityFormatBytes(detectedRecoverySize)}</strong><small>${sameInventory?"AppData et autres fichiers accessibles, facultatifs":"Inventaire du disque en cours de synchronisation"}</small></article>
       <article class="capacity-card"><span>Plan actuellement sélectionné</span><strong>${capacityFormatBytes(planned)}</strong><small>${capacityFormatBytes(defaultPlanned)} de base · ${capacityFormatBytes(recoverySize)} de profils · ${capacityFormatBytes(additionalSize)} de projets</small></article>
       <article class="capacity-card"><span>Total récupérable visible</span><strong>${capacityFormatBytes(maximumDetected)}</strong><small>Profils détectés et projets déjà cochés</small></article>
       <article class="capacity-card"><span>Données utilisées non classées</span><strong>${capacityFormatBytes(unexplainedBytes)}</strong><small>Système, programmes, fichiers protégés ou dossiers encore non mesurés</small></article>
@@ -101,11 +116,15 @@ function renderCapacityDiagnostic(){
 
 async function refreshCapacityDiagnostic(){
   const mode=document.querySelector("#source-mode")?.value;
-  const source=document.querySelector("#source-root")?.value;
+  const source=document.querySelector("#source-root")?.value??"";
+  const normalizedSource=normalizeCapacitySource(source);
   const panel=ensureCapacityPanel();
   if(!panel)return;
+  const requestId=++capacityState.requestId;
+  capacityState.diagnostic=null;
+  capacityState.sourceRoot=normalizedSource;
+  window.fsbackupDestinationCapacityValid=false;
   if(mode!=="windows_disk"||!source){panel.classList.add("hidden");return;}
-  if(capacityState.loading)return;
   capacityState.loading=true;
   panel.className="capacity-panel";
   panel.innerHTML="<strong>Calcul du périmètre réel et contrôle de la destination…</strong>";
@@ -113,14 +132,20 @@ async function refreshCapacityDiagnostic(){
     const response=await fetch("/api/v1/sources/diagnostic",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({source_root:source})});
     const data=await response.json();
     if(!response.ok)throw new Error(data.detail??"Diagnostic impossible.");
+    const selectedNow=normalizeCapacitySource(document.querySelector("#source-root")?.value);
+    if(requestId!==capacityState.requestId||selectedNow!==normalizedSource)return;
     capacityState.diagnostic=data;
+    capacityState.sourceRoot=normalizedSource;
     renderCapacityDiagnostic();
     setTimeout(clarifyDiagnosticSummary,0);
   }catch(error){
+    if(requestId!==capacityState.requestId)return;
     capacityState.diagnostic=null;
     window.fsbackupDestinationCapacityValid=false;
     panel.innerHTML=`<div class="capacity-error">${error.message}</div>`;
-  }finally{capacityState.loading=false;}
+  }finally{
+    if(requestId===capacityState.requestId)capacityState.loading=false;
+  }
 }
 
 function renameWindowsSourceMode(){
