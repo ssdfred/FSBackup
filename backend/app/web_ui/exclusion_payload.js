@@ -12,6 +12,7 @@
         payload.approved_exclusions=window.getApprovedBackupExclusions?.()??[];
         payload.exclusions_confirmed=window.areBackupExclusionsConfirmed?.()??true;
         payload.selected_additional_paths=window.getSelectedAdditionalPaths?.()??[];
+        payload.selected_recovery_paths=window.getSelectedRecoveryPaths?.()??[];
         options={...options,body:JSON.stringify(payload)};
       }catch(_error){
         // Le backend validera la requête originale si le corps n'est pas du JSON valide.

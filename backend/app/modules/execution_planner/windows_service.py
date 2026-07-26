@@ -1,4 +1,4 @@
-"""Build a Windows recovery plan that includes personal folders and selected projects."""
+"""Build a Windows recovery plan with personal, selected and legacy data."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from .service import ExecutionPlannerService
 
 
 class WindowsExecutionPlannerService:
-    """Combine browser/application data with personal folders and approved projects."""
+    """Combine detected application data with explicitly recoverable folders."""
 
     @classmethod
     def build_plan(
@@ -21,6 +21,7 @@ class WindowsExecutionPlannerService:
         source_root: str | Path,
         selected_item_ids: list[str] | None = None,
         selected_additional_paths: list[str] | None = None,
+        selected_recovery_paths: list[str] | None = None,
     ) -> ExecutionPlan:
         base_plan = ExecutionPlannerService().build_plan(source_root, selected_item_ids)
         root = Path(base_plan.source_root).resolve(strict=True)
@@ -65,6 +66,22 @@ class WindowsExecutionPlannerService:
                 warnings=warnings,
             )
 
+        for raw_path in dict.fromkeys(selected_recovery_paths or []):
+            candidate = Path(raw_path).expanduser().resolve(strict=True)
+            cls._validate_recovery_path(root, candidate)
+            cls._append_directory(
+                root=root,
+                directory=candidate,
+                logical_id=f"recovery:{candidate.relative_to(root)}",
+                category="selected_recovery_data",
+                application_name="Données de récupération sélectionnées",
+                user_name=cls._recovery_user_name(root, candidate),
+                profile_name=candidate.name,
+                files_by_path=files_by_path,
+                items=items,
+                warnings=warnings,
+            )
+
         physical_files = sorted(
             files_by_path.values(), key=lambda item: item.relative_path.casefold()
         )
@@ -98,12 +115,44 @@ class WindowsExecutionPlannerService:
         if candidate == root:
             raise ValueError("La racine complète ne peut pas être ajoutée manuellement.")
         top_level = relative.parts[0].casefold() if relative.parts else ""
-        if top_level in SYSTEM_ROOTS:
+        is_programdata_child = top_level == "programdata" and len(relative.parts) >= 2
+        if top_level in SYSTEM_ROOTS and not is_programdata_child:
             raise ValueError(
                 f"Dossier système non sélectionnable manuellement : {candidate}"
             )
         if not candidate.is_dir():
             raise ValueError(f"Dossier supplémentaire invalide : {candidate}")
+
+    @staticmethod
+    def _validate_recovery_path(root: Path, candidate: Path) -> None:
+        try:
+            relative = candidate.relative_to(root)
+        except ValueError as exc:
+            raise ValueError(
+                f"Donnée de récupération hors de la source : {candidate}"
+            ) from exc
+        if not candidate.is_dir() or candidate == root:
+            raise ValueError(f"Donnée de récupération invalide : {candidate}")
+
+        parts = [part.casefold() for part in relative.parts]
+        current_profile = len(parts) >= 2 and parts[0] in {"users", "utilisateurs"}
+        old_profile = (
+            len(parts) >= 3
+            and parts[0] == "windows.old"
+            and parts[1] in {"users", "utilisateurs"}
+        )
+        if not (current_profile or old_profile):
+            raise ValueError(
+                "Les données de récupération doivent appartenir à un profil "
+                f"utilisateur courant ou à Windows.old : {candidate}"
+            )
+
+    @staticmethod
+    def _recovery_user_name(root: Path, candidate: Path) -> str:
+        parts = candidate.relative_to(root).parts
+        if parts and parts[0].casefold() == "windows.old" and len(parts) >= 3:
+            return parts[2]
+        return parts[1] if len(parts) >= 2 else "local"
 
     @classmethod
     def _append_directory(

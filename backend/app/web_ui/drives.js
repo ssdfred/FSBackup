@@ -105,10 +105,14 @@ async function loadAvailableDrives(){
   }
 }
 
-const UI_MODULE_VERSION="10.6.2";
+const UI_MODULE_VERSION="10.7.7";
 
 function loadOptionalModule(src,attribute){
-  if(document.querySelector(`script[${attribute}]`))return;
+  const alreadyLoaded=[...document.scripts].some(script=>{
+    const scriptUrl=new URL(script.src||"",window.location.href);
+    return script.hasAttribute(attribute)||scriptUrl.pathname===src;
+  });
+  if(alreadyLoaded)return;
   const script=document.createElement("script");
   const separator=src.includes("?")?"&":"?";
   script.src=`${src}${separator}v=${encodeURIComponent(UI_MODULE_VERSION)}`;
@@ -121,7 +125,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   loadOptionalModule("/app/diagnostic.js","data-fsbackup-diagnostic");
   loadOptionalModule("/app/capacity.js","data-fsbackup-capacity");
   loadOptionalModule("/app/root_inventory.js","data-fsbackup-root-inventory");
-  loadOptionalModule("/app/backup_payload_bridge.js","data-fsbackup-payload-bridge");
+  loadOptionalModule("/app/exclusion_payload.js","data-fsbackup-payload-bridge");
   locationConfigs.forEach(bindLocation);
   loadAvailableDrives();
 });

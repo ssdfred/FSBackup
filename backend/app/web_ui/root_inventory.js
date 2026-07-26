@@ -6,21 +6,44 @@ function inventoryFormatBytes(value){
   return `${(value/(1024**index)).toLocaleString("fr-FR",{maximumFractionDigits:index?1:0})} ${units[index]}`;
 }
 
-const inventoryState={selectable:[],selected:new Set()};
+const inventoryState={sourceRoot:"",requestId:0,selectable:[],selected:new Set(),recovery:[],selectedRecovery:new Set(),loading:false,error:null,timer:null,controller:null};
 const inventoryLabels={
   "données_personnelles":"Données personnelles à la racine",
   "à_examiner":"Dossiers et projets à examiner",
+  "programdata_à_examiner":"Données partagées dans ProgramData",
   "système_non_inclus":"Éléments système non inclus",
-  "ancienne_installation_windows":"Ancienne installation Windows"
+  "ancienne_installation_windows":"Ancienne installation Windows complète"
 };
 
 window.getSelectedAdditionalPaths=()=>[...inventoryState.selected];
 window.getSelectedAdditionalSize=()=>inventoryState.selectable
   .filter(item=>inventoryState.selected.has(item.path))
   .reduce((total,item)=>total+Number(item.size_bytes??0),0);
+window.getSelectedRecoveryPaths=()=>[...inventoryState.selectedRecovery];
+window.getSelectedRecoverySize=()=>inventoryState.recovery
+  .filter(item=>inventoryState.selectedRecovery.has(item.path))
+  .reduce((total,item)=>total+Number(item.profile_kind==="current"?item.additional_size_bytes:item.total_size_bytes),0);
+window.getDetectedRecoverableProfileSize=()=>inventoryState.recovery
+  .reduce((total,item)=>total+Number(item.profile_kind==="current"?item.additional_size_bytes:item.total_size_bytes),0);
+window.getInventorySourceRoot=()=>inventoryState.sourceRoot;
+window.getInventoryStatus=()=>({loading:inventoryState.loading,error:inventoryState.error,ready:Boolean(inventoryState.sourceRoot&&!inventoryState.loading&&!inventoryState.error)});
 
 function notifyInventorySelection(){
   window.dispatchEvent(new CustomEvent("fsbackup:plan-selection-changed"));
+}
+
+function notifyInventoryStatus(){
+  window.dispatchEvent(new CustomEvent("fsbackup:inventory-status-changed",{detail:window.getInventoryStatus()}));
+}
+
+function clearInventoryState(sourceRoot=""){
+  inventoryState.sourceRoot=sourceRoot;
+  inventoryState.selectable=[];
+  inventoryState.selected.clear();
+  inventoryState.recovery=[];
+  inventoryState.selectedRecovery.clear();
+  inventoryState.error=null;
+  notifyInventorySelection();
 }
 
 function ensureRootInventoryPanel(){
@@ -47,61 +70,118 @@ function ensureRootInventoryPanel(){
 }
 
 function selectableEntry(item){
-  return item.category==="à_examiner"||item.category==="données_personnelles";
+  return ["à_examiner","données_personnelles","programdata_à_examiner","ancienne_installation_windows"].includes(item.category);
 }
 
 function renderInventoryEntry(item){
-  const details=`<div><div class="inventory-entry-head"><b>${item.name}</b><span>${inventoryFormatBytes(item.size_bytes)}</span></div><div class="inventory-path">${item.path}</div><small>${item.reason}${item.file_count!==null&&item.file_count!==undefined?` · ${Number(item.file_count).toLocaleString("fr-FR")} fichiers`:""}</small></div>`;
+  const warning=item.category==="ancienne_installation_windows"
+    ?" · Inclut aussi d’anciens fichiers système et programmes"
+    :"";
+  const details=`<div><div class="inventory-entry-head"><b>${item.name}</b><span>${inventoryFormatBytes(item.size_bytes)}</span></div><div class="inventory-path">${item.path}</div><small>${item.reason}${warning}${item.file_count!==null&&item.file_count!==undefined?` · ${Number(item.file_count).toLocaleString("fr-FR")} fichiers`:""}</small></div>`;
   if(!selectableEntry(item))return `<div class="inventory-entry">${details}</div>`;
   return `<label class="inventory-entry inventory-select"><input type="checkbox" data-inventory-path="${encodeURIComponent(item.path)}"><span>${details}</span></label>`;
 }
 
-function renderRootInventory(report){
+function renderRecoveryProfile(profile){
+  const current=profile.profile_kind==="current";
+  const addedSize=current?profile.additional_size_bytes:profile.total_size_bytes;
+  const addedFiles=current?profile.additional_file_count:profile.total_file_count;
+  const title=current?`${profile.name} — compléter le profil actuel`:`${profile.name} — ancien profil Windows`;
+  const detail=current
+    ?`${inventoryFormatBytes(profile.standard_size_bytes)} déjà inclus · ${inventoryFormatBytes(addedSize)} supplémentaires récupérables`
+    :`${inventoryFormatBytes(profile.total_size_bytes)} récupérables dans Windows.old`;
+  return `<label class="inventory-old inventory-select"><input type="checkbox" data-recovery-path="${encodeURIComponent(profile.path)}"><span><b>${title}</b><div class="inventory-path">${profile.path}</div><small>${detail} · ${Number(addedFiles).toLocaleString("fr-FR")} fichiers supplémentaires</small></span></label>`;
+}
+
+function renderRootInventory(report,sourceRoot){
+  if(sourceRoot!==inventoryState.sourceRoot)return;
   const panel=ensureRootInventoryPanel();
   if(!panel)return;
   inventoryState.selected.clear();
+  inventoryState.selectedRecovery.clear();
   inventoryState.selectable=(report.entries??[]).filter(selectableEntry);
+  inventoryState.recovery=[...(report.current_windows_profiles??[]),...(report.old_windows_profiles??[])];
+  inventoryState.loading=false;
+  inventoryState.error=null;
   const groups={};
   (report.entries??[]).forEach(item=>(groups[item.category]??=[]).push(item));
-  const order=["données_personnelles","à_examiner","ancienne_installation_windows","système_non_inclus"];
+  const order=["données_personnelles","à_examiner","programdata_à_examiner","ancienne_installation_windows","système_non_inclus"];
+  const currentProfiles=inventoryState.recovery.filter(item=>item.profile_kind==="current");
+  const oldProfiles=inventoryState.recovery.filter(item=>item.profile_kind==="old");
   panel.innerHTML=`
-    <p class="eyebrow">Périmètre du disque</p><h2>Inventaire des dossiers à la racine</h2>
-    <div class="inventory-warning"><strong>Les projets sont facultatifs et décochés par défaut.</strong><p>Les dossiers personnels standards sont déjà inclus par le plan Windows. Cochez uniquement les projets supplémentaires à ajouter.</p></div>
+    <p class="eyebrow">Périmètre du disque</p><h2>Inventaire des données récupérables</h2>
+    <div class="inventory-warning"><strong>Les données standards sont incluses, les compléments restent facultatifs.</strong><p>Cochez un profil complet, un ancien profil, un projet, un dossier ProgramData ou Windows.old pour l’ajouter réellement au plan et à l’archive.</p></div>
     <div class="diagnostic-grid">
-      <article class="diagnostic-card"><span>Dossiers sélectionnables</span><strong>${inventoryState.selectable.length}</strong><small>${inventoryFormatBytes(report.review_size_bytes)} détectés</small></article>
-      <article class="diagnostic-card"><span>Anciennes installations</span><strong>${(groups["ancienne_installation_windows"]??[]).length}</strong><small>${(report.old_windows_profiles??[]).length} profil(s) trouvé(s)</small></article>
+      <article class="diagnostic-card"><span>Éléments sélectionnables</span><strong>${inventoryState.selectable.length}</strong><small>${inventoryFormatBytes(report.review_size_bytes)} de projets détectés, hors ProgramData et Windows.old</small></article>
+      <article class="diagnostic-card"><span>Compléments de profils</span><strong>${inventoryState.recovery.length}</strong><small>${inventoryFormatBytes(window.getDetectedRecoverableProfileSize())} récupérables en plus</small></article>
       <article class="diagnostic-card"><span>Éléments système</span><strong>${(groups["système_non_inclus"]??[]).length}</strong><small>Non sélectionnables</small></article>
     </div>
-    ${order.map(category=>{const entries=groups[category]??[];if(!entries.length)return "";return `<div class="inventory-group"><h3>${inventoryLabels[category]}</h3>${entries.map(renderInventoryEntry).join("")}</div>`;}).join("")}
-    ${(report.old_windows_profiles??[]).length?`<div class="inventory-group"><h3>Profils repérés dans Windows.old</h3>${report.old_windows_profiles.map(profile=>`<div class="inventory-old"><b>${profile.name}</b><div class="inventory-path">${profile.path}</div><small>${inventoryFormatBytes(profile.personal_size_bytes)} · ${Number(profile.personal_file_count).toLocaleString("fr-FR")} fichiers personnels repérés</small></div>`).join("")}</div>`:""}`;
+    ${currentProfiles.length?`<div class="inventory-group"><h3>Profils Windows actuels à compléter</h3><p>Les dossiers standards sont déjà inclus. Cette option ajoute AppData et les autres fichiers accessibles du profil.</p>${currentProfiles.map(renderRecoveryProfile).join("")}</div>`:""}
+    ${oldProfiles.length?`<div class="inventory-group"><h3>Profils récupérables dans Windows.old</h3><p>Ces profils ne sont jamais ajoutés sans sélection explicite. Si leur taille reste nulle, utilisez plus bas l’option Windows.old complète.</p>${oldProfiles.map(renderRecoveryProfile).join("")}</div>`:""}
+    ${order.map(category=>{const entries=groups[category]??[];if(!entries.length)return "";return `<div class="inventory-group"><h3>${inventoryLabels[category]}</h3>${entries.map(renderInventoryEntry).join("")}</div>`;}).join("")}`;
   panel.querySelectorAll("[data-inventory-path]").forEach(input=>input.addEventListener("change",()=>{
     const path=decodeURIComponent(input.dataset.inventoryPath);
     if(input.checked)inventoryState.selected.add(path);else inventoryState.selected.delete(path);
     notifyInventorySelection();
   }));
+  panel.querySelectorAll("[data-recovery-path]").forEach(input=>input.addEventListener("change",()=>{
+    const path=decodeURIComponent(input.dataset.recoveryPath);
+    if(input.checked)inventoryState.selectedRecovery.add(path);else inventoryState.selectedRecovery.delete(path);
+    notifyInventorySelection();
+  }));
+  notifyInventoryStatus();
   notifyInventorySelection();
 }
 
 async function runRootInventory(){
   const mode=document.querySelector("#source-mode");
   const source=document.querySelector("#source-root");
-  if(mode?.value!=="windows_disk"||!source?.value)return;
+  if(mode?.value!=="windows_disk"||!source?.value){
+    inventoryState.controller?.abort();
+    inventoryState.loading=false;
+    clearInventoryState();
+    notifyInventoryStatus();
+    return;
+  }
+  const sourceRoot=source.value;
+  const requestId=++inventoryState.requestId;
+  inventoryState.controller?.abort();
+  inventoryState.controller=new AbortController();
+  clearInventoryState(sourceRoot);
+  inventoryState.loading=true;
+  notifyInventoryStatus();
   const panel=ensureRootInventoryPanel();
-  if(!panel){setTimeout(runRootInventory,100);return;}
-  panel.innerHTML="<strong>Inventaire des dossiers de la racine…</strong><p>Analyse en lecture seule, sans sélection automatique.</p>";
+  if(!panel){scheduleRootInventory(100);return;}
+  panel.innerHTML="<strong>Inventaire complet en cours…</strong><p>Analyse unique en lecture seule des profils, projets, ProgramData et Windows.old. Cette étape peut durer plusieurs minutes sur un ancien disque.</p>";
   try{
-    const response=await fetch("/api/v1/sources/root-inventory",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({source_root:source.value})});
+    const response=await fetch("/api/v1/sources/root-inventory",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({source_root:sourceRoot}),signal:inventoryState.controller.signal});
     const report=await response.json();
     if(!response.ok)throw new Error(report.detail??"Inventaire indisponible.");
-    renderRootInventory(report);
-  }catch(error){panel.innerHTML=`<strong>Inventaire indisponible</strong><p class="diagnostic-error">${error.message}</p>`;}
+    if(requestId!==inventoryState.requestId||sourceRoot!==document.querySelector("#source-root")?.value)return;
+    renderRootInventory(report,sourceRoot);
+  }catch(error){
+    if(error.name==="AbortError"||requestId!==inventoryState.requestId)return;
+    inventoryState.loading=false;
+    inventoryState.error=error.message;
+    panel.innerHTML=`<strong>Inventaire indisponible</strong><p class="diagnostic-error">${error.message}</p>`;
+    notifyInventoryStatus();
+    notifyInventorySelection();
+  }
+}
+
+function scheduleRootInventory(delay=250){
+  if(inventoryState.timer)clearTimeout(inventoryState.timer);
+  inventoryState.timer=setTimeout(()=>{
+    inventoryState.timer=null;
+    runRootInventory();
+  },delay);
 }
 
 function initRootInventory(){
-  document.querySelector("#source-root")?.addEventListener("change",()=>setTimeout(runRootInventory,0));
-  document.querySelector("#source-mode")?.addEventListener("change",()=>setTimeout(runRootInventory,0));
-  window.addEventListener("fsbackup:drives-loaded",()=>setTimeout(runRootInventory,0));
-  setTimeout(runRootInventory,0);
+  document.querySelector("#source-root")?.addEventListener("change",()=>scheduleRootInventory());
+  document.querySelector("#source-mode")?.addEventListener("change",()=>scheduleRootInventory());
+  window.addEventListener("fsbackup:drives-loaded",()=>scheduleRootInventory());
+  scheduleRootInventory();
 }
 
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",initRootInventory);else initRootInventory();

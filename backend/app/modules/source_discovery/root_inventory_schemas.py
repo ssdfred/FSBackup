@@ -12,6 +12,7 @@ class RootEntryCategory(StrEnum):
 
     PERSONAL = "données_personnelles"
     REVIEW = "à_examiner"
+    PROGRAM_DATA = "programdata_à_examiner"
     SYSTEM = "système_non_inclus"
     OLD_WINDOWS = "ancienne_installation_windows"
 
@@ -29,13 +30,19 @@ class RootInventoryEntry(BaseModel):
     warnings: list[str] = Field(default_factory=list)
 
 
-class OldWindowsProfile(BaseModel):
-    """Personal data found in one Windows.old user profile."""
+class WindowsRecoveryProfile(BaseModel):
+    """Recoverable content found in one current or legacy Windows profile."""
 
     name: str
     path: str
-    personal_size_bytes: int = 0
-    personal_file_count: int = 0
+    profile_kind: str
+    standard_size_bytes: int = 0
+    standard_file_count: int = 0
+    total_size_bytes: int = 0
+    total_file_count: int = 0
+    additional_size_bytes: int = 0
+    additional_file_count: int = 0
+    warnings: list[str] = Field(default_factory=list)
 
 
 class RootInventoryRequest(BaseModel):
@@ -47,7 +54,10 @@ class RootInventoryReport(BaseModel):
 
     source_root: str
     entries: list[RootInventoryEntry] = Field(default_factory=list)
-    old_windows_profiles: list[OldWindowsProfile] = Field(default_factory=list)
+    current_windows_profiles: list[WindowsRecoveryProfile] = Field(default_factory=list)
+    old_windows_profiles: list[WindowsRecoveryProfile] = Field(default_factory=list)
     review_size_bytes: int = 0
     review_file_count: int = 0
+    recoverable_profile_size_bytes: int = 0
+    recoverable_profile_file_count: int = 0
     warnings: list[str] = Field(default_factory=list)

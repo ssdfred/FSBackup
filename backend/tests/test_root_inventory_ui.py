@@ -4,14 +4,16 @@ from pathlib import Path
 WEB_UI = Path(__file__).parents[1] / "app" / "web_ui"
 
 
-def test_root_inventory_ui_explains_uncovered_folders() -> None:
+def test_root_inventory_ui_explains_recoverable_scope() -> None:
     script = (WEB_UI / "root_inventory.js").read_text(encoding="utf-8")
 
-    assert "Inventaire des dossiers à la racine" in script
-    assert "Les projets sont facultatifs et décochés par défaut" in script
-    assert "Dossiers et projets à examiner" in script
-    assert "Éléments système non inclus" in script
-    assert "Profils repérés dans Windows.old" in script
+    assert "Inventaire des données récupérables" in script
+    assert "Profils Windows actuels à compléter" in script
+    assert "Profils récupérables dans Windows.old" in script
+    assert "AppData" in script
+    assert "data-recovery-path" in script
+    assert "getSelectedRecoverySize" in script
+    assert "réellement au plan et à l’archive" in script
     assert "/api/v1/sources/root-inventory" in script
 
 

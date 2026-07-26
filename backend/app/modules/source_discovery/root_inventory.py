@@ -10,10 +10,10 @@ from .diagnostic import (
     _safe_directory_estimate,
 )
 from .root_inventory_schemas import (
-    OldWindowsProfile,
     RootEntryCategory,
     RootInventoryEntry,
     RootInventoryReport,
+    WindowsRecoveryProfile,
 )
 from .service import SourceDiscoveryService
 
@@ -61,14 +61,12 @@ def _classify(name: str) -> tuple[RootEntryCategory, str]:
     if normalized == "windows.old":
         return (
             RootEntryCategory.OLD_WINDOWS,
-            "Ancienne installation Windows à analyser séparément avant "
-            "toute récupération.",
+            "Ancienne installation Windows complète, facultative et à examiner avant récupération.",
         )
     if normalized in SYSTEM_ROOTS:
         return (
             RootEntryCategory.SYSTEM,
-            "Élément système ou technique non inclus automatiquement "
-            "dans une sauvegarde de données.",
+            "Élément système ou technique non inclus automatiquement dans une sauvegarde de données.",
         )
     if normalized in PERSONAL_ROOTS:
         return (
@@ -77,28 +75,51 @@ def _classify(name: str) -> tuple[RootEntryCategory, str]:
         )
     return (
         RootEntryCategory.REVIEW,
-        "Dossier applicatif, projet ou donnée personnalisée à examiner "
-        "manuellement.",
+        "Dossier applicatif, projet ou donnée personnalisée à examiner manuellement.",
     )
 
 
-def _old_windows_profiles(
-    old_windows: Path,
-) -> tuple[list[OldWindowsProfile], list[str]]:
-    profiles: list[OldWindowsProfile] = []
+def _profile_report(profile: Path, profile_kind: str) -> WindowsRecoveryProfile:
     warnings: list[str] = []
-    users_root = old_windows / "Users"
-    if not users_root.is_dir():
-        users_root = old_windows / "Utilisateurs"
+    standard_size = 0
+    standard_files = 0
+    for _display_name, aliases in PERSONAL_FOLDER_ALIASES:
+        folder = _resolve_personal_folder(profile, aliases)
+        try:
+            if not folder.is_dir():
+                continue
+        except OSError:
+            continue
+        size, files, local_warnings = _safe_directory_estimate(folder)
+        standard_size += size
+        standard_files += files
+        warnings.extend(local_warnings)
+
+    total_size, total_files, total_warnings = _safe_directory_estimate(profile)
+    warnings.extend(total_warnings)
+    return WindowsRecoveryProfile(
+        name=profile.name,
+        path=str(profile),
+        profile_kind=profile_kind,
+        standard_size_bytes=standard_size,
+        standard_file_count=standard_files,
+        total_size_bytes=total_size,
+        total_file_count=total_files,
+        additional_size_bytes=max(total_size - standard_size, 0),
+        additional_file_count=max(total_files - standard_files, 0),
+        warnings=warnings,
+    )
+
+
+def _windows_profiles(
+    users_root: Path, profile_kind: str
+) -> tuple[list[WindowsRecoveryProfile], list[str]]:
+    profiles: list[WindowsRecoveryProfile] = []
+    warnings: list[str] = []
     try:
-        candidates = sorted(
-            users_root.iterdir(),
-            key=lambda item: item.name.casefold(),
-        )
+        candidates = sorted(users_root.iterdir(), key=lambda item: item.name.casefold())
     except OSError as exc:
-        return profiles, [
-            f"Impossible de lire les profils de {old_windows} : {exc}"
-        ]
+        return profiles, [f"Impossible de lire les profils de {users_root} : {exc}"]
 
     for profile in candidates:
         try:
@@ -108,49 +129,72 @@ def _old_windows_profiles(
         except OSError as exc:
             warnings.append(f"Impossible d'inspecter {profile} : {exc}")
             continue
-        size_bytes = 0
-        file_count = 0
-        for _display_name, aliases in PERSONAL_FOLDER_ALIASES:
-            folder = _resolve_personal_folder(profile, aliases)
-            try:
-                if not folder.is_dir():
-                    continue
-            except OSError:
-                continue
-            size, files, local_warnings = _safe_directory_estimate(folder)
-            size_bytes += size
-            file_count += files
-            warnings.extend(local_warnings)
-        profiles.append(
-            OldWindowsProfile(
-                name=profile.name,
-                path=str(profile),
-                personal_size_bytes=size_bytes,
-                personal_file_count=file_count,
-            )
-        )
+        report = _profile_report(profile, profile_kind)
+        profiles.append(report)
+        warnings.extend(report.warnings)
     return profiles, warnings
 
 
+def _programdata_entries(programdata_root: Path) -> tuple[list[RootInventoryEntry], list[str]]:
+    """Inventory direct ProgramData children without selecting the whole tree."""
+
+    entries: list[RootInventoryEntry] = []
+    warnings: list[str] = []
+    try:
+        candidates = sorted(programdata_root.iterdir(), key=lambda item: item.name.casefold())
+    except OSError as exc:
+        return entries, [f"Impossible de lire {programdata_root} : {exc}"]
+
+    for candidate in candidates:
+        try:
+            if candidate.is_symlink() or not candidate.is_dir():
+                continue
+        except OSError as exc:
+            warnings.append(f"Impossible d'inspecter {candidate} : {exc}")
+            continue
+        size_bytes, file_count, local_warnings = _safe_directory_estimate(candidate)
+        entries.append(
+            RootInventoryEntry(
+                name=f"ProgramData\\{candidate.name}",
+                path=str(candidate),
+                category=RootEntryCategory.PROGRAM_DATA,
+                reason=(
+                    "Données partagées d'application. À sélectionner seulement si leur "
+                    "configuration ou leur contenu doit être conservé."
+                ),
+                included_by_default=False,
+                size_bytes=size_bytes,
+                file_count=file_count,
+                warnings=local_warnings,
+            )
+        )
+        warnings.extend(local_warnings)
+    return entries, warnings
+
+
 def inventory_root(source_root: str | Path) -> RootInventoryReport:
-    """Classify visible root directories without changing or following links."""
+    """Classify visible root directories and estimate recoverable profiles."""
 
     root = SourceDiscoveryService()._validate_source_root(source_root)
     entries: list[RootInventoryEntry] = []
-    old_profiles: list[OldWindowsProfile] = []
     warnings: list[str] = []
     review_size = 0
     review_files = 0
 
+    users_root = root / "Users"
+    if not users_root.is_dir():
+        users_root = root / "Utilisateurs"
+    current_profiles, current_warnings = _windows_profiles(users_root, "current")
+    warnings.extend(current_warnings)
+    old_profiles: list[WindowsRecoveryProfile] = []
+
     try:
-        candidates = sorted(
-            root.iterdir(),
-            key=lambda item: item.name.casefold(),
-        )
+        candidates = sorted(root.iterdir(), key=lambda item: item.name.casefold())
     except OSError as exc:
         return RootInventoryReport(
             source_root=str(root),
-            warnings=[f"Impossible de lire la racine {root} : {exc}"],
+            current_windows_profiles=current_profiles,
+            warnings=warnings + [f"Impossible de lire la racine {root} : {exc}"],
         )
 
     for candidate in candidates:
@@ -166,25 +210,19 @@ def inventory_root(source_root: str | Path) -> RootInventoryReport:
         file_count: int | None = None
         local_warnings: list[str] = []
 
-        if category in {
-            RootEntryCategory.REVIEW,
-            RootEntryCategory.PERSONAL,
-        }:
-            size_bytes, file_count, local_warnings = (
-                _safe_directory_estimate(candidate)
-            )
+        if category in {RootEntryCategory.REVIEW, RootEntryCategory.PERSONAL}:
+            size_bytes, file_count, local_warnings = _safe_directory_estimate(candidate)
             review_size += size_bytes
             review_files += file_count
         elif category == RootEntryCategory.OLD_WINDOWS:
-            profiles, profile_warnings = _old_windows_profiles(candidate)
+            old_users = candidate / "Users"
+            if not old_users.is_dir():
+                old_users = candidate / "Utilisateurs"
+            profiles, profile_warnings = _windows_profiles(old_users, "old")
             old_profiles.extend(profiles)
             local_warnings.extend(profile_warnings)
-            size_bytes = sum(
-                profile.personal_size_bytes for profile in profiles
-            )
-            file_count = sum(
-                profile.personal_file_count for profile in profiles
-            )
+            size_bytes, file_count, estimate_warnings = _safe_directory_estimate(candidate)
+            local_warnings.extend(estimate_warnings)
 
         entries.append(
             RootInventoryEntry(
@@ -199,13 +237,25 @@ def inventory_root(source_root: str | Path) -> RootInventoryReport:
             )
         )
 
+    programdata_entries, programdata_warnings = _programdata_entries(root / "ProgramData")
+    entries.extend(programdata_entries)
+    warnings.extend(programdata_warnings)
+
     entries.sort(key=lambda item: (item.category, item.name.casefold()))
+    recoverable_profiles = current_profiles + old_profiles
     return RootInventoryReport(
         source_root=str(root),
         entries=entries,
+        current_windows_profiles=current_profiles,
         old_windows_profiles=old_profiles,
         review_size_bytes=review_size,
         review_file_count=review_files,
+        recoverable_profile_size_bytes=sum(
+            profile.total_size_bytes for profile in recoverable_profiles
+        ),
+        recoverable_profile_file_count=sum(
+            profile.total_file_count for profile in recoverable_profiles
+        ),
         warnings=warnings,
     )
 
