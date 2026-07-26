@@ -39,9 +39,9 @@ def test_capacity_ui_distinguishes_disk_personal_data_and_plan() -> None:
     script = (WEB_UI / "capacity.js").read_text(encoding="utf-8")
 
     assert "Capacité du lecteur source" in script
-    assert "Données personnelles repérées" in script
+    assert "Données personnelles incluses" in script
     assert "Plan réellement sauvegardé" in script
-    assert "ne réalise pas une image complète" in script
+    assert "Les fichiers système et programmes installés restent exclus" in script
 
 
 def test_capacity_ui_blocks_an_unknown_or_insufficient_destination() -> None:

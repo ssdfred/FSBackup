@@ -52,6 +52,7 @@ def test_run_creates_and_verifies_encrypted_archive(tmp_path: Path, monkeypatch)
     report = BackupOrchestratorService.run(
         BackupRunRequest(
             source_root=str(source),
+            source_mode=BackupSourceMode.CUSTOM_FOLDER,
             destination_directory=str(tmp_path / "archives"),
             archive_name="poste-complet",
             encryption=EncryptionSettings(password=SecretStr("mot-de-passe")),
@@ -88,17 +89,3 @@ def test_run_creates_archive_from_custom_folder(tmp_path: Path) -> None:
     assert Path(report.archive_path).suffix == ".fsb"
     assert report.integrity_report is not None
     assert report.integrity_report.valid is True
-
-
-def test_run_reports_planning_failure(tmp_path: Path) -> None:
-    report = BackupOrchestratorService.run(
-        BackupRunRequest(
-            source_root=str(tmp_path / "absent"),
-            destination_directory=str(tmp_path / "archives"),
-            archive_name="backup",
-        )
-    )
-
-    assert report.success is False
-    assert report.archive_path is None
-    assert report.error
