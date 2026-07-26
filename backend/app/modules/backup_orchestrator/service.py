@@ -11,7 +11,7 @@ from app.modules.execution_planner.schemas import (
     ExecutionPlanSummary,
     PhysicalFile,
 )
-from app.modules.execution_planner.service import ExecutionPlannerService
+from app.modules.execution_planner.windows_service import WindowsExecutionPlannerService
 from app.modules.integrity_engine.schemas import IntegrityRequest
 from app.modules.integrity_engine.service import IntegrityEngineService
 from app.modules.manifest_builder.schemas import ManifestExclusion
@@ -26,8 +26,7 @@ class BackupOrchestratorService:
         try:
             execution_plan = cls._build_execution_plan(request)
             execution_plan, excluded_files, excluded_size = cls._apply_exclusions(
-                execution_plan,
-                request,
+                execution_plan, request
             )
             with TemporaryDirectory(prefix="fsbackup-") as workspace:
                 copy_report = CopyEngineService.execute(
@@ -88,9 +87,7 @@ class BackupOrchestratorService:
                 integrity_report = None
                 if request.verify_integrity:
                     password = (
-                        request.encryption.password
-                        if request.encryption
-                        else None
+                        request.encryption.password if request.encryption else None
                     )
                     integrity_report = IntegrityEngineService.verify(
                         IntegrityRequest(
@@ -130,9 +127,10 @@ class BackupOrchestratorService:
     def _build_execution_plan(cls, request: BackupRunRequest) -> ExecutionPlan:
         if request.source_mode == BackupSourceMode.CUSTOM_FOLDER:
             return cls._build_custom_folder_plan(request.source_root)
-        return ExecutionPlannerService().build_plan(
+        return WindowsExecutionPlannerService.build_plan(
             request.source_root,
             request.selected_item_ids,
+            request.selected_additional_paths,
         )
 
     @staticmethod
@@ -160,7 +158,9 @@ class BackupOrchestratorService:
                     f"Exclusion hors de la source interdite : {candidate}"
                 ) from exc
             if candidate == source_root:
-                raise ValueError("La racine complète de la source ne peut pas être exclue.")
+                raise ValueError(
+                    "La racine complète de la source ne peut pas être exclue."
+                )
             excluded_roots.append(candidate)
 
         kept: list[PhysicalFile] = []
