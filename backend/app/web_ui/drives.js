@@ -6,7 +6,7 @@ function driveOptions(drives){
 }
 
 function joinWindowsPath(root,subdirectory){
-  const cleanRoot=root.replace(/[\\/]+$/,"");
+  const cleanRoot=root.replace(/[\\/]+$/m,"");
   const cleanSubdirectory=subdirectory.trim().replace(/^[\\/]+|[\\/]+$/g,"");
   return cleanSubdirectory?`${cleanRoot}\\${cleanSubdirectory}`:`${cleanRoot}\\`;
 }
@@ -81,6 +81,7 @@ async function loadAvailableDrives(){
       const element=document.querySelector(`#${config.drive}`);
       if(element)element.dispatchEvent(new Event("change"));
     });
+    window.dispatchEvent(new CustomEvent("fsbackup:drives-loaded"));
   }catch(error){
     selects.forEach(select=>select.innerHTML='<option value="">Détection impossible</option>');
     const message=document.querySelector("#backup-message");
@@ -93,7 +94,17 @@ async function loadAvailableDrives(){
   }
 }
 
+function loadDiagnosticModule(){
+  if(document.querySelector('script[data-fsbackup-diagnostic]'))return;
+  const script=document.createElement("script");
+  script.src="/app/diagnostic.js";
+  script.defer=true;
+  script.dataset.fsbackupDiagnostic="true";
+  document.body.appendChild(script);
+}
+
 document.addEventListener("DOMContentLoaded",()=>{
+  loadDiagnosticModule();
   locationConfigs.forEach(bindLocation);
   loadAvailableDrives();
 });
