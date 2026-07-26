@@ -44,6 +44,15 @@
           <label>Nom de l’archive<input id="archive-name" name="archive_name" required value="sauvegarde-poste"></label>
           <label>Niveau de compression<select id="compression-level" name="compression_level"><option value="0">Aucune</option><option value="3">Rapide</option><option value="6" selected>Équilibrée</option><option value="9">Maximum</option></select></label>
         </div>
+        <section id="windows-diagnostic" class="report-panel hidden" aria-live="polite">
+          <div class="report-heading"><div><p class="eyebrow">Diagnostic de la source</p><h2 id="diagnostic-title">Analyse du disque Windows</h2></div><span id="diagnostic-status" class="report-badge">Analyse…</span></div>
+          <div id="diagnostic-loading" class="message">Analyse strictement en lecture seule en cours…</div>
+          <div id="diagnostic-content" class="hidden">
+            <dl class="report-grid"><div><dt>Installation Windows</dt><dd id="diagnostic-windows">—</dd></div><div><dt>Utilisateurs</dt><dd id="diagnostic-users">0</dd></div><div><dt>Navigateurs</dt><dd id="diagnostic-browsers">—</dd></div><div><dt>Taille estimée</dt><dd id="diagnostic-size">0 octet</dd></div><div><dt>Fichiers estimés</dt><dd id="diagnostic-files">0</dd></div><div><dt>Espace nécessaire</dt><dd id="diagnostic-space">0 octet</dd></div></dl>
+            <div class="diagnostic-columns"><div><h3>Messageries</h3><p id="diagnostic-mail">Aucune détectée</p></div><div><h3>Applications importantes</h3><p id="diagnostic-apps">Aucune détectée</p></div></div>
+            <div id="diagnostic-warnings" class="message hidden"></div>
+          </div>
+        </section>
         <div class="option-list"><label class="check-row"><input id="verify-integrity" type="checkbox" checked><span><strong>Vérifier l’intégrité</strong><small>Contrôle automatique de l’archive après création.</small></span></label><label class="check-row"><input id="enable-encryption" type="checkbox"><span><strong>Chiffrer la sauvegarde</strong><small>Protège l’archive avec un mot de passe.</small></span></label></div>
         <div id="password-fields" class="form-grid hidden"><label>Mot de passe<input id="encryption-password" type="password" minlength="8" autocomplete="new-password"></label><label>Confirmer le mot de passe<input id="encryption-confirmation" type="password" minlength="8" autocomplete="new-password"></label></div>
         <section id="backup-progress" class="progress-panel hidden" aria-live="polite"><div class="progress-heading"><strong id="progress-title">Préparation</strong><span id="progress-state">En attente</span></div><div class="progress-track"><span id="progress-bar"></span></div><ol class="progress-steps"><li data-step="prepare">Préparation</li><li data-step="copy">Copie des fichiers</li><li data-step="archive">Création de l’archive</li><li data-step="verify">Vérification</li></ol></section>
@@ -119,6 +128,7 @@
   </main>
   <script src="/app/app.js" defer></script>
   <script src="/app/drives.js" defer></script>
+  <script src="/app/diagnostic.js" defer></script>
   <script src="/app/picker.js" defer></script>
   <script src="/app/restore.js" defer></script>
   <script src="/app/retention.js" defer></script>
