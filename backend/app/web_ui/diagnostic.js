@@ -5,7 +5,7 @@ function diagnosticFormatBytes(value){
   return `${(value/(1024**index)).toLocaleString("fr-FR",{maximumFractionDigits:index?1:0})} ${units[index]}`;
 }
 
-const exclusionState={suggestions:[],confirmed:false,sourceRoot:"",sourceSize:0};
+const exclusionState={suggestions:[],confirmed:false,sourceRoot:"",sourceSize:0,basePaths:[]};
 
 function ensureDiagnosticPanel(){
   let panel=document.querySelector("#source-diagnostic");
@@ -46,8 +46,47 @@ function diagnosticNames(items,property="name"){
   return items?.length?items.map(item=>item[property]).join(", "):"Aucun";
 }
 
+function normalizeExclusionPath(value){
+  return String(value??"").trim().replaceAll("/","\\").replace(/\\+$/g,"").toLowerCase();
+}
+
+function pathIsInside(path,root){
+  const candidate=normalizeExclusionPath(path);
+  const parent=normalizeExclusionPath(root);
+  return Boolean(candidate&&parent&&(candidate===parent||candidate.startsWith(`${parent}\\`)));
+}
+
 function selectedExclusions(){
   return exclusionState.suggestions.filter(item=>item.selected);
+}
+
+function selectedScopeRoots(){
+  return [
+    ...exclusionState.basePaths,
+    ...(window.getSelectedRecoveryPaths?.()??[]),
+    ...(window.getSelectedAdditionalPaths?.()??[]),
+  ];
+}
+
+function applicableSelectedExclusions(){
+  const roots=selectedScopeRoots();
+  return selectedExclusions().filter(item=>roots.some(root=>pathIsInside(item.path,root)));
+}
+
+window.getSelectedApplicableExclusionSize=()=>applicableSelectedExclusions()
+  .reduce((total,item)=>total+Number(item.size_bytes??0),0);
+window.getSelectedApplicableExclusionCount=()=>applicableSelectedExclusions().length;
+window.getSelectedExclusionSize=()=>selectedExclusions()
+  .reduce((total,item)=>total+Number(item.size_bytes??0),0);
+
+function notifyExclusionsChanged(){
+  window.dispatchEvent(new CustomEvent("fsbackup:exclusions-changed",{
+    detail:{
+      selectedSize:window.getSelectedExclusionSize(),
+      applicableSize:window.getSelectedApplicableExclusionSize(),
+      applicableCount:window.getSelectedApplicableExclusionCount(),
+    },
+  }));
 }
 
 function updateExclusionSummary(){
@@ -67,6 +106,7 @@ function updateExclusionSummary(){
   }
   const status=document.querySelector("#exclusion-confirmation-status");
   if(status)status.textContent=exclusionState.confirmed?"Exclusions confirmées":"Confirmation obligatoire";
+  notifyExclusionsChanged();
 }
 
 function renderExclusions(report){
@@ -76,6 +116,7 @@ function renderExclusions(report){
   exclusionState.confirmed=false;
   if(!exclusionState.suggestions.length){
     host.innerHTML='<div class="exclusion-panel"><h3>Exclusions proposées</h3><p>Aucune exclusion sûre et conditionnelle n’a été détectée. En cas de doute, FSBackup sauvegarde les fichiers.</p></div>';
+    notifyExclusionsChanged();
     return;
   }
   host.innerHTML=`
@@ -119,7 +160,10 @@ async function loadExclusionSuggestions(sourceRoot){
     const report=await response.json();
     if(!response.ok)throw new Error(report.detail??"Suggestions indisponibles.");
     renderExclusions(report);
-  }catch(error){host.innerHTML=`<div class="exclusion-panel"><strong>Suggestions indisponibles</strong><p class="diagnostic-error">${error.message}</p></div>`;}
+  }catch(error){
+    host.innerHTML=`<div class="exclusion-panel"><strong>Suggestions indisponibles</strong><p class="diagnostic-error">${error.message}</p></div>`;
+    notifyExclusionsChanged();
+  }
 }
 
 function renderSourceDiagnostic(data){
@@ -131,6 +175,9 @@ function renderSourceDiagnostic(data){
   const system=data.system??{};
   exclusionState.sourceRoot=data.source_root;
   exclusionState.sourceSize=data.estimate?.total_size_bytes??0;
+  exclusionState.basePaths=users.flatMap(user=>(user.folders??[])
+    .filter(folder=>folder.present&&folder.path)
+    .map(folder=>folder.path));
   exclusionState.confirmed=false;
   const markerText=data.markers.filter(item=>item.present).map(item=>item.name).join(", ")||"Aucun marqueur";
   panel.className="diagnostic-panel";
@@ -155,7 +202,11 @@ async function runSourceDiagnostic(){
   const mode=document.querySelector("#source-mode");
   const source=document.querySelector("#source-root");
   const panel=ensureDiagnosticPanel();
-  exclusionState.suggestions=[];exclusionState.confirmed=false;exclusionState.sourceRoot="";
+  exclusionState.suggestions=[];
+  exclusionState.confirmed=false;
+  exclusionState.sourceRoot="";
+  exclusionState.basePaths=[];
+  notifyExclusionsChanged();
   if(!panel)return;
   if(mode?.value!=="windows_disk"||!source?.value){panel.classList.add("hidden");return;}
   panel.className="diagnostic-panel loading";
@@ -165,7 +216,10 @@ async function runSourceDiagnostic(){
     const data=await response.json();
     if(!response.ok)throw new Error(data.detail??"Diagnostic impossible.");
     renderSourceDiagnostic(data);
-  }catch(error){panel.className="diagnostic-panel";panel.innerHTML=`<strong>Diagnostic indisponible</strong><p class="diagnostic-error">${error.message}</p>`;}
+  }catch(error){
+    panel.className="diagnostic-panel";
+    panel.innerHTML=`<strong>Diagnostic indisponible</strong><p class="diagnostic-error">${error.message}</p>`;
+  }
 }
 
 function bindSafeExclusionSubmission(){
@@ -174,7 +228,8 @@ function bindSafeExclusionSubmission(){
   form.addEventListener("submit",event=>{
     const selected=selectedExclusions();
     if(selected.length&&!exclusionState.confirmed){
-      event.preventDefault();event.stopImmediatePropagation();
+      event.preventDefault();
+      event.stopImmediatePropagation();
       const confirmation=document.querySelector("#exclusion-confirmation");
       confirmation?.classList.remove("hidden");
       confirmation?.scrollIntoView({behavior:"smooth",block:"center"});
@@ -190,10 +245,13 @@ function bindSafeExclusionSubmission(){
 window.getApprovedBackupExclusions=()=>window.fsbackupApprovedExclusions??[];
 window.areBackupExclusionsConfirmed=()=>window.fsbackupExclusionsConfirmed??true;
 
-document.addEventListener("DOMContentLoaded",()=>{
+function initDiagnostic(){
   ensureDiagnosticPanel();
   bindSafeExclusionSubmission();
   document.querySelector("#source-root")?.addEventListener("change",runSourceDiagnostic);
   document.querySelector("#source-mode")?.addEventListener("change",runSourceDiagnostic);
   window.addEventListener("fsbackup:drives-loaded",runSourceDiagnostic);
-});
+  window.addEventListener("fsbackup:plan-selection-changed",notifyExclusionsChanged);
+}
+
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",initDiagnostic);else initDiagnostic();
