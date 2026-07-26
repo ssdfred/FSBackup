@@ -16,6 +16,8 @@ from .diagnostic_schemas import (
 from .drives import list_available_drives
 from .exclusion_schemas import ExclusionSuggestionReport, ExclusionSuggestionRequest
 from .exclusions import suggest_exclusions
+from .root_inventory import inventory_root
+from .root_inventory_schemas import RootInventoryReport, RootInventoryRequest
 from .schemas import (
     AvailableDrivesReport,
     SourceDiscoveryReport,
@@ -103,6 +105,25 @@ def diagnose_selected_windows_source(
         )
 
     return report
+
+
+@router.post(
+    "/root-inventory",
+    response_model=RootInventoryReport,
+    status_code=status.HTTP_200_OK,
+)
+def inventory_selected_source_root(
+    payload: RootInventoryRequest,
+) -> RootInventoryReport:
+    """Classify visible root folders without selecting or modifying any of them."""
+
+    try:
+        return inventory_root(payload.source_root)
+    except SourceDiscoveryError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
 
 
 @router.post(
