@@ -27,6 +27,7 @@ class BackupRunRequest(BaseModel):
     destination_directory: str = Field(min_length=1)
     archive_name: str = Field(min_length=1)
     selected_item_ids: list[str] | None = None
+    selected_additional_paths: list[str] = Field(default_factory=list)
     approved_exclusions: list[ApprovedExclusion] = Field(default_factory=list)
     exclusions_confirmed: bool = False
     compression: CompressionSettings = Field(default_factory=CompressionSettings)
