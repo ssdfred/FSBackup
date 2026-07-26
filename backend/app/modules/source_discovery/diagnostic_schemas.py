@@ -55,6 +55,25 @@ class WindowsSystemInformation(BaseModel):
     system_size_bytes: int | None = None
 
 
+class DetectedApplication(BaseModel):
+    """Application inferred from standard installation or user-data paths."""
+
+    key: str
+    name: str
+    detected_paths: list[str] = Field(default_factory=list)
+
+
+class MessagingProfileDiagnostic(BaseModel):
+    """Useful mail-client data detected for one Windows profile."""
+
+    client: str
+    user_name: str
+    paths: list[str] = Field(default_factory=list)
+    size_bytes: int = 0
+    file_count: int = 0
+    warnings: list[str] = Field(default_factory=list)
+
+
 class WindowsDiagnosticRequest(BaseModel):
     """Request for a strict read-only source diagnostic."""
 
@@ -71,5 +90,7 @@ class WindowsDiagnosticReport(BaseModel):
     system: WindowsSystemInformation = Field(default_factory=WindowsSystemInformation)
     users: list[UserProfileDiagnostic] = Field(default_factory=list)
     detected_browsers: list[str] = Field(default_factory=list)
+    messaging_profiles: list[MessagingProfileDiagnostic] = Field(default_factory=list)
+    applications: list[DetectedApplication] = Field(default_factory=list)
     estimate: BackupEstimate = Field(default_factory=BackupEstimate)
     warnings: list[str] = Field(default_factory=list)
