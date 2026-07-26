@@ -114,7 +114,9 @@ def _profile_report(profile: Path, profile_kind: str) -> WindowsRecoveryProfile:
     )
 
 
-def _windows_profiles(users_root: Path, profile_kind: str) -> tuple[list[WindowsRecoveryProfile], list[str]]:
+def _windows_profiles(
+    users_root: Path, profile_kind: str
+) -> tuple[list[WindowsRecoveryProfile], list[str]]:
     profiles: list[WindowsRecoveryProfile] = []
     warnings: list[str] = []
     try:
@@ -185,8 +187,8 @@ def inventory_root(source_root: str | Path) -> RootInventoryReport:
             profiles, profile_warnings = _windows_profiles(old_users, "old")
             old_profiles.extend(profiles)
             local_warnings.extend(profile_warnings)
-            size_bytes = sum(profile.total_size_bytes for profile in profiles)
-            file_count = sum(profile.total_file_count for profile in profiles)
+            size_bytes, file_count, estimate_warnings = _safe_directory_estimate(candidate)
+            local_warnings.extend(estimate_warnings)
 
         entries.append(
             RootInventoryEntry(
