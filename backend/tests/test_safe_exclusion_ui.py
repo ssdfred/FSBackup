@@ -13,13 +13,17 @@ def test_exclusion_ui_keeps_suggestions_disabled_by_default() -> None:
 
 
 def test_exclusion_ui_requires_separate_confirmation() -> None:
-    script = (WEB_UI / "diagnostic.js").read_text(encoding="utf-8")
+    diagnostic = (WEB_UI / "diagnostic.js").read_text(encoding="utf-8")
+    payload_bridge = (WEB_UI / "exclusion_payload.js").read_text(encoding="utf-8")
 
-    assert "Validation séparée obligatoire" in script
-    assert "Confirmer les exclusions" in script
-    assert "stopImmediatePropagation" in script
-    assert "exclusions_confirmed" in script
-    assert "approved_exclusions" in script
+    assert "Validation séparée obligatoire" in diagnostic
+    assert "Confirmer les exclusions" in diagnostic
+    assert "stopImmediatePropagation" in diagnostic
+    assert "getApprovedBackupExclusions" in diagnostic
+    assert "areBackupExclusionsConfirmed" in diagnostic
+    assert "approved_exclusions" in payload_bridge
+    assert "exclusions_confirmed" in payload_bridge
+    assert 'url==="/api/v1/backup/run"' in payload_bridge
 
 
 def test_exclusion_ui_displays_risk_and_clear_estimates() -> None:
