@@ -28,13 +28,17 @@ def test_capacity_distinguishes_base_selected_and_recoverable_totals() -> None:
 
     assert "Dossiers standards inclus" in script
     assert "Compléments de profils détectés" in script
-    assert "Plan actuellement sélectionné" in script
+    assert "Plan avant exclusions" in script
+    assert "Exclusions applicables" in script
+    assert "Plan final estimé" in script
     assert "Total récupérable visible" in script
     assert "Données utilisées non classées" in script
     assert "getSelectedAdditionalSize" in script
     assert "getSelectedRecoverySize" in script
     assert "getDetectedRecoverableProfileSize" in script
+    assert "getSelectedApplicableExclusionSize" in script
     assert "fsbackup:plan-selection-changed" in script
+    assert "fsbackup:exclusions-changed" in script
     assert 'document.readyState==="loading"' in script
     assert "initCapacity()" in script
     assert "Espace insuffisant" in script
