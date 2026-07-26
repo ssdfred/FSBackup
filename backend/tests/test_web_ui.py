@@ -12,6 +12,15 @@ def test_root_redirects_to_web_interface() -> None:
     assert response.headers["location"] == "/app/"
 
 
+def test_favicon_is_served() -> None:
+    response = client.get("/favicon.ico")
+
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("image/svg+xml")
+    assert "<svg" in response.text
+    assert "FSBackup" in response.text
+
+
 def test_dashboard_page_is_served() -> None:
     response = client.get("/app/")
 
