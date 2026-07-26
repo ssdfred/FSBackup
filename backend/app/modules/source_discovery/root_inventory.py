@@ -4,7 +4,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from .diagnostic import PERSONAL_FOLDER_ALIASES, _resolve_personal_folder, _safe_directory_estimate
+from .diagnostic import (
+    PERSONAL_FOLDER_ALIASES,
+    _resolve_personal_folder,
+    _safe_directory_estimate,
+)
 from .root_inventory_schemas import (
     OldWindowsProfile,
     RootEntryCategory,
@@ -57,12 +61,14 @@ def _classify(name: str) -> tuple[RootEntryCategory, str]:
     if normalized == "windows.old":
         return (
             RootEntryCategory.OLD_WINDOWS,
-            "Ancienne installation Windows à analyser séparément avant toute récupération.",
+            "Ancienne installation Windows à analyser séparément avant "
+            "toute récupération.",
         )
     if normalized in SYSTEM_ROOTS:
         return (
             RootEntryCategory.SYSTEM,
-            "Élément système ou technique non inclus automatiquement dans une sauvegarde de données.",
+            "Élément système ou technique non inclus automatiquement "
+            "dans une sauvegarde de données.",
         )
     if normalized in PERSONAL_ROOTS:
         return (
@@ -71,24 +77,33 @@ def _classify(name: str) -> tuple[RootEntryCategory, str]:
         )
     return (
         RootEntryCategory.REVIEW,
-        "Dossier applicatif, projet ou donnée personnalisée à examiner manuellement.",
+        "Dossier applicatif, projet ou donnée personnalisée à examiner "
+        "manuellement.",
     )
 
 
-def _old_windows_profiles(old_windows: Path) -> tuple[list[OldWindowsProfile], list[str]]:
+def _old_windows_profiles(
+    old_windows: Path,
+) -> tuple[list[OldWindowsProfile], list[str]]:
     profiles: list[OldWindowsProfile] = []
     warnings: list[str] = []
     users_root = old_windows / "Users"
     if not users_root.is_dir():
         users_root = old_windows / "Utilisateurs"
     try:
-        candidates = sorted(users_root.iterdir(), key=lambda item: item.name.casefold())
+        candidates = sorted(
+            users_root.iterdir(),
+            key=lambda item: item.name.casefold(),
+        )
     except OSError as exc:
-        return profiles, [f"Impossible de lire les profils de {old_windows} : {exc}"]
+        return profiles, [
+            f"Impossible de lire les profils de {old_windows} : {exc}"
+        ]
 
     for profile in candidates:
         try:
-            if not profile.is_dir() or SourceDiscoveryService._should_ignore_user(profile.name):
+            ignored = SourceDiscoveryService._should_ignore_user(profile.name)
+            if not profile.is_dir() or ignored:
                 continue
         except OSError as exc:
             warnings.append(f"Impossible d'inspecter {profile} : {exc}")
@@ -128,7 +143,10 @@ def inventory_root(source_root: str | Path) -> RootInventoryReport:
     review_files = 0
 
     try:
-        candidates = sorted(root.iterdir(), key=lambda item: item.name.casefold())
+        candidates = sorted(
+            root.iterdir(),
+            key=lambda item: item.name.casefold(),
+        )
     except OSError as exc:
         return RootInventoryReport(
             source_root=str(root),
@@ -148,16 +166,25 @@ def inventory_root(source_root: str | Path) -> RootInventoryReport:
         file_count: int | None = None
         local_warnings: list[str] = []
 
-        if category in {RootEntryCategory.REVIEW, RootEntryCategory.PERSONAL}:
-            size_bytes, file_count, local_warnings = _safe_directory_estimate(candidate)
+        if category in {
+            RootEntryCategory.REVIEW,
+            RootEntryCategory.PERSONAL,
+        }:
+            size_bytes, file_count, local_warnings = (
+                _safe_directory_estimate(candidate)
+            )
             review_size += size_bytes
             review_files += file_count
         elif category == RootEntryCategory.OLD_WINDOWS:
             profiles, profile_warnings = _old_windows_profiles(candidate)
             old_profiles.extend(profiles)
             local_warnings.extend(profile_warnings)
-            size_bytes = sum(profile.personal_size_bytes for profile in profiles)
-            file_count = sum(profile.personal_file_count for profile in profiles)
+            size_bytes = sum(
+                profile.personal_size_bytes for profile in profiles
+            )
+            file_count = sum(
+                profile.personal_file_count for profile in profiles
+            )
 
         entries.append(
             RootInventoryEntry(
