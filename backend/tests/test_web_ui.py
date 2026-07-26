@@ -128,6 +128,9 @@ def test_dashboard_assets_are_served() -> None:
     assert "renderReport" in script.text
     assert "renderCatalog" in script.text
     assert "formatBytes" in script.text
+    assert "data-restore-archive" in script.text
+    assert "prepareRestoreFromCatalog" in script.text
+    assert 'mode.value="custom"' in script.text
     assert drives_script.status_code == 200
     assert "/api/v1/sources/drives" in drives_script.text
     assert "systemDrive" in drives_script.text
