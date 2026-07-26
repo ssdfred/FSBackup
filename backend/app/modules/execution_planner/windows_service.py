@@ -115,7 +115,8 @@ class WindowsExecutionPlannerService:
         if candidate == root:
             raise ValueError("La racine complète ne peut pas être ajoutée manuellement.")
         top_level = relative.parts[0].casefold() if relative.parts else ""
-        if top_level in SYSTEM_ROOTS:
+        is_programdata_child = top_level == "programdata" and len(relative.parts) >= 2
+        if top_level in SYSTEM_ROOTS and not is_programdata_child:
             raise ValueError(
                 f"Dossier système non sélectionnable manuellement : {candidate}"
             )
