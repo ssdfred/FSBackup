@@ -131,6 +131,7 @@ class BackupOrchestratorService:
             request.source_root,
             request.selected_item_ids,
             request.selected_additional_paths,
+            request.selected_recovery_paths,
         )
 
     @staticmethod
