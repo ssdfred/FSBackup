@@ -5,7 +5,7 @@ import shutil
 
 from fastapi import APIRouter, HTTPException, status
 
-from app.modules.execution_planner.service import ExecutionPlannerService
+from app.modules.execution_planner.windows_service import WindowsExecutionPlannerService
 
 from .diagnostic import diagnose_windows_source
 from .diagnostic_schemas import (
@@ -25,59 +25,32 @@ from .schemas import (
 )
 from .service import SourceDiscoveryError, discover_source
 
-router = APIRouter(
-    prefix="/sources",
-    tags=["Source Discovery"],
-)
+router = APIRouter(prefix="/sources", tags=["Source Discovery"])
 
 
-@router.get(
-    "/drives",
-    response_model=AvailableDrivesReport,
-    status_code=status.HTTP_200_OK,
-)
+@router.get("/drives", response_model=AvailableDrivesReport, status_code=status.HTTP_200_OK)
 def get_available_drives() -> AvailableDrivesReport:
-    """List mounted drive roots available as backup sources."""
-
     return list_available_drives()
 
 
-@router.post(
-    "/discover",
-    response_model=SourceDiscoveryReport,
-    status_code=status.HTTP_200_OK,
-)
-def discover_windows_source(
-    payload: SourceDiscoveryRequest,
-) -> SourceDiscoveryReport:
-    """Discover users and browser profiles on a Windows disk."""
-
+@router.post("/discover", response_model=SourceDiscoveryReport, status_code=status.HTTP_200_OK)
+def discover_windows_source(payload: SourceDiscoveryRequest) -> SourceDiscoveryReport:
     try:
         return discover_source(payload.source_root)
     except SourceDiscoveryError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(exc),
-        ) from exc
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
 
-@router.post(
-    "/diagnostic",
-    response_model=WindowsDiagnosticReport,
-    status_code=status.HTTP_200_OK,
-)
+@router.post("/diagnostic", response_model=WindowsDiagnosticReport, status_code=status.HTTP_200_OK)
 def diagnose_selected_windows_source(
     payload: WindowsDiagnosticRequest,
 ) -> WindowsDiagnosticReport:
-    """Describe disk usage, personal data and the actual backup-plan scope."""
+    """Describe disk usage, personal data and the default Windows backup plan."""
 
     try:
         report = diagnose_windows_source(payload.source_root)
     except SourceDiscoveryError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(exc),
-        ) from exc
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
     root = Path(report.source_root)
     try:
@@ -93,15 +66,15 @@ def diagnose_selected_windows_source(
         )
 
     try:
-        plan = ExecutionPlannerService().build_plan(root)
+        plan = WindowsExecutionPlannerService.build_plan(root)
         report.estimate.planned_size_bytes = plan.summary.estimated_size_bytes
         report.estimate.planned_file_count = plan.summary.physical_files
         report.estimate.planned_logical_items = plan.summary.logical_items
         report.estimate.required_free_space_bytes = plan.summary.estimated_size_bytes
+        report.estimate.plan_scope = "personal_browser_and_selected_projects"
     except (OSError, ValueError) as exc:
         report.warnings.append(
-            "Le plan réel de sauvegarde n'a pas pu être estimé : "
-            f"{exc}"
+            "Le plan réel de sauvegarde n'a pas pu être estimé : " f"{exc}"
         )
 
     return report
@@ -115,15 +88,10 @@ def diagnose_selected_windows_source(
 def inventory_selected_source_root(
     payload: RootInventoryRequest,
 ) -> RootInventoryReport:
-    """Classify visible root folders without selecting or modifying any of them."""
-
     try:
         return inventory_root(payload.source_root)
     except SourceDiscoveryError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(exc),
-        ) from exc
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
 
 @router.post(
@@ -134,12 +102,7 @@ def inventory_selected_source_root(
 def suggest_source_exclusions(
     payload: ExclusionSuggestionRequest,
 ) -> ExclusionSuggestionReport:
-    """Return conservative exclusion suggestions, all disabled by default."""
-
     try:
         return suggest_exclusions(payload.source_root)
     except SourceDiscoveryError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(exc),
-        ) from exc
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
