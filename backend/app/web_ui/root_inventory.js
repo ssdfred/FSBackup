@@ -76,7 +76,7 @@ function renderRootInventory(report){
   const order=["données_personnelles","à_examiner","ancienne_installation_windows","système_non_inclus"];
   panel.innerHTML=`
     <p class="eyebrow">Périmètre du disque</p><h2>Inventaire des dossiers à la racine</h2>
-    <div class="inventory-warning"><strong>Aucune donnée supplémentaire n’est sélectionnée par défaut.</strong><p>Les dossiers personnels standards sont déjà inclus. Les projets et anciens profils cochés seront réellement ajoutés à l’archive.</p></div>
+    <div class="inventory-warning"><strong>Les projets et anciennes données sont facultatifs et décochés par défaut.</strong><p>Les dossiers personnels standards sont déjà inclus. Les projets et anciens profils cochés seront réellement ajoutés à l’archive.</p></div>
     <div class="diagnostic-grid">
       <article class="diagnostic-card"><span>Dossiers sélectionnables</span><strong>${inventoryState.selectable.length}</strong><small>${inventoryFormatBytes(report.review_size_bytes)} détectés</small></article>
       <article class="diagnostic-card"><span>Anciens profils récupérables</span><strong>${inventoryState.recovery.length}</strong><small>Sélection séparée et facultative</small></article>
