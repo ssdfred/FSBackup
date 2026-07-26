@@ -1,7 +1,10 @@
 from pathlib import Path
 
+import pytest
+
 from app.modules.source_discovery.root_inventory import inventory_root
 from app.modules.source_discovery.root_inventory_schemas import RootEntryCategory
+from app.modules.source_discovery.service import SourceDiscoveryService
 
 
 def _write(path: Path, size: int = 4) -> None:
@@ -9,8 +12,20 @@ def _write(path: Path, size: int = 4) -> None:
     path.write_bytes(b"x" * size)
 
 
+@pytest.fixture
+def allow_temporary_root(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Allow a pytest temporary directory to stand in for a Windows drive root."""
+
+    monkeypatch.setattr(
+        SourceDiscoveryService,
+        "_validate_source_root",
+        lambda _self, source_root: Path(source_root).resolve(strict=True),
+    )
+
+
 def test_root_inventory_classifies_projects_system_and_windows_old(
     tmp_path: Path,
+    allow_temporary_root: None,
 ) -> None:
     (tmp_path / "Windows").mkdir()
     (tmp_path / "ProgramData").mkdir()
@@ -37,7 +52,10 @@ def test_root_inventory_classifies_projects_system_and_windows_old(
     assert report.old_windows_profiles[0].personal_size_bytes == 9
 
 
-def test_root_inventory_does_not_follow_directory_symlinks(tmp_path: Path) -> None:
+def test_root_inventory_does_not_follow_directory_symlinks(
+    tmp_path: Path,
+    allow_temporary_root: None,
+) -> None:
     target = tmp_path / "outside"
     _write(target / "secret.txt", 11)
     link = tmp_path / "project-link"
