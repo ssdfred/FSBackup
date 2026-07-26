@@ -67,8 +67,9 @@ function clarifyDiagnosticSummary(){
     const label=card.querySelector("span");
     const small=card.querySelector("small");
     if(label?.textContent==="Espace libre conseillé"||label?.textContent==="Plan de base inclus"){
-      label.textContent="Plan de base inclus";
-      if(small)small.textContent="Avant profils complets, Windows.old, ProgramData et projets";
+      if(label.textContent!=="Plan de base inclus")label.textContent="Plan de base inclus";
+      const expected="Avant profils complets, Windows.old, ProgramData et projets";
+      if(small&&small.textContent!==expected)small.textContent=expected;
     }
     if(label?.textContent==="Taille personnelle estimée"&&small&&!small.textContent.includes("dossiers standards")){
       small.textContent=`${small.textContent} dans les dossiers standards`;
