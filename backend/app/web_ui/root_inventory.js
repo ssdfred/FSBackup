@@ -6,7 +6,7 @@ function inventoryFormatBytes(value){
   return `${(value/(1024**index)).toLocaleString("fr-FR",{maximumFractionDigits:index?1:0})} ${units[index]}`;
 }
 
-const inventoryState={selectable:[],selected:new Set()};
+const inventoryState={selectable:[],selected:new Set(),recovery:[],selectedRecovery:new Set()};
 const inventoryLabels={
   "données_personnelles":"Données personnelles à la racine",
   "à_examiner":"Dossiers et projets à examiner",
@@ -18,6 +18,10 @@ window.getSelectedAdditionalPaths=()=>[...inventoryState.selected];
 window.getSelectedAdditionalSize=()=>inventoryState.selectable
   .filter(item=>inventoryState.selected.has(item.path))
   .reduce((total,item)=>total+Number(item.size_bytes??0),0);
+window.getSelectedRecoveryPaths=()=>[...inventoryState.selectedRecovery];
+window.getSelectedRecoverySize=()=>inventoryState.recovery
+  .filter(item=>inventoryState.selectedRecovery.has(item.path))
+  .reduce((total,item)=>total+Number(item.personal_size_bytes??0),0);
 
 function notifyInventorySelection(){
   window.dispatchEvent(new CustomEvent("fsbackup:plan-selection-changed"));
@@ -56,27 +60,38 @@ function renderInventoryEntry(item){
   return `<label class="inventory-entry inventory-select"><input type="checkbox" data-inventory-path="${encodeURIComponent(item.path)}"><span>${details}</span></label>`;
 }
 
+function renderOldProfile(profile){
+  return `<label class="inventory-old inventory-select"><input type="checkbox" data-recovery-path="${encodeURIComponent(profile.path)}"><span><b>${profile.name}</b><div class="inventory-path">${profile.path}</div><small>${inventoryFormatBytes(profile.personal_size_bytes)} · ${Number(profile.personal_file_count).toLocaleString("fr-FR")} fichiers personnels repérés · inclut aussi les données applicatives accessibles du profil</small></span></label>`;
+}
+
 function renderRootInventory(report){
   const panel=ensureRootInventoryPanel();
   if(!panel)return;
   inventoryState.selected.clear();
+  inventoryState.selectedRecovery.clear();
   inventoryState.selectable=(report.entries??[]).filter(selectableEntry);
+  inventoryState.recovery=report.old_windows_profiles??[];
   const groups={};
   (report.entries??[]).forEach(item=>(groups[item.category]??=[]).push(item));
   const order=["données_personnelles","à_examiner","ancienne_installation_windows","système_non_inclus"];
   panel.innerHTML=`
     <p class="eyebrow">Périmètre du disque</p><h2>Inventaire des dossiers à la racine</h2>
-    <div class="inventory-warning"><strong>Les projets sont facultatifs et décochés par défaut.</strong><p>Les dossiers personnels standards sont déjà inclus par le plan Windows. Cochez uniquement les projets supplémentaires à ajouter.</p></div>
+    <div class="inventory-warning"><strong>Aucune donnée supplémentaire n’est sélectionnée par défaut.</strong><p>Les dossiers personnels standards sont déjà inclus. Les projets et anciens profils cochés seront réellement ajoutés à l’archive.</p></div>
     <div class="diagnostic-grid">
       <article class="diagnostic-card"><span>Dossiers sélectionnables</span><strong>${inventoryState.selectable.length}</strong><small>${inventoryFormatBytes(report.review_size_bytes)} détectés</small></article>
-      <article class="diagnostic-card"><span>Anciennes installations</span><strong>${(groups["ancienne_installation_windows"]??[]).length}</strong><small>${(report.old_windows_profiles??[]).length} profil(s) trouvé(s)</small></article>
+      <article class="diagnostic-card"><span>Anciens profils récupérables</span><strong>${inventoryState.recovery.length}</strong><small>Sélection séparée et facultative</small></article>
       <article class="diagnostic-card"><span>Éléments système</span><strong>${(groups["système_non_inclus"]??[]).length}</strong><small>Non sélectionnables</small></article>
     </div>
     ${order.map(category=>{const entries=groups[category]??[];if(!entries.length)return "";return `<div class="inventory-group"><h3>${inventoryLabels[category]}</h3>${entries.map(renderInventoryEntry).join("")}</div>`;}).join("")}
-    ${(report.old_windows_profiles??[]).length?`<div class="inventory-group"><h3>Profils repérés dans Windows.old</h3>${report.old_windows_profiles.map(profile=>`<div class="inventory-old"><b>${profile.name}</b><div class="inventory-path">${profile.path}</div><small>${inventoryFormatBytes(profile.personal_size_bytes)} · ${Number(profile.personal_file_count).toLocaleString("fr-FR")} fichiers personnels repérés</small></div>`).join("")}</div>`:""}`;
+    ${inventoryState.recovery.length?`<div class="inventory-group"><h3>Profils récupérables dans Windows.old</h3><p>Cochez un profil pour ajouter réellement ses fichiers accessibles au plan de sauvegarde.</p>${inventoryState.recovery.map(renderOldProfile).join("")}</div>`:""}`;
   panel.querySelectorAll("[data-inventory-path]").forEach(input=>input.addEventListener("change",()=>{
     const path=decodeURIComponent(input.dataset.inventoryPath);
     if(input.checked)inventoryState.selected.add(path);else inventoryState.selected.delete(path);
+    notifyInventorySelection();
+  }));
+  panel.querySelectorAll("[data-recovery-path]").forEach(input=>input.addEventListener("change",()=>{
+    const path=decodeURIComponent(input.dataset.recoveryPath);
+    if(input.checked)inventoryState.selectedRecovery.add(path);else inventoryState.selectedRecovery.delete(path);
     notifyInventorySelection();
   }));
   notifyInventorySelection();
