@@ -207,10 +207,9 @@ def suggest_exclusions(source_root: str | Path) -> ExclusionSuggestionReport:
                 continue
 
             if current == root and normalized in SKIPPED_ROOTS:
-                filtered.append(directory)
                 continue
 
-            rule = RULES.get(directory)
+            rule = RULES.get(normalized)
             if rule is None:
                 filtered.append(directory)
                 continue
