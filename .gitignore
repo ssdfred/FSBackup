@@ -11,3 +11,5 @@ backend/htmlcov/
 # Ruff
 .ruff_cache/
 .venv/
+TestSource/
+TestsRetention/
