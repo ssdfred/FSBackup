@@ -12,6 +12,15 @@ def test_root_redirects_to_web_interface() -> None:
     assert response.headers["location"] == "/app/"
 
 
+def test_favicon_is_served() -> None:
+    response = client.get("/favicon.ico")
+
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("image/svg+xml")
+    assert "<svg" in response.text
+    assert "FSBackup" in response.text
+
+
 def test_dashboard_page_is_served() -> None:
     response = client.get("/app/")
 
@@ -128,6 +137,9 @@ def test_dashboard_assets_are_served() -> None:
     assert "renderReport" in script.text
     assert "renderCatalog" in script.text
     assert "formatBytes" in script.text
+    assert "data-restore-archive" in script.text
+    assert "prepareRestoreFromCatalog" in script.text
+    assert 'mode.value="custom"' in script.text
     assert drives_script.status_code == 200
     assert "/api/v1/sources/drives" in drives_script.text
     assert "systemDrive" in drives_script.text

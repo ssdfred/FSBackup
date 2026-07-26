@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.modules.native_picker.schemas import NativePickerReport
+from app.modules.native_picker.schemas import NativeOpenReport, NativePickerReport
 from app.modules.native_picker.service import NativePickerService
 
 client = TestClient(app)
@@ -36,9 +36,7 @@ def test_pick_archive_can_be_cancelled(monkeypatch) -> None:
     monkeypatch.setattr(
         NativePickerService,
         "pick_archive",
-        staticmethod(
-            lambda initial_path=None: NativePickerReport(selected=False)
-        ),
+        staticmethod(lambda initial_path=None: NativePickerReport(selected=False)),
     )
 
     response = client.post(
@@ -49,3 +47,19 @@ def test_pick_archive_can_be_cancelled(monkeypatch) -> None:
     assert response.status_code == 200
     assert response.json()["selected"] is False
     assert response.json()["path"] is None
+
+
+def test_open_location_returns_success(monkeypatch) -> None:
+    monkeypatch.setattr(
+        NativePickerService,
+        "open_location",
+        staticmethod(lambda path: NativeOpenReport(success=True)),
+    )
+
+    response = client.post(
+        "/api/v1/system/picker/open",
+        json={"path": r"H:\FSBackup\TestsRetention\archive.fsb"},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {"success": True, "error": None}

@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import os
+import subprocess
 from pathlib import Path
 
-from .schemas import NativePickerReport
+from .schemas import NativeOpenReport, NativePickerReport
 
 
 class NativePickerService:
@@ -14,6 +15,35 @@ class NativePickerService:
     @staticmethod
     def pick_archive(initial_path: str | None = None) -> NativePickerReport:
         return NativePickerService._pick(kind="archive", initial_path=initial_path)
+
+    @staticmethod
+    def open_location(path: str) -> NativeOpenReport:
+        if os.name != "nt":
+            return NativeOpenReport(
+                success=False,
+                error="L’ouverture de l’emplacement est disponible uniquement sous Windows.",
+            )
+
+        candidate = Path(path).expanduser()
+        if not candidate.exists():
+            return NativeOpenReport(
+                success=False,
+                error="Le fichier ou le dossier demandé n’existe plus.",
+            )
+
+        try:
+            resolved = candidate.resolve(strict=True)
+            if resolved.is_file():
+                subprocess.Popen(["explorer.exe", f"/select,{resolved}"], close_fds=True)
+            else:
+                subprocess.Popen(["explorer.exe", str(resolved)], close_fds=True)
+        except (OSError, RuntimeError) as exc:
+            return NativeOpenReport(
+                success=False,
+                error=f"Impossible d’ouvrir l’emplacement Windows : {exc}",
+            )
+
+        return NativeOpenReport(success=True)
 
     @staticmethod
     def _pick(*, kind: str, initial_path: str | None) -> NativePickerReport:
