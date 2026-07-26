@@ -8,10 +8,11 @@ def test_root_inventory_ui_explains_uncovered_folders() -> None:
     script = (WEB_UI / "root_inventory.js").read_text(encoding="utf-8")
 
     assert "Inventaire des dossiers à la racine" in script
-    assert "Les projets sont facultatifs et décochés par défaut" in script
+    assert "Les projets et anciennes données sont facultatifs et décochés par défaut" in script
     assert "Dossiers et projets à examiner" in script
     assert "Éléments système non inclus" in script
-    assert "Profils repérés dans Windows.old" in script
+    assert "Profils récupérables dans Windows.old" in script
+    assert "réellement ajoutés à l’archive" in script
     assert "/api/v1/sources/root-inventory" in script
 
 
