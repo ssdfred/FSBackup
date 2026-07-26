@@ -8,7 +8,7 @@ def test_root_inventory_projects_are_disabled_by_default() -> None:
     script = (WEB_UI / "root_inventory.js").read_text(encoding="utf-8")
 
     assert 'type="checkbox"' in script
-    assert "inventoryState.selected=new Set()" in script
+    assert "selected:new Set()" in script
     assert "décochés par défaut" in script
     assert "getSelectedAdditionalPaths" in script
 
