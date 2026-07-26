@@ -9,7 +9,7 @@ function capacityFormatBytes(value){
 
 function normalizeDriveRoot(value){
   const match=String(value??"").trim().match(/^([a-zA-Z]:)/);
-  return match?`${match[1].toUpperCase()}\\`:"";
+  return match?`${match[1].toUpperCase()}\`:"";
 }
 
 function selectedDestinationDrive(){
@@ -52,7 +52,8 @@ function renderCapacityDiagnostic(){
   const destination=selectedDestinationDrive();
   const defaultPlanned=Number(estimate.planned_size_bytes??0);
   const additionalSize=Number(window.getSelectedAdditionalSize?.()??0);
-  const planned=defaultPlanned+additionalSize;
+  const recoverySize=Number(window.getSelectedRecoverySize?.()??0);
+  const planned=defaultPlanned+additionalSize+recoverySize;
   const destinationFree=Number(destination?.free_bytes??0);
   const enough=Boolean(destination&&planned>0&&destinationFree>=planned);
   const destinationStatus=!destination
@@ -68,10 +69,10 @@ function renderCapacityDiagnostic(){
     <div class="capacity-grid">
       <article class="capacity-card"><span>Capacité du lecteur source</span><strong>${capacityFormatBytes(disk.total_bytes)}</strong><small>${capacityFormatBytes(disk.used_bytes)} utilisés · ${capacityFormatBytes(disk.free_bytes)} libres</small></article>
       <article class="capacity-card"><span>Données personnelles incluses</span><strong>${capacityFormatBytes(estimate.total_size_bytes)}</strong><small>${Number(estimate.total_file_count??0).toLocaleString("fr-FR")} fichiers standards</small></article>
-      <article class="capacity-card"><span>Plan réellement sauvegardé</span><strong>${capacityFormatBytes(planned)}</strong><small>${capacityFormatBytes(defaultPlanned)} par défaut · ${capacityFormatBytes(additionalSize)} de projets ajoutés</small></article>
+      <article class="capacity-card"><span>Plan réellement sauvegardé</span><strong>${capacityFormatBytes(planned)}</strong><small>${capacityFormatBytes(defaultPlanned)} par défaut · ${capacityFormatBytes(additionalSize)} de projets · ${capacityFormatBytes(recoverySize)} d’anciennes données</small></article>
       <article class="capacity-card"><span>Destination</span><strong>${destination?destination.label:"Inconnue"}</strong><small>${destination?`${capacityFormatBytes(destinationFree)} libres`:"Sélectionnez un lecteur détecté"}</small></article>
     </div>
-    <div class="capacity-warning"><strong>Périmètre :</strong> les dossiers personnels Windows et les données de navigateurs sont inclus automatiquement. Les projets à la racine sont ajoutés uniquement lorsqu’ils sont cochés. Les fichiers système et programmes installés restent exclus.</div>
+    <div class="capacity-warning"><strong>Périmètre :</strong> les dossiers personnels Windows et les données reconnues sont inclus automatiquement. Les projets et anciens profils sont ajoutés uniquement lorsqu’ils sont cochés. Les fichiers système et programmes installés restent exclus.</div>
     ${destinationStatus}`;
   window.fsbackupDestinationCapacityValid=enough;
 }
