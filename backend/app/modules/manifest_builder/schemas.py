@@ -16,6 +16,15 @@ class ManifestFile(BaseModel):
     required_by: list[str] = Field(default_factory=list)
 
 
+class ManifestExclusion(BaseModel):
+    """User-approved source path intentionally absent from the archive."""
+
+    path: str
+    reason: str
+    risk: str
+    approved_by_user: bool = True
+
+
 class ManifestSummary(BaseModel):
     """Legacy Manifest V1 summary kept for backward compatibility."""
 
@@ -36,6 +45,7 @@ class Manifest(BaseModel):
     source_root: str
     summary: ManifestSummary
     files: list[ManifestFile] = Field(default_factory=list)
+    exclusions: list[ManifestExclusion] = Field(default_factory=list)
 
 
 class ManifestHeader(BaseModel):
