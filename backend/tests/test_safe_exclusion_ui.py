@@ -45,7 +45,7 @@ def test_capacity_ui_distinguishes_disk_recovery_scope_and_plan() -> None:
     assert "Exclusions applicables" in script
     assert "Plan final estimé" in script
     assert "Total récupérable visible" in script
-    assert "Windows et les programmes installés restent exclus" in script
+    assert "Une exclusion est déduite uniquement lorsqu’elle se trouve" in script
 
 
 def test_capacity_ui_blocks_an_unknown_or_insufficient_destination() -> None:
