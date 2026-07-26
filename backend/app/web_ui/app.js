@@ -150,6 +150,17 @@ function catalogStatus(entry){
   return ["Invalide","invalid"];
 }
 
+function catalogActionIcon(kind){
+  if(kind==="folder")return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 6.5h6l1.75 2h9.25v9.75a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/><path d="M8 12h8"/></svg>';
+  return '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="10" height="11" rx="2"/><path d="M6 16H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+}
+
+function catalogMessage(text,type="success"){
+  const message=document.querySelector("#catalog-message");
+  message.textContent=text;
+  message.className=`message ${type}`;
+}
+
 function prepareRestoreFromCatalog(path){
   const mode=document.querySelector("#restore-archive-mode");
   const custom=document.querySelector("#restore-archive-custom");
@@ -166,6 +177,29 @@ function prepareRestoreFromCatalog(path){
   custom.focus();
 }
 
+async function copyCatalogPath(path){
+  try{
+    await navigator.clipboard.writeText(path);
+    catalogMessage("Le chemin de l’archive a été copié.");
+  }catch(error){
+    catalogMessage(`Impossible de copier le chemin : ${error.message}`,"error");
+  }
+}
+
+async function openCatalogLocation(path,button){
+  button.disabled=true;
+  try{
+    const response=await fetch("/api/v1/system/picker/open",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({path})});
+    const report=await response.json();
+    if(!response.ok||!report.success)throw new Error(report.error??"Impossible d’ouvrir le dossier.");
+    catalogMessage("Le dossier de l’archive a été ouvert.");
+  }catch(error){
+    catalogMessage(error.message,"error");
+  }finally{
+    button.disabled=false;
+  }
+}
+
 function renderCatalog(data){
   document.querySelector("#catalog-summary").classList.remove("hidden");
   document.querySelector("#catalog-total").textContent=data.summary.total;
@@ -176,16 +210,21 @@ function renderCatalog(data){
   if(!data.archives.length){list.innerHTML='<div class="empty-state"><strong>Aucune archive trouvée</strong><p>Le dossier ne contient aucun fichier .fsb ou .fsbe.</p></div>';return;}
   list.innerHTML=data.archives.map(entry=>{
     const [label,status]=catalogStatus(entry);
-    const action=entry.status==="valid"?`<button class="secondary-action" type="button" data-restore-archive="${encodeURIComponent(entry.path)}">Restaurer</button>`:'<button class="secondary-action" type="button" disabled>Indisponible</button>';
-    return `<article class="archive-card"><div class="archive-main"><div class="archive-icon">${entry.encrypted?"🔒":"▣"}</div><div><div class="archive-title"><h3>${entry.name}</h3><span class="archive-status ${status}">${label}</span></div><p class="archive-path">${entry.path}</p><div class="archive-meta"><span>${formatDate(entry.created_at??entry.modified_at)}</span><span>${formatBytes(entry.size_bytes)}</span><span>${entry.file_count??"—"} fichier(s)</span>${entry.application_version?`<span>FSBackup ${entry.application_version}</span>`:""}</div>${entry.error?`<p class="archive-error">${entry.error}</p>`:""}</div></div>${action}</article>`;
+    const encoded=encodeURIComponent(entry.path);
+    const restore=entry.status==="valid"?`<button class="secondary-action" type="button" data-restore-archive="${encoded}">Restaurer</button>`:'<button class="secondary-action" type="button" disabled>Indisponible</button>';
+    const actions=`<div class="archive-actions">${restore}<button class="icon-action" type="button" data-open-archive="${encoded}" aria-label="Ouvrir le dossier" title="Ouvrir le dossier">${catalogActionIcon("folder")}</button><button class="icon-action" type="button" data-copy-archive="${encoded}" aria-label="Copier le chemin" title="Copier le chemin">${catalogActionIcon("copy")}</button></div>`;
+    return `<article class="archive-card"><div class="archive-main"><div class="archive-icon">${entry.encrypted?"🔒":"▣"}</div><div><div class="archive-title"><h3>${entry.name}</h3><span class="archive-status ${status}">${label}</span></div><p class="archive-path">${entry.path}</p><div class="archive-meta"><span>${formatDate(entry.created_at??entry.modified_at)}</span><span>${formatBytes(entry.size_bytes)}</span><span>${entry.file_count??"—"} fichier(s)</span>${entry.application_version?`<span>FSBackup ${entry.application_version}</span>`:""}</div>${entry.error?`<p class="archive-error">${entry.error}</p>`:""}</div></div>${actions}</article>`;
   }).join("");
 }
 
 function bindCatalogActions(){
   document.querySelector("#catalog-list").addEventListener("click",event=>{
-    const button=event.target.closest("[data-restore-archive]");
-    if(!button)return;
-    prepareRestoreFromCatalog(decodeURIComponent(button.dataset.restoreArchive));
+    const restore=event.target.closest("[data-restore-archive]");
+    if(restore){prepareRestoreFromCatalog(decodeURIComponent(restore.dataset.restoreArchive));return;}
+    const copy=event.target.closest("[data-copy-archive]");
+    if(copy){copyCatalogPath(decodeURIComponent(copy.dataset.copyArchive));return;}
+    const open=event.target.closest("[data-open-archive]");
+    if(open)openCatalogLocation(decodeURIComponent(open.dataset.openArchive),open);
   });
 }
 
