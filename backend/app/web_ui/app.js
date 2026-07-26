@@ -150,6 +150,22 @@ function catalogStatus(entry){
   return ["Invalide","invalid"];
 }
 
+function prepareRestoreFromCatalog(path){
+  const mode=document.querySelector("#restore-archive-mode");
+  const custom=document.querySelector("#restore-archive-custom");
+  const archive=document.querySelector("#restore-archive");
+  mode.value="custom";
+  mode.dispatchEvent(new Event("change",{bubbles:true}));
+  custom.value=path;
+  custom.dispatchEvent(new Event("input",{bubbles:true}));
+  custom.dispatchEvent(new Event("change",{bubbles:true}));
+  archive.value=path;
+  document.querySelector("#restore-message").className="message hidden";
+  document.querySelector("#restore-report").classList.add("hidden");
+  showView("restore");
+  custom.focus();
+}
+
 function renderCatalog(data){
   document.querySelector("#catalog-summary").classList.remove("hidden");
   document.querySelector("#catalog-total").textContent=data.summary.total;
@@ -160,8 +176,17 @@ function renderCatalog(data){
   if(!data.archives.length){list.innerHTML='<div class="empty-state"><strong>Aucune archive trouvée</strong><p>Le dossier ne contient aucun fichier .fsb ou .fsbe.</p></div>';return;}
   list.innerHTML=data.archives.map(entry=>{
     const [label,status]=catalogStatus(entry);
-    return `<article class="archive-card"><div class="archive-main"><div class="archive-icon">${entry.encrypted?"🔒":"▣"}</div><div><div class="archive-title"><h3>${entry.name}</h3><span class="archive-status ${status}">${label}</span></div><p class="archive-path">${entry.path}</p><div class="archive-meta"><span>${formatDate(entry.created_at??entry.modified_at)}</span><span>${formatBytes(entry.size_bytes)}</span><span>${entry.file_count??"—"} fichier(s)</span>${entry.application_version?`<span>FSBackup ${entry.application_version}</span>`:""}</div>${entry.error?`<p class="archive-error">${entry.error}</p>`:""}</div></div><button class="secondary-action" type="button" disabled>${entry.status==="valid"?"Restaurer":"Indisponible"}</button></article>`;
+    const action=entry.status==="valid"?`<button class="secondary-action" type="button" data-restore-archive="${encodeURIComponent(entry.path)}">Restaurer</button>`:'<button class="secondary-action" type="button" disabled>Indisponible</button>';
+    return `<article class="archive-card"><div class="archive-main"><div class="archive-icon">${entry.encrypted?"🔒":"▣"}</div><div><div class="archive-title"><h3>${entry.name}</h3><span class="archive-status ${status}">${label}</span></div><p class="archive-path">${entry.path}</p><div class="archive-meta"><span>${formatDate(entry.created_at??entry.modified_at)}</span><span>${formatBytes(entry.size_bytes)}</span><span>${entry.file_count??"—"} fichier(s)</span>${entry.application_version?`<span>FSBackup ${entry.application_version}</span>`:""}</div>${entry.error?`<p class="archive-error">${entry.error}</p>`:""}</div></div>${action}</article>`;
   }).join("");
+}
+
+function bindCatalogActions(){
+  document.querySelector("#catalog-list").addEventListener("click",event=>{
+    const button=event.target.closest("[data-restore-archive]");
+    if(!button)return;
+    prepareRestoreFromCatalog(decodeURIComponent(button.dataset.restoreArchive));
+  });
 }
 
 function bindCatalogForm(){
@@ -188,6 +213,7 @@ function bindCatalogForm(){
 document.querySelector("#refresh").addEventListener("click",loadDashboard);
 bindNavigation();
 bindBackupForm();
+bindCatalogActions();
 bindCatalogForm();
 loadDashboard();
 const initial=window.location.hash.slice(1);
