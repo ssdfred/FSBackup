@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import socket
 import threading
 import traceback
 import webbrowser
@@ -15,7 +16,8 @@ DEFAULT_PORT = 8765
 
 
 def application_url(host: str = DEFAULT_HOST, port: int = DEFAULT_PORT) -> str:
-    return f"http://{host}:{port}/app/"
+    browser_host = "127.0.0.1" if host in {"0.0.0.0", "::"} else host
+    return f"http://{browser_host}:{port}/app/"
 
 
 def log_file_path() -> Path:
@@ -59,10 +61,24 @@ def schedule_browser_open(url: str, delay_seconds: float = 1.2) -> threading.Tim
     return timer
 
 
+def instance_is_running(host: str, port: int, timeout_seconds: float = 0.25) -> bool:
+    probe_host = "127.0.0.1" if host in {"0.0.0.0", "::"} else host
+    try:
+        with socket.create_connection((probe_host, port), timeout=timeout_seconds):
+            return True
+    except OSError:
+        return False
+
+
 def run() -> None:
     host = os.getenv("FSBACKUP_HOST", DEFAULT_HOST)
     port = int(os.getenv("FSBACKUP_PORT", str(DEFAULT_PORT)))
     url = application_url(host, port)
+
+    if instance_is_running(host, port):
+        open_application(url)
+        return
+
     schedule_browser_open(url)
     uvicorn.run(
         app,
