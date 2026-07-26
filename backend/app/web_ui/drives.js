@@ -115,6 +115,7 @@ function loadOptionalModule(src,attribute){
 
 document.addEventListener("DOMContentLoaded",()=>{
   loadOptionalModule("/app/diagnostic.js","data-fsbackup-diagnostic");
+  loadOptionalModule("/app/exclusion_payload.js","data-fsbackup-exclusion-payload");
   loadOptionalModule("/app/capacity.js","data-fsbackup-capacity");
   locationConfigs.forEach(bindLocation);
   loadAvailableDrives();
