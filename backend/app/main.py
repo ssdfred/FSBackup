@@ -6,10 +6,11 @@ from fastapi.staticfiles import StaticFiles
 
 from app.api.v1.router import router as v1_router
 from app.core.api_errors import register_error_handlers
+from app.version import __version__
 
 app = FastAPI(
     title="FSBackup",
-    version="0.1.0",
+    version=__version__,
     description="Backup, migration and workstation audit platform.",
 )
 
