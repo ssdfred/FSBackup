@@ -53,7 +53,7 @@ const locationConfigs=[
   {mode:"backup-destination-mode",target:"destination-directory",drive:"backup-destination-drive",relative:"backup-destination-subdirectory",custom:"backup-destination-custom",driveField:"backup-destination-drive-field",relativeField:"backup-destination-subdirectory-field",customField:"backup-destination-custom-field"},
   {mode:"catalog-location-mode",target:"catalog-directory",drive:"catalog-drive",relative:"catalog-subdirectory",custom:"catalog-custom-directory",driveField:"catalog-drive-field",relativeField:"catalog-subdirectory-field",customField:"catalog-custom-field"},
   {mode:"restore-archive-mode",target:"restore-archive",drive:"restore-archive-drive",relative:"restore-archive-relative",custom:"restore-archive-custom",driveField:"restore-archive-drive-field",relativeField:"restore-archive-relative-field",customField:"restore-archive-custom-field"},
-  {mode:"restore-destination-mode",target:"restore-destination",drive:"restore-destination-drive",relative:"restore-destination-subdirectory",custom:"restore-destination-custom",driveField:"restore-destination-drive-field",relativeField:"restore-destination-subdirectory-field",customField:"restore-destination-custom-field"},
+  {mode:"restore-destination-mode",target:"restore-destination",drive:"restore-destination-drive",relative:"restore-destination-subdirectory",custom:"restore-destination-custom",driveField:"restore-destination-drive-field",relativeField:"restore-destination-relative-field",customField:"restore-destination-custom-field"},
   {mode:"retention-location-mode",target:"retention-directory",drive:"retention-drive",relative:"retention-subdirectory",custom:"retention-custom-directory",driveField:"retention-drive-field",relativeField:"retention-subdirectory-field",customField:"retention-custom-field"}
 ];
 
@@ -105,7 +105,7 @@ async function loadAvailableDrives(){
   }
 }
 
-const UI_MODULE_VERSION="10.7.5";
+const UI_MODULE_VERSION="10.7.6";
 
 function loadOptionalModule(src,attribute){
   const alreadyLoaded=[...document.scripts].some(script=>{
