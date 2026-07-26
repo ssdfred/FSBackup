@@ -6,7 +6,11 @@ function inventoryFormatBytes(value){
   return `${(value/(1024**index)).toLocaleString("fr-FR",{maximumFractionDigits:index?1:0})} ${units[index]}`;
 }
 
-const inventoryState={selectable:[],selected:new Set(),recovery:[],selectedRecovery:new Set()};
+function normalizeInventoryRoot(value){
+  return String(value??"").trim().replace(/[\\/]+$/g,"").toLowerCase();
+}
+
+const inventoryState={selectable:[],selected:new Set(),recovery:[],selectedRecovery:new Set(),sourceRoot:"",requestId:0};
 const inventoryLabels={
   "données_personnelles":"Données personnelles à la racine",
   "à_examiner":"Dossiers et projets à examiner",
@@ -14,19 +18,34 @@ const inventoryLabels={
   "ancienne_installation_windows":"Ancienne installation Windows"
 };
 
-window.getSelectedAdditionalPaths=()=>[...inventoryState.selected];
-window.getSelectedAdditionalSize=()=>inventoryState.selectable
+function inventoryMatchesSelectedSource(){
+  const selected=normalizeInventoryRoot(document.querySelector("#source-root")?.value);
+  return Boolean(selected&&inventoryState.sourceRoot===selected);
+}
+
+window.getInventorySourceRoot=()=>inventoryState.sourceRoot;
+window.getSelectedAdditionalPaths=()=>inventoryMatchesSelectedSource()?[...inventoryState.selected]:[];
+window.getSelectedAdditionalSize=()=>inventoryMatchesSelectedSource()?inventoryState.selectable
   .filter(item=>inventoryState.selected.has(item.path))
-  .reduce((total,item)=>total+Number(item.size_bytes??0),0);
-window.getSelectedRecoveryPaths=()=>[...inventoryState.selectedRecovery];
-window.getSelectedRecoverySize=()=>inventoryState.recovery
+  .reduce((total,item)=>total+Number(item.size_bytes??0),0):0;
+window.getSelectedRecoveryPaths=()=>inventoryMatchesSelectedSource()?[...inventoryState.selectedRecovery]:[];
+window.getSelectedRecoverySize=()=>inventoryMatchesSelectedSource()?inventoryState.recovery
   .filter(item=>inventoryState.selectedRecovery.has(item.path))
-  .reduce((total,item)=>total+Number(item.profile_kind==="current"?item.additional_size_bytes:item.total_size_bytes),0);
-window.getDetectedRecoverableProfileSize=()=>inventoryState.recovery
-  .reduce((total,item)=>total+Number(item.profile_kind==="current"?item.additional_size_bytes:item.total_size_bytes),0);
+  .reduce((total,item)=>total+Number(item.profile_kind==="current"?item.additional_size_bytes:item.total_size_bytes),0):0;
+window.getDetectedRecoverableProfileSize=()=>inventoryMatchesSelectedSource()?inventoryState.recovery
+  .reduce((total,item)=>total+Number(item.profile_kind==="current"?item.additional_size_bytes:item.total_size_bytes),0):0;
 
 function notifyInventorySelection(){
   window.dispatchEvent(new CustomEvent("fsbackup:plan-selection-changed"));
+}
+
+function resetInventoryState(sourceRoot=""){
+  inventoryState.sourceRoot=normalizeInventoryRoot(sourceRoot);
+  inventoryState.selectable=[];
+  inventoryState.recovery=[];
+  inventoryState.selected.clear();
+  inventoryState.selectedRecovery.clear();
+  notifyInventorySelection();
 }
 
 function ensureRootInventoryPanel(){
@@ -76,6 +95,7 @@ function renderRecoveryProfile(profile){
 function renderRootInventory(report){
   const panel=ensureRootInventoryPanel();
   if(!panel)return;
+  inventoryState.sourceRoot=normalizeInventoryRoot(report.source_root);
   inventoryState.selected.clear();
   inventoryState.selectedRecovery.clear();
   inventoryState.selectable=(report.entries??[]).filter(selectableEntry);
@@ -112,16 +132,25 @@ function renderRootInventory(report){
 async function runRootInventory(){
   const mode=document.querySelector("#source-mode");
   const source=document.querySelector("#source-root");
-  if(mode?.value!=="windows_disk"||!source?.value)return;
+  const requestedSource=source?.value??"";
+  const normalizedRequested=normalizeInventoryRoot(requestedSource);
+  const requestId=++inventoryState.requestId;
+  resetInventoryState(requestedSource);
+  if(mode?.value!=="windows_disk"||!requestedSource)return;
   const panel=ensureRootInventoryPanel();
   if(!panel){setTimeout(runRootInventory,100);return;}
   panel.innerHTML="<strong>Inventaire des profils et dossiers récupérables…</strong><p>Analyse en lecture seule, sans sélection automatique.</p>";
   try{
-    const response=await fetch("/api/v1/sources/root-inventory",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({source_root:source.value})});
+    const response=await fetch("/api/v1/sources/root-inventory",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({source_root:requestedSource})});
     const report=await response.json();
     if(!response.ok)throw new Error(report.detail??"Inventaire indisponible.");
+    const selectedNow=normalizeInventoryRoot(document.querySelector("#source-root")?.value);
+    if(requestId!==inventoryState.requestId||selectedNow!==normalizedRequested||normalizeInventoryRoot(report.source_root)!==normalizedRequested)return;
     renderRootInventory(report);
-  }catch(error){panel.innerHTML=`<strong>Inventaire indisponible</strong><p class="diagnostic-error">${error.message}</p>`;}
+  }catch(error){
+    if(requestId!==inventoryState.requestId)return;
+    panel.innerHTML=`<strong>Inventaire indisponible</strong><p class="diagnostic-error">${error.message}</p>`;
+  }
 }
 
 function initRootInventory(){
