@@ -35,12 +35,14 @@ def test_exclusion_ui_displays_risk_and_clear_estimates() -> None:
     assert "Ces données ne seront pas présentes dans l’archive" in script
 
 
-def test_capacity_ui_distinguishes_disk_personal_data_and_plan() -> None:
+def test_capacity_ui_distinguishes_disk_recovery_scope_and_plan() -> None:
     script = (WEB_UI / "capacity.js").read_text(encoding="utf-8")
 
     assert "Capacité du lecteur source" in script
-    assert "Données personnelles incluses" in script
-    assert "Plan réellement sauvegardé" in script
+    assert "Dossiers standards inclus" in script
+    assert "Compléments de profils détectés" in script
+    assert "Total récupérable visible" in script
+    assert "Plan actuellement sélectionné" in script
     assert "Les fichiers système et programmes installés restent exclus" in script
 
 
