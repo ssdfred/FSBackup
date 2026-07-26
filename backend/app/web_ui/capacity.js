@@ -66,14 +66,21 @@ function clarifyDiagnosticSummary(){
   document.querySelectorAll("#source-diagnostic .diagnostic-card").forEach(card=>{
     const label=card.querySelector("span");
     const small=card.querySelector("small");
-    if(label?.textContent==="Espace libre conseillé"){
+    if(label?.textContent==="Espace libre conseillé"||label?.textContent==="Plan de base inclus"){
       label.textContent="Plan de base inclus";
-      if(small)small.textContent="Avant profils complets, anciennes données et projets";
+      if(small)small.textContent="Avant profils complets, Windows.old, ProgramData et projets";
     }
-    if(label?.textContent==="Taille personnelle estimée"&&small){
+    if(label?.textContent==="Taille personnelle estimée"&&small&&!small.textContent.includes("dossiers standards")){
       small.textContent=`${small.textContent} dans les dossiers standards`;
     }
   });
+}
+
+function observeDiagnosticSummary(){
+  const diagnostic=document.querySelector("#source-diagnostic");
+  if(!diagnostic||diagnostic.dataset.capacityObserved==="true")return;
+  diagnostic.dataset.capacityObserved="true";
+  new MutationObserver(()=>clarifyDiagnosticSummary()).observe(diagnostic,{childList:true,subtree:true});
 }
 
 function renderCapacityDiagnostic(){
@@ -116,12 +123,12 @@ function renderCapacityDiagnostic(){
       <article class="capacity-card"><span>Capacité du lecteur source</span><strong>${capacityFormatBytes(disk.total_bytes)}</strong><small>${capacityFormatBytes(usedBytes)} utilisés · ${capacityFormatBytes(disk.free_bytes)} libres</small></article>
       <article class="capacity-card"><span>Dossiers standards inclus</span><strong>${capacityFormatBytes(estimate.total_size_bytes)}</strong><small>${Number(estimate.total_file_count??0).toLocaleString("fr-FR")} fichiers personnels</small></article>
       <article class="capacity-card"><span>Compléments de profils détectés</span><strong>${pendingValue??capacityFormatBytes(detectedRecoverySize)}</strong><small>${inventoryPending?"Analyse des profils, de ProgramData et de Windows.old":"AppData et autres fichiers accessibles, facultatifs"}</small></article>
-      <article class="capacity-card"><span>Plan actuellement sélectionné</span><strong>${pendingValue??capacityFormatBytes(planned)}</strong><small>${inventoryPending?"Le total final sera disponible après l’inventaire":`${capacityFormatBytes(defaultPlanned)} de base · ${capacityFormatBytes(recoverySize)} de profils · ${capacityFormatBytes(additionalSize)} de projets`}</small></article>
-      <article class="capacity-card"><span>Total récupérable visible</span><strong>${pendingValue??capacityFormatBytes(maximumDetected)}</strong><small>${inventoryPending?"Calcul en attente":"Profils détectés et projets déjà cochés"}</small></article>
+      <article class="capacity-card"><span>Plan actuellement sélectionné</span><strong>${pendingValue??capacityFormatBytes(planned)}</strong><small>${inventoryPending?"Le total final sera disponible après l’inventaire":`${capacityFormatBytes(defaultPlanned)} de base · ${capacityFormatBytes(recoverySize)} de profils · ${capacityFormatBytes(additionalSize)} de données supplémentaires`}</small></article>
+      <article class="capacity-card"><span>Total récupérable visible</span><strong>${pendingValue??capacityFormatBytes(maximumDetected)}</strong><small>${inventoryPending?"Calcul en attente":"Profils et données supplémentaires déjà sélectionnés"}</small></article>
       <article class="capacity-card"><span>Données utilisées non classées</span><strong>${pendingValue??capacityFormatBytes(unexplainedBytes)}</strong><small>${inventoryPending?"Calcul en attente":"Système, programmes, fichiers protégés ou dossiers encore non mesurés"}</small></article>
       <article class="capacity-card"><span>Destination</span><strong>${destination?destination.label:"Inconnue"}</strong><small>${destination?`${capacityFormatBytes(destinationFree)} libres`:"Sélectionnez un lecteur détecté"}</small></article>
     </div>
-    <div class="capacity-warning"><strong>Périmètre :</strong> le plan de base inclut les dossiers standards et les données reconnues. Cochez « compléter le profil » pour ajouter AppData et les autres fichiers accessibles. Les projets et anciens profils restent facultatifs. Windows et les programmes installés restent exclus.</div>
+    <div class="capacity-warning"><strong>Périmètre :</strong> le plan de base inclut les dossiers standards et les données reconnues. Les profils complets, Windows.old, ProgramData et les projets restent facultatifs. Windows et les programmes installés restent exclus sauf sélection explicite de Windows.old complet.</div>
     ${destinationStatus}`;
   window.fsbackupDestinationCapacityValid=enough;
   clarifyDiagnosticSummary();
@@ -183,6 +190,7 @@ function initCapacity(){
   capacityState.initialized=true;
   renameWindowsSourceMode();
   ensureCapacityPanel();
+  observeDiagnosticSummary();
   bindCapacityGuard();
   document.querySelector("#source-root")?.addEventListener("change",refreshCapacityDiagnostic);
   document.querySelector("#source-mode")?.addEventListener("change",refreshCapacityDiagnostic);
