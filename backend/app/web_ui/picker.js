@@ -7,6 +7,15 @@ const pickerBindings=[
   {target:"retention-custom-directory",kind:"directory",mode:"retention-location-mode",modeValue:"custom"}
 ];
 
+function ensurePickerStyles(){
+  if(document.querySelector('link[data-picker-styles]'))return;
+  const link=document.createElement("link");
+  link.rel="stylesheet";
+  link.href="/app/picker.css";
+  link.dataset.pickerStyles="true";
+  document.head.appendChild(link);
+}
+
 function pickerMessage(text,type=""){
   const message=document.querySelector("#backup-message");
   if(!message)return;
@@ -54,6 +63,7 @@ async function openNativePicker(binding,button){
 }
 
 function bindNativePickers(){
+  ensurePickerStyles();
   pickerBindings.forEach(binding=>{
     const target=document.querySelector(`#${binding.target}`);
     if(!target||target.dataset.pickerBound)return;
