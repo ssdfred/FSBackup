@@ -35,13 +35,25 @@ class UserProfileDiagnostic(BaseModel):
     total_file_count: int = 0
 
 
+class DiskUsageDiagnostic(BaseModel):
+    """Capacity information reported by the filesystem for the selected volume."""
+
+    total_bytes: int = Field(default=0, ge=0)
+    used_bytes: int = Field(default=0, ge=0)
+    free_bytes: int = Field(default=0, ge=0)
+
+
 class BackupEstimate(BaseModel):
-    """Global source estimate before any user-approved exclusion."""
+    """Separate personal-data and actual execution-plan estimates."""
 
     total_size_bytes: int = 0
     total_file_count: int = 0
     required_free_space_bytes: int = 0
     duration_seconds: int | None = None
+    planned_size_bytes: int = 0
+    planned_file_count: int = 0
+    planned_logical_items: int = 0
+    plan_scope: str = "browser_and_profile_data"
 
 
 class WindowsSystemInformation(BaseModel):
@@ -87,6 +99,7 @@ class WindowsDiagnosticReport(BaseModel):
     windows_detected: bool
     confidence: str
     markers: list[WindowsDirectoryMarker] = Field(default_factory=list)
+    disk: DiskUsageDiagnostic = Field(default_factory=DiskUsageDiagnostic)
     system: WindowsSystemInformation = Field(default_factory=WindowsSystemInformation)
     users: list[UserProfileDiagnostic] = Field(default_factory=list)
     detected_browsers: list[str] = Field(default_factory=list)

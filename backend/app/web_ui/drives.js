@@ -1,7 +1,15 @@
+function driveFormatBytes(value){
+  if(!value)return "0 octet";
+  const units=["octets","Ko","Mo","Go","To"];
+  const index=Math.min(Math.floor(Math.log(value)/Math.log(1024)),units.length-1);
+  return `${(value/(1024**index)).toLocaleString("fr-FR",{maximumFractionDigits:index?1:0})} ${units[index]}`;
+}
+
 function driveOptions(drives){
   return '<option value="">Choisir un disque</option>'+drives.map(drive=>{
     const suffix=drive.system?" — disque système":"";
-    return `<option value="${drive.root}">${drive.label}${suffix}</option>`;
+    const free=drive.free_bytes?` — ${driveFormatBytes(drive.free_bytes)} libres`:"";
+    return `<option value="${drive.root}">${drive.label}${suffix}${free}</option>`;
   }).join("");
 }
 
@@ -29,6 +37,7 @@ function bindLocation(config){
     relativeField.classList.toggle("hidden",customMode);
     customField.classList.toggle("hidden",!customMode);
     target.value=customMode?custom.value.trim():(drive.value?joinWindowsPath(drive.value,relative.value):"");
+    window.dispatchEvent(new CustomEvent("fsbackup:destination-changed"));
   };
 
   mode.addEventListener("change",sync);
@@ -61,6 +70,7 @@ async function loadAvailableDrives(){
     const response=await fetch("/api/v1/sources/drives");
     const data=await response.json();
     if(!response.ok)throw new Error(data.error?.message??"Impossible de détecter les lecteurs.");
+    window.fsbackupDrives=data.drives??[];
     if(!data.drives.length){
       selects.forEach(select=>select.innerHTML='<option value="">Aucun lecteur disponible</option>');
       return;
@@ -94,17 +104,20 @@ async function loadAvailableDrives(){
   }
 }
 
-function loadDiagnosticModule(){
-  if(document.querySelector('script[data-fsbackup-diagnostic]'))return;
+function loadOptionalModule(src,attribute){
+  if(document.querySelector(`script[${attribute}]`))return;
   const script=document.createElement("script");
-  script.src="/app/diagnostic.js";
+  script.src=src;
   script.defer=true;
-  script.dataset.fsbackupDiagnostic="true";
+  script.setAttribute(attribute,"true");
   document.body.appendChild(script);
 }
 
 document.addEventListener("DOMContentLoaded",()=>{
-  loadDiagnosticModule();
+  loadOptionalModule("/app/diagnostic.js","data-fsbackup-diagnostic");
+  loadOptionalModule("/app/capacity.js","data-fsbackup-capacity");
+  loadOptionalModule("/app/root_inventory.js","data-fsbackup-root-inventory");
+  loadOptionalModule("/app/backup_payload_bridge.js","data-fsbackup-payload-bridge");
   locationConfigs.forEach(bindLocation);
   loadAvailableDrives();
 });

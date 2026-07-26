@@ -15,6 +15,7 @@ from .schemas import (
     ExecutionInfo,
     IntegrityInfo,
     Manifest,
+    ManifestExclusion,
     ManifestFile,
     ManifestHeader,
     ManifestSummary,
@@ -31,7 +32,11 @@ class ManifestBuilderError(ValueError):
 class ManifestBuilderService:
     """Transform a read-only execution plan into a legacy V1 manifest."""
 
-    def build(self, execution_plan: ExecutionPlan) -> Manifest:
+    def build(
+        self,
+        execution_plan: ExecutionPlan,
+        exclusions: list[ManifestExclusion] | None = None,
+    ) -> Manifest:
         """Create a deterministic V1 manifest without touching source files."""
 
         files = self._build_files(execution_plan)
@@ -49,6 +54,7 @@ class ManifestBuilderService:
                 warnings=summary.warnings,
             ),
             files=files,
+            exclusions=exclusions or [],
         )
 
     @classmethod

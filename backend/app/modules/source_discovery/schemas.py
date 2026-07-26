@@ -15,11 +15,14 @@ class SourceType(StrEnum):
 
 
 class AvailableDrive(BaseModel):
-    """A mounted filesystem root available as a backup source."""
+    """A mounted filesystem root available as a backup source or destination."""
 
     root: str
     label: str
     system: bool = False
+    total_bytes: int = Field(default=0, ge=0)
+    used_bytes: int = Field(default=0, ge=0)
+    free_bytes: int = Field(default=0, ge=0)
 
 
 class AvailableDrivesReport(BaseModel):
