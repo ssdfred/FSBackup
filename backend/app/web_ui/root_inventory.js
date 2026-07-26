@@ -6,7 +6,7 @@ function inventoryFormatBytes(value){
   return `${(value/(1024**index)).toLocaleString("fr-FR",{maximumFractionDigits:index?1:0})} ${units[index]}`;
 }
 
-const inventoryState={sourceRoot:"",requestId:0,selectable:[],selected:new Set(),recovery:[],selectedRecovery:new Set()};
+const inventoryState={sourceRoot:"",requestId:0,selectable:[],selected:new Set(),recovery:[],selectedRecovery:new Set(),loading:false,error:null,timer:null,controller:null};
 const inventoryLabels={
   "données_personnelles":"Données personnelles à la racine",
   "à_examiner":"Dossiers et projets à examiner",
@@ -25,9 +25,15 @@ window.getSelectedRecoverySize=()=>inventoryState.recovery
   .reduce((total,item)=>total+Number(item.profile_kind==="current"?item.additional_size_bytes:item.total_size_bytes),0);
 window.getDetectedRecoverableProfileSize=()=>inventoryState.recovery
   .reduce((total,item)=>total+Number(item.profile_kind==="current"?item.additional_size_bytes:item.total_size_bytes),0);
+window.getInventorySourceRoot=()=>inventoryState.sourceRoot;
+window.getInventoryStatus=()=>({loading:inventoryState.loading,error:inventoryState.error,ready:Boolean(inventoryState.sourceRoot&&!inventoryState.loading&&!inventoryState.error)});
 
 function notifyInventorySelection(){
   window.dispatchEvent(new CustomEvent("fsbackup:plan-selection-changed"));
+}
+
+function notifyInventoryStatus(){
+  window.dispatchEvent(new CustomEvent("fsbackup:inventory-status-changed",{detail:window.getInventoryStatus()}));
 }
 
 function clearInventoryState(sourceRoot=""){
@@ -36,6 +42,7 @@ function clearInventoryState(sourceRoot=""){
   inventoryState.selected.clear();
   inventoryState.recovery=[];
   inventoryState.selectedRecovery.clear();
+  inventoryState.error=null;
   notifyInventorySelection();
 }
 
@@ -94,6 +101,8 @@ function renderRootInventory(report,sourceRoot){
   inventoryState.selectedRecovery.clear();
   inventoryState.selectable=(report.entries??[]).filter(selectableEntry);
   inventoryState.recovery=[...(report.current_windows_profiles??[]),...(report.old_windows_profiles??[])];
+  inventoryState.loading=false;
+  inventoryState.error=null;
   const groups={};
   (report.entries??[]).forEach(item=>(groups[item.category]??=[]).push(item));
   const order=["données_personnelles","à_examiner","programdata_à_examiner","ancienne_installation_windows","système_non_inclus"];
@@ -120,36 +129,59 @@ function renderRootInventory(report,sourceRoot){
     if(input.checked)inventoryState.selectedRecovery.add(path);else inventoryState.selectedRecovery.delete(path);
     notifyInventorySelection();
   }));
+  notifyInventoryStatus();
   notifyInventorySelection();
 }
 
 async function runRootInventory(){
   const mode=document.querySelector("#source-mode");
   const source=document.querySelector("#source-root");
-  if(mode?.value!=="windows_disk"||!source?.value){clearInventoryState();return;}
+  if(mode?.value!=="windows_disk"||!source?.value){
+    inventoryState.controller?.abort();
+    inventoryState.loading=false;
+    clearInventoryState();
+    notifyInventoryStatus();
+    return;
+  }
   const sourceRoot=source.value;
   const requestId=++inventoryState.requestId;
+  inventoryState.controller?.abort();
+  inventoryState.controller=new AbortController();
   clearInventoryState(sourceRoot);
+  inventoryState.loading=true;
+  notifyInventoryStatus();
   const panel=ensureRootInventoryPanel();
-  if(!panel){setTimeout(runRootInventory,100);return;}
-  panel.innerHTML="<strong>Inventaire des profils et dossiers récupérables…</strong><p>Analyse en lecture seule, sans sélection automatique.</p>";
+  if(!panel){scheduleRootInventory(100);return;}
+  panel.innerHTML="<strong>Inventaire complet en cours…</strong><p>Analyse unique en lecture seule des profils, projets, ProgramData et Windows.old. Cette étape peut durer plusieurs minutes sur un ancien disque.</p>";
   try{
-    const response=await fetch("/api/v1/sources/root-inventory",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({source_root:sourceRoot})});
+    const response=await fetch("/api/v1/sources/root-inventory",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({source_root:sourceRoot}),signal:inventoryState.controller.signal});
     const report=await response.json();
     if(!response.ok)throw new Error(report.detail??"Inventaire indisponible.");
     if(requestId!==inventoryState.requestId||sourceRoot!==document.querySelector("#source-root")?.value)return;
     renderRootInventory(report,sourceRoot);
   }catch(error){
-    if(requestId!==inventoryState.requestId)return;
+    if(error.name==="AbortError"||requestId!==inventoryState.requestId)return;
+    inventoryState.loading=false;
+    inventoryState.error=error.message;
     panel.innerHTML=`<strong>Inventaire indisponible</strong><p class="diagnostic-error">${error.message}</p>`;
+    notifyInventoryStatus();
+    notifyInventorySelection();
   }
 }
 
+function scheduleRootInventory(delay=250){
+  if(inventoryState.timer)clearTimeout(inventoryState.timer);
+  inventoryState.timer=setTimeout(()=>{
+    inventoryState.timer=null;
+    runRootInventory();
+  },delay);
+}
+
 function initRootInventory(){
-  document.querySelector("#source-root")?.addEventListener("change",()=>setTimeout(runRootInventory,0));
-  document.querySelector("#source-mode")?.addEventListener("change",()=>setTimeout(runRootInventory,0));
-  window.addEventListener("fsbackup:drives-loaded",()=>setTimeout(runRootInventory,0));
-  setTimeout(runRootInventory,0);
+  document.querySelector("#source-root")?.addEventListener("change",()=>scheduleRootInventory());
+  document.querySelector("#source-mode")?.addEventListener("change",()=>scheduleRootInventory());
+  window.addEventListener("fsbackup:drives-loaded",()=>scheduleRootInventory());
+  scheduleRootInventory();
 }
 
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",initRootInventory);else initRootInventory();
