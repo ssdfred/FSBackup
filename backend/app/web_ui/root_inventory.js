@@ -68,7 +68,7 @@ async function runRootInventory(){
   const source=document.querySelector("#source-root");
   if(mode?.value!=="windows_disk"||!source?.value)return;
   const panel=ensureRootInventoryPanel();
-  if(!panel)return;
+  if(!panel){setTimeout(runRootInventory,100);return;}
   panel.innerHTML="<strong>Inventaire des dossiers de la racine…</strong><p>Analyse en lecture seule, sans sélection automatique.</p>";
   try{
     const response=await fetch("/api/v1/sources/root-inventory",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({source_root:source.value})});
@@ -78,8 +78,12 @@ async function runRootInventory(){
   }catch(error){panel.innerHTML=`<strong>Inventaire indisponible</strong><p class="diagnostic-error">${error.message}</p>`;}
 }
 
-document.addEventListener("DOMContentLoaded",()=>{
+function initRootInventory(){
   document.querySelector("#source-root")?.addEventListener("change",()=>setTimeout(runRootInventory,0));
   document.querySelector("#source-mode")?.addEventListener("change",()=>setTimeout(runRootInventory,0));
   window.addEventListener("fsbackup:drives-loaded",()=>setTimeout(runRootInventory,0));
-});
+  setTimeout(runRootInventory,0);
+}
+
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",initRootInventory);
+else initRootInventory();
