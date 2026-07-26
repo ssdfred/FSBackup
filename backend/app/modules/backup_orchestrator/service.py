@@ -14,6 +14,7 @@ from app.modules.execution_planner.schemas import (
 from app.modules.execution_planner.service import ExecutionPlannerService
 from app.modules.integrity_engine.schemas import IntegrityRequest
 from app.modules.integrity_engine.service import IntegrityEngineService
+from app.modules.manifest_builder.schemas import ManifestExclusion
 from app.modules.manifest_builder.service import ManifestBuilderService
 
 from .schemas import BackupRunReport, BackupRunRequest, BackupSourceMode
@@ -24,6 +25,10 @@ class BackupOrchestratorService:
     def run(cls, request: BackupRunRequest) -> BackupRunReport:
         try:
             execution_plan = cls._build_execution_plan(request)
+            execution_plan, excluded_files, excluded_size = cls._apply_exclusions(
+                execution_plan,
+                request,
+            )
             with TemporaryDirectory(prefix="fsbackup-") as workspace:
                 copy_report = CopyEngineService.execute(
                     CopyRequest(
@@ -41,12 +46,23 @@ class BackupOrchestratorService:
                     return BackupRunReport(
                         success=False,
                         copied_files=copy_report.summary.copied,
+                        excluded_files=excluded_files,
+                        excluded_size_bytes=excluded_size,
                         warnings=warnings,
                         error=error,
                         copy_report=copy_report,
                     )
 
-                manifest = ManifestBuilderService().build(execution_plan)
+                exclusions = [
+                    ManifestExclusion(
+                        path=item.path,
+                        reason=item.reason,
+                        risk=item.risk,
+                        approved_by_user=item.approved_by_user,
+                    )
+                    for item in request.approved_exclusions
+                ]
+                manifest = ManifestBuilderService().build(execution_plan, exclusions)
                 archive_report = ArchiveEngineService.create(
                     ArchiveRequest(
                         source_directory=workspace,
@@ -61,6 +77,8 @@ class BackupOrchestratorService:
                     return BackupRunReport(
                         success=False,
                         copied_files=copy_report.summary.copied,
+                        excluded_files=excluded_files,
+                        excluded_size_bytes=excluded_size,
                         warnings=warnings,
                         error=archive_report.error,
                         copy_report=copy_report,
@@ -85,6 +103,8 @@ class BackupOrchestratorService:
                         return BackupRunReport(
                             success=False,
                             copied_files=copy_report.summary.copied,
+                            excluded_files=excluded_files,
+                            excluded_size_bytes=excluded_size,
                             warnings=warnings + integrity_report.warnings,
                             error="Archive integrity verification failed.",
                             copy_report=copy_report,
@@ -96,6 +116,8 @@ class BackupOrchestratorService:
                     success=True,
                     archive_path=archive_report.archive_path,
                     copied_files=copy_report.summary.copied,
+                    excluded_files=excluded_files,
+                    excluded_size_bytes=excluded_size,
                     warnings=warnings,
                     copy_report=copy_report,
                     archive_report=archive_report,
@@ -111,6 +133,68 @@ class BackupOrchestratorService:
         return ExecutionPlannerService().build_plan(
             request.source_root,
             request.selected_item_ids,
+        )
+
+    @staticmethod
+    def _apply_exclusions(
+        execution_plan: ExecutionPlan,
+        request: BackupRunRequest,
+    ) -> tuple[ExecutionPlan, int, int]:
+        if not request.approved_exclusions:
+            return execution_plan, 0, 0
+        if not request.exclusions_confirmed:
+            raise ValueError(
+                "Les exclusions sélectionnées doivent être confirmées explicitement."
+            )
+        if any(not item.approved_by_user for item in request.approved_exclusions):
+            raise ValueError("Chaque exclusion doit être approuvée par l'utilisateur.")
+
+        source_root = Path(execution_plan.source_root).resolve(strict=True)
+        excluded_roots: list[Path] = []
+        for exclusion in request.approved_exclusions:
+            candidate = Path(exclusion.path).expanduser().resolve(strict=True)
+            try:
+                candidate.relative_to(source_root)
+            except ValueError as exc:
+                raise ValueError(
+                    f"Exclusion hors de la source interdite : {candidate}"
+                ) from exc
+            if candidate == source_root:
+                raise ValueError("La racine complète de la source ne peut pas être exclue.")
+            excluded_roots.append(candidate)
+
+        kept: list[PhysicalFile] = []
+        excluded: list[PhysicalFile] = []
+        for physical_file in execution_plan.physical_files:
+            candidate = Path(physical_file.source_path).resolve(strict=False)
+            if any(
+                candidate == excluded_root or excluded_root in candidate.parents
+                for excluded_root in excluded_roots
+            ):
+                excluded.append(physical_file)
+            else:
+                kept.append(physical_file)
+
+        summary = execution_plan.summary.model_copy(
+            update={
+                "physical_files": len(kept),
+                "estimated_size_bytes": sum(item.size_bytes for item in kept),
+            }
+        )
+        filtered_plan = execution_plan.model_copy(
+            update={
+                "physical_files": kept,
+                "summary": summary,
+                "warnings": execution_plan.warnings
+                + [
+                    f"{len(excluded)} fichier(s) exclus après confirmation utilisateur."
+                ],
+            }
+        )
+        return (
+            filtered_plan,
+            len(excluded),
+            sum(item.size_bytes for item in excluded),
         )
 
     @staticmethod
