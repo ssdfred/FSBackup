@@ -30,6 +30,7 @@ function bindLocation(config){
   const driveField=document.querySelector(`#${config.driveField}`);
   const relativeField=document.querySelector(`#${config.relativeField}`);
   const customField=document.querySelector(`#${config.customField}`);
+  if(!drive||!relative||!custom||!driveField||!relativeField||!customField)return;
 
   const sync=()=>{
     const customMode=mode.value==="custom";
@@ -49,7 +50,7 @@ function bindLocation(config){
 }
 
 const locationConfigs=[
-  {mode:"backup-destination-mode",target:"destination-directory",drive:"backup-destination-drive",relative:"backup-destination-subdirectory",custom:"backup-destination-custom",driveField:"backup-destination-drive-field",relativeField:"backup-destination-relative-field",customField:"backup-destination-custom-field"},
+  {mode:"backup-destination-mode",target:"destination-directory",drive:"backup-destination-drive",relative:"backup-destination-subdirectory",custom:"backup-destination-custom",driveField:"backup-destination-drive-field",relativeField:"backup-destination-subdirectory-field",customField:"backup-destination-custom-field"},
   {mode:"catalog-location-mode",target:"catalog-directory",drive:"catalog-drive",relative:"catalog-subdirectory",custom:"catalog-custom-directory",driveField:"catalog-drive-field",relativeField:"catalog-subdirectory-field",customField:"catalog-custom-field"},
   {mode:"restore-archive-mode",target:"restore-archive",drive:"restore-archive-drive",relative:"restore-archive-relative",custom:"restore-archive-custom",driveField:"restore-archive-drive-field",relativeField:"restore-archive-relative-field",customField:"restore-archive-custom-field"},
   {mode:"restore-destination-mode",target:"restore-destination",drive:"restore-destination-drive",relative:"restore-destination-subdirectory",custom:"restore-destination-custom",driveField:"restore-destination-drive-field",relativeField:"restore-destination-subdirectory-field",customField:"restore-destination-custom-field"},
@@ -104,7 +105,7 @@ async function loadAvailableDrives(){
   }
 }
 
-const UI_MODULE_VERSION="10.6.1";
+const UI_MODULE_VERSION="10.6.2";
 
 function loadOptionalModule(src,attribute){
   if(document.querySelector(`script[${attribute}]`))return;
