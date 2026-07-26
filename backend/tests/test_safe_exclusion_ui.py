@@ -43,7 +43,7 @@ def test_capacity_ui_distinguishes_disk_recovery_scope_and_plan() -> None:
     assert "Compléments de profils détectés" in script
     assert "Total récupérable visible" in script
     assert "Plan actuellement sélectionné" in script
-    assert "Les fichiers système et programmes installés restent exclus" in script
+    assert "Windows et les programmes installés restent exclus" in script
 
 
 def test_capacity_ui_blocks_an_unknown_or_insufficient_destination() -> None:
