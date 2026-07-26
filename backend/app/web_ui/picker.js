@@ -14,12 +14,18 @@ function pickerMessage(text,type=""){
   message.className=`message ${type}`;
 }
 
+function pickerIcon(kind){
+  if(kind==="archive"){
+    return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2.75h8l4.25 4.25v14.25H6z"/><path d="M14 2.75V7h4.25"/><path d="M9 12h6M9 15h6"/></svg>';
+  }
+  return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 6.5h6l1.75 2h9.25v9.75a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg>';
+}
+
 async function openNativePicker(binding,button){
   const target=document.querySelector(`#${binding.target}`);
   if(!target)return;
   button.disabled=true;
-  const previous=button.textContent;
-  button.textContent="Ouverture…";
+  button.classList.add("is-loading");
   try{
     const response=await fetch(`/api/v1/system/picker/${binding.kind}`,{
       method:"POST",
@@ -43,7 +49,7 @@ async function openNativePicker(binding,button){
     pickerMessage(error.message,"error");
   }finally{
     button.disabled=false;
-    button.textContent=previous;
+    button.classList.remove("is-loading");
   }
 }
 
@@ -57,9 +63,12 @@ function bindNativePickers(){
     target.parentNode.insertBefore(wrapper,target);
     wrapper.appendChild(target);
     const button=document.createElement("button");
+    const label=binding.kind==="archive"?"Choisir une archive":"Choisir un dossier";
     button.type="button";
-    button.className="secondary-action picker-button";
-    button.textContent="Parcourir…";
+    button.className="picker-button";
+    button.setAttribute("aria-label",label);
+    button.title=label;
+    button.innerHTML=pickerIcon(binding.kind);
     button.addEventListener("click",()=>openNativePicker(binding,button));
     wrapper.appendChild(button);
   });
