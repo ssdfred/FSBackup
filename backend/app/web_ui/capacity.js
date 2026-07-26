@@ -32,6 +32,11 @@ function inventoryMatchesCapacitySource(){
   return Boolean(inventoryRoot&&inventoryRoot===capacityState.sourceRoot&&selectedSourceMatchesCapacity());
 }
 
+function currentInventoryStatus(){
+  const fallback={loading:true,error:null,ready:false};
+  return window.getInventoryStatus?.()??fallback;
+}
+
 function ensureCapacityPanel(){
   let panel=document.querySelector("#backup-capacity-diagnostic");
   if(panel)return panel;
@@ -79,7 +84,10 @@ function renderCapacityDiagnostic(){
   const estimate=data.estimate??{};
   const destination=selectedDestinationDrive();
   const defaultPlanned=Number(estimate.planned_size_bytes??0);
-  const sameInventory=inventoryMatchesCapacitySource();
+  const inventoryStatus=currentInventoryStatus();
+  const sameInventory=inventoryMatchesCapacitySource()&&inventoryStatus.ready;
+  const inventoryPending=inventoryStatus.loading||!sameInventory;
+  const inventoryError=inventoryStatus.error;
   const additionalSize=sameInventory?Number(window.getSelectedAdditionalSize?.()??0):0;
   const recoverySize=sameInventory?Number(window.getSelectedRecoverySize?.()??0):0;
   const detectedRecoverySize=sameInventory?Number(window.getDetectedRecoverableProfileSize?.()??0):0;
@@ -88,24 +96,29 @@ function renderCapacityDiagnostic(){
   const usedBytes=Number(disk.used_bytes??0);
   const unexplainedBytes=Math.max(usedBytes-maximumDetected,0);
   const destinationFree=Number(destination?.free_bytes??0);
-  const enough=Boolean(destination&&planned>0&&destinationFree>=planned);
-  const destinationStatus=!destination
-    ?'<div class="capacity-error">Destination inconnue : FSBackup ne peut pas vérifier l’espace disponible.</div>'
-    :planned<=0
-      ?'<div class="capacity-error">Le plan réel est vide ou indéterminé. La sauvegarde reste bloquée.</div>'
-      :enough
-        ?`<div class="capacity-ok">Destination compatible : ${capacityFormatBytes(destinationFree)} libres pour un plan estimé à ${capacityFormatBytes(planned)}.</div>`
-        :`<div class="capacity-error">Espace insuffisant sur ${destination.label} : ${capacityFormatBytes(destinationFree)} libres pour ${capacityFormatBytes(planned)} prévus.</div>`;
+  const enough=Boolean(!inventoryPending&&!inventoryError&&destination&&planned>0&&destinationFree>=planned);
+  const destinationStatus=inventoryError
+    ?`<div class="capacity-error">Inventaire impossible : ${inventoryError}. La sauvegarde reste bloquée.</div>`
+    :inventoryPending
+      ?'<div class="capacity-warning"><strong>Analyse complète en cours.</strong> Le plan final et le bouton de sauvegarde restent bloqués jusqu’à la fin de l’inventaire.</div>'
+      :!destination
+        ?'<div class="capacity-error">Destination inconnue : FSBackup ne peut pas vérifier l’espace disponible.</div>'
+        :planned<=0
+          ?'<div class="capacity-error">Le plan réel est vide ou indéterminé. La sauvegarde reste bloquée.</div>'
+          :enough
+            ?`<div class="capacity-ok">Destination compatible : ${capacityFormatBytes(destinationFree)} libres pour un plan estimé à ${capacityFormatBytes(planned)}.</div>`
+            :`<div class="capacity-error">Espace insuffisant sur ${destination.label} : ${capacityFormatBytes(destinationFree)} libres pour ${capacityFormatBytes(planned)} prévus.</div>`;
+  const pendingValue=inventoryPending?"Analyse en cours":null;
   panel.className="capacity-panel";
   panel.innerHTML=`
     <p class="eyebrow">Périmètre réel de la sauvegarde</p><h3>Ce qui sera réellement inclus</h3>
     <div class="capacity-grid">
       <article class="capacity-card"><span>Capacité du lecteur source</span><strong>${capacityFormatBytes(disk.total_bytes)}</strong><small>${capacityFormatBytes(usedBytes)} utilisés · ${capacityFormatBytes(disk.free_bytes)} libres</small></article>
       <article class="capacity-card"><span>Dossiers standards inclus</span><strong>${capacityFormatBytes(estimate.total_size_bytes)}</strong><small>${Number(estimate.total_file_count??0).toLocaleString("fr-FR")} fichiers personnels</small></article>
-      <article class="capacity-card"><span>Compléments de profils détectés</span><strong>${capacityFormatBytes(detectedRecoverySize)}</strong><small>${sameInventory?"AppData et autres fichiers accessibles, facultatifs":"Inventaire du disque en cours de synchronisation"}</small></article>
-      <article class="capacity-card"><span>Plan actuellement sélectionné</span><strong>${capacityFormatBytes(planned)}</strong><small>${capacityFormatBytes(defaultPlanned)} de base · ${capacityFormatBytes(recoverySize)} de profils · ${capacityFormatBytes(additionalSize)} de projets</small></article>
-      <article class="capacity-card"><span>Total récupérable visible</span><strong>${capacityFormatBytes(maximumDetected)}</strong><small>Profils détectés et projets déjà cochés</small></article>
-      <article class="capacity-card"><span>Données utilisées non classées</span><strong>${capacityFormatBytes(unexplainedBytes)}</strong><small>Système, programmes, fichiers protégés ou dossiers encore non mesurés</small></article>
+      <article class="capacity-card"><span>Compléments de profils détectés</span><strong>${pendingValue??capacityFormatBytes(detectedRecoverySize)}</strong><small>${inventoryPending?"Analyse des profils, de ProgramData et de Windows.old":"AppData et autres fichiers accessibles, facultatifs"}</small></article>
+      <article class="capacity-card"><span>Plan actuellement sélectionné</span><strong>${pendingValue??capacityFormatBytes(planned)}</strong><small>${inventoryPending?"Le total final sera disponible après l’inventaire":`${capacityFormatBytes(defaultPlanned)} de base · ${capacityFormatBytes(recoverySize)} de profils · ${capacityFormatBytes(additionalSize)} de projets`}</small></article>
+      <article class="capacity-card"><span>Total récupérable visible</span><strong>${pendingValue??capacityFormatBytes(maximumDetected)}</strong><small>${inventoryPending?"Calcul en attente":"Profils détectés et projets déjà cochés"}</small></article>
+      <article class="capacity-card"><span>Données utilisées non classées</span><strong>${pendingValue??capacityFormatBytes(unexplainedBytes)}</strong><small>${inventoryPending?"Calcul en attente":"Système, programmes, fichiers protégés ou dossiers encore non mesurés"}</small></article>
       <article class="capacity-card"><span>Destination</span><strong>${destination?destination.label:"Inconnue"}</strong><small>${destination?`${capacityFormatBytes(destinationFree)} libres`:"Sélectionnez un lecteur détecté"}</small></article>
     </div>
     <div class="capacity-warning"><strong>Périmètre :</strong> le plan de base inclut les dossiers standards et les données reconnues. Cochez « compléter le profil » pour ajouter AppData et les autres fichiers accessibles. Les projets et anciens profils restent facultatifs. Windows et les programmes installés restent exclus.</div>
@@ -176,6 +189,7 @@ function initCapacity(){
   document.querySelector("#backup-destination-drive")?.addEventListener("change",renderCapacityDiagnostic);
   window.addEventListener("fsbackup:destination-changed",renderCapacityDiagnostic);
   window.addEventListener("fsbackup:plan-selection-changed",renderCapacityDiagnostic);
+  window.addEventListener("fsbackup:inventory-status-changed",renderCapacityDiagnostic);
   window.addEventListener("fsbackup:drives-loaded",refreshCapacityDiagnostic);
   setTimeout(refreshCapacityDiagnostic,0);
 }
