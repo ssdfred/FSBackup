@@ -54,13 +54,12 @@ function updateExclusionSummary(){
   const selected=selectedExclusions();
   const selectedSize=selected.reduce((total,item)=>total+item.size_bytes,0);
   const selectedFiles=selected.reduce((total,item)=>total+item.file_count,0);
-  const after=Math.max(0,exclusionState.sourceSize-selectedSize);
   const count=document.querySelector("#exclusion-selected-count");
   const size=document.querySelector("#exclusion-selected-size");
-  const afterElement=document.querySelector("#exclusion-after-size");
+  const saving=document.querySelector("#exclusion-saving-size");
   if(count)count.textContent=`${selected.length} dossier(s) — ${selectedFiles.toLocaleString("fr-FR")} fichiers`;
   if(size)size.textContent=diagnosticFormatBytes(selectedSize);
-  if(afterElement)afterElement.textContent=diagnosticFormatBytes(after);
+  if(saving)saving.textContent=diagnosticFormatBytes(selectedSize);
   const confirmation=document.querySelector("#exclusion-confirmation");
   if(confirmation){
     confirmation.classList.toggle("hidden",selected.length===0);
@@ -83,7 +82,7 @@ function renderExclusions(report){
     <div class="exclusion-panel">
       <p class="eyebrow">Optimisation facultative</p><h3>Exclusions proposées</h3>
       <p>Aucune exclusion n’est active par défaut. Cochez uniquement les dossiers que vous acceptez de ne pas inclure.</p>
-      <div class="exclusion-summary"><div>Source estimée<strong>${diagnosticFormatBytes(exclusionState.sourceSize)}</strong></div><div>Sélection<strong id="exclusion-selected-size">0 octet</strong><small id="exclusion-selected-count">0 dossier</small></div><div>Après exclusions<strong id="exclusion-after-size">${diagnosticFormatBytes(exclusionState.sourceSize)}</strong></div></div>
+      <div class="exclusion-summary"><div>Données personnelles estimées<strong>${diagnosticFormatBytes(exclusionState.sourceSize)}</strong><small>Documents, Bureau, médias et téléchargements</small></div><div>Exclusions sélectionnées<strong id="exclusion-selected-size">0 octet</strong><small id="exclusion-selected-count">0 dossier</small></div><div>Économie potentielle<strong id="exclusion-saving-size">0 octet</strong><small>La taille finale sera calculée par le plan de sauvegarde</small></div></div>
       <div>${exclusionState.suggestions.map((item,index)=>`
         <label class="exclusion-item">
           <input type="checkbox" data-exclusion-index="${index}">
@@ -140,7 +139,7 @@ function renderSourceDiagnostic(data){
     <div class="diagnostic-grid">
       <article class="diagnostic-card"><span>Utilisateurs trouvés</span><strong>${users.length}</strong><small>${diagnosticNames(users)}</small></article>
       <article class="diagnostic-card"><span>Taille personnelle estimée</span><strong>${diagnosticFormatBytes(data.estimate.total_size_bytes)}</strong><small>${Number(data.estimate.total_file_count).toLocaleString("fr-FR")} fichiers</small></article>
-      <article class="diagnostic-card"><span>Espace libre conseillé</span><strong>${diagnosticFormatBytes(data.estimate.required_free_space_bytes)}</strong><small>Avant toute exclusion</small></article>
+      <article class="diagnostic-card"><span>Espace libre conseillé</span><strong>${diagnosticFormatBytes(data.estimate.required_free_space_bytes)}</strong><small>Estimation des données personnelles</small></article>
       <article class="diagnostic-card"><span>Navigateurs</span><strong>${data.detected_browsers.length}</strong><div class="diagnostic-list">${data.detected_browsers.map(item=>`<span>${item}</span>`).join("")||"<small>Aucun détecté</small>"}</div></article>
       <article class="diagnostic-card"><span>Applications importantes</span><strong>${applications.length}</strong><div class="diagnostic-list">${applications.map(item=>`<span>${item.name}</span>`).join("")||"<small>Aucune détectée</small>"}</div></article>
       <article class="diagnostic-card"><span>Messageries</span><strong>${mail.length}</strong><div class="diagnostic-list">${mail.map(item=>`<span>${item.client} — ${item.user_name}</span>`).join("")||"<small>Aucune détectée</small>"}</div></article>
@@ -179,27 +178,21 @@ function bindSafeExclusionSubmission(){
       const confirmation=document.querySelector("#exclusion-confirmation");
       confirmation?.classList.remove("hidden");
       confirmation?.scrollIntoView({behavior:"smooth",block:"center"});
-      document.querySelector("#exclusion-confirmation-status").textContent="Confirmez séparément avant de lancer la sauvegarde";
+      const status=document.querySelector("#exclusion-confirmation-status");
+      if(status)status.textContent="Confirmez séparément avant de lancer la sauvegarde";
+      return;
     }
+    window.fsbackupApprovedExclusions=selected.map(item=>({path:item.path,reason:item.reason,risk:item.risk,approved_by_user:true}));
+    window.fsbackupExclusionsConfirmed=selected.length===0||exclusionState.confirmed;
   },true);
-  const originalFetch=window.fetch.bind(window);
-  window.fetch=async(input,init={})=>{
-    const url=typeof input==="string"?input:input.url;
-    if(url.includes("/api/v1/backup/run")&&init.body){
-      try{
-        const payload=JSON.parse(init.body);
-        const selected=selectedExclusions();
-        payload.approved_exclusions=selected.map(item=>({path:item.path,reason:item.reason,risk:item.risk,approved_by_user:true}));
-        payload.exclusions_confirmed=selected.length>0&&exclusionState.confirmed;
-        init={...init,body:JSON.stringify(payload)};
-      }catch(_error){/* Le backend validera la requête originale. */}
-    }
-    return originalFetch(input,init);
-  };
 }
 
+window.getApprovedBackupExclusions=()=>window.fsbackupApprovedExclusions??[];
+window.areBackupExclusionsConfirmed=()=>window.fsbackupExclusionsConfirmed??true;
+
 document.addEventListener("DOMContentLoaded",()=>{
-  ensureDiagnosticPanel();bindSafeExclusionSubmission();
+  ensureDiagnosticPanel();
+  bindSafeExclusionSubmission();
   document.querySelector("#source-root")?.addEventListener("change",runSourceDiagnostic);
   document.querySelector("#source-mode")?.addEventListener("change",runSourceDiagnostic);
   window.addEventListener("fsbackup:drives-loaded",runSourceDiagnostic);
