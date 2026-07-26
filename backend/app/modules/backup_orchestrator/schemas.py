@@ -14,12 +14,21 @@ class BackupSourceMode(StrEnum):
     CUSTOM_FOLDER = "custom_folder"
 
 
+class ApprovedExclusion(BaseModel):
+    path: str = Field(min_length=1)
+    reason: str = Field(min_length=1)
+    risk: str = Field(min_length=1)
+    approved_by_user: bool = True
+
+
 class BackupRunRequest(BaseModel):
     source_root: str = Field(min_length=1)
     source_mode: BackupSourceMode = BackupSourceMode.WINDOWS_DISK
     destination_directory: str = Field(min_length=1)
     archive_name: str = Field(min_length=1)
     selected_item_ids: list[str] | None = None
+    approved_exclusions: list[ApprovedExclusion] = Field(default_factory=list)
+    exclusions_confirmed: bool = False
     compression: CompressionSettings = Field(default_factory=CompressionSettings)
     encryption: EncryptionSettings | None = None
     verify_integrity: bool = True
@@ -29,6 +38,8 @@ class BackupRunReport(BaseModel):
     success: bool
     archive_path: str | None = None
     copied_files: int = 0
+    excluded_files: int = 0
+    excluded_size_bytes: int = 0
     warnings: list[str] = Field(default_factory=list)
     error: str | None = None
     copy_report: CopyReport | None = None
