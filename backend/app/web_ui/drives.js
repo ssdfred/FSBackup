@@ -30,6 +30,7 @@ function bindLocation(config){
   const driveField=document.querySelector(`#${config.driveField}`);
   const relativeField=document.querySelector(`#${config.relativeField}`);
   const customField=document.querySelector(`#${config.customField}`);
+  if(!drive||!relative||!custom||!driveField||!relativeField||!customField)return;
 
   const sync=()=>{
     const customMode=mode.value==="custom";
@@ -104,10 +105,13 @@ async function loadAvailableDrives(){
   }
 }
 
+const UI_MODULE_VERSION="10.6.2";
+
 function loadOptionalModule(src,attribute){
   if(document.querySelector(`script[${attribute}]`))return;
   const script=document.createElement("script");
-  script.src=src;
+  const separator=src.includes("?")?"&":"?";
+  script.src=`${src}${separator}v=${encodeURIComponent(UI_MODULE_VERSION)}`;
   script.defer=true;
   script.setAttribute(attribute,"true");
   document.body.appendChild(script);
