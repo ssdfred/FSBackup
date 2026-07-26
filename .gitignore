@@ -14,5 +14,6 @@ backend/htmlcov/
 backend/.venv-build/
 backend/build/
 backend/dist/
+release/
 TestSource/
 TestsRetention/
