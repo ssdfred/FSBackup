@@ -99,10 +99,13 @@ function renderCapacityDiagnostic(){
   const additionalSize=sameInventory?Number(window.getSelectedAdditionalSize?.()??0):0;
   const recoverySize=sameInventory?Number(window.getSelectedRecoverySize?.()??0):0;
   const detectedRecoverySize=sameInventory?Number(window.getDetectedRecoverableProfileSize?.()??0):0;
-  const planned=defaultPlanned+additionalSize+recoverySize;
-  const maximumDetected=defaultPlanned+detectedRecoverySize+additionalSize;
+  const beforeExclusions=defaultPlanned+additionalSize+recoverySize;
+  const exclusionSize=sameInventory?Number(window.getSelectedApplicableExclusionSize?.()??0):0;
+  const exclusionCount=sameInventory?Number(window.getSelectedApplicableExclusionCount?.()??0):0;
+  const planned=Math.max(beforeExclusions-exclusionSize,0);
+  const maximumDetected=Math.max(defaultPlanned+detectedRecoverySize+additionalSize-exclusionSize,0);
   const usedBytes=Number(disk.used_bytes??0);
-  const unexplainedBytes=Math.max(usedBytes-maximumDetected,0);
+  const unexplainedBytes=Math.max(usedBytes-(defaultPlanned+detectedRecoverySize+additionalSize),0);
   const destinationFree=Number(destination?.free_bytes??0);
   const enough=Boolean(!inventoryPending&&!inventoryError&&destination&&planned>0&&destinationFree>=planned);
   const destinationStatus=inventoryError
@@ -114,7 +117,7 @@ function renderCapacityDiagnostic(){
         :planned<=0
           ?'<div class="capacity-error">Le plan réel est vide ou indéterminé. La sauvegarde reste bloquée.</div>'
           :enough
-            ?`<div class="capacity-ok">Destination compatible : ${capacityFormatBytes(destinationFree)} libres pour un plan estimé à ${capacityFormatBytes(planned)}.</div>`
+            ?`<div class="capacity-ok">Destination compatible : ${capacityFormatBytes(destinationFree)} libres pour un plan final estimé à ${capacityFormatBytes(planned)}.</div>`
             :`<div class="capacity-error">Espace insuffisant sur ${destination.label} : ${capacityFormatBytes(destinationFree)} libres pour ${capacityFormatBytes(planned)} prévus.</div>`;
   const pendingValue=inventoryPending?"Analyse en cours":null;
   panel.className="capacity-panel";
@@ -124,12 +127,14 @@ function renderCapacityDiagnostic(){
       <article class="capacity-card"><span>Capacité du lecteur source</span><strong>${capacityFormatBytes(disk.total_bytes)}</strong><small>${capacityFormatBytes(usedBytes)} utilisés · ${capacityFormatBytes(disk.free_bytes)} libres</small></article>
       <article class="capacity-card"><span>Dossiers standards inclus</span><strong>${capacityFormatBytes(estimate.total_size_bytes)}</strong><small>${Number(estimate.total_file_count??0).toLocaleString("fr-FR")} fichiers personnels</small></article>
       <article class="capacity-card"><span>Compléments de profils détectés</span><strong>${pendingValue??capacityFormatBytes(detectedRecoverySize)}</strong><small>${inventoryPending?"Analyse des profils, de ProgramData et de Windows.old":"AppData et autres fichiers accessibles, facultatifs"}</small></article>
-      <article class="capacity-card"><span>Plan actuellement sélectionné</span><strong>${pendingValue??capacityFormatBytes(planned)}</strong><small>${inventoryPending?"Le total final sera disponible après l’inventaire":`${capacityFormatBytes(defaultPlanned)} de base · ${capacityFormatBytes(recoverySize)} de profils · ${capacityFormatBytes(additionalSize)} de données supplémentaires`}</small></article>
-      <article class="capacity-card"><span>Total récupérable visible</span><strong>${pendingValue??capacityFormatBytes(maximumDetected)}</strong><small>${inventoryPending?"Calcul en attente":"Profils et données supplémentaires déjà sélectionnés"}</small></article>
+      <article class="capacity-card"><span>Plan avant exclusions</span><strong>${pendingValue??capacityFormatBytes(beforeExclusions)}</strong><small>${inventoryPending?"Le total sera disponible après l’inventaire":`${capacityFormatBytes(defaultPlanned)} de base · ${capacityFormatBytes(recoverySize)} de profils · ${capacityFormatBytes(additionalSize)} de données supplémentaires`}</small></article>
+      <article class="capacity-card"><span>Exclusions applicables</span><strong>${pendingValue??capacityFormatBytes(exclusionSize)}</strong><small>${inventoryPending?"Calcul en attente":`${exclusionCount} exclusion(s) située(s) dans le périmètre sélectionné`}</small></article>
+      <article class="capacity-card"><span>Plan final estimé</span><strong>${pendingValue??capacityFormatBytes(planned)}</strong><small>${inventoryPending?"Calcul en attente":"Plan avant exclusions moins les exclusions applicables"}</small></article>
+      <article class="capacity-card"><span>Total récupérable visible</span><strong>${pendingValue??capacityFormatBytes(maximumDetected)}</strong><small>${inventoryPending?"Calcul en attente":"Profils et données supplémentaires, après exclusions applicables"}</small></article>
       <article class="capacity-card"><span>Données utilisées non classées</span><strong>${pendingValue??capacityFormatBytes(unexplainedBytes)}</strong><small>${inventoryPending?"Calcul en attente":"Système, programmes, fichiers protégés ou dossiers encore non mesurés"}</small></article>
       <article class="capacity-card"><span>Destination</span><strong>${destination?destination.label:"Inconnue"}</strong><small>${destination?`${capacityFormatBytes(destinationFree)} libres`:"Sélectionnez un lecteur détecté"}</small></article>
     </div>
-    <div class="capacity-warning"><strong>Périmètre :</strong> le plan de base inclut les dossiers standards et les données reconnues. Les profils complets, Windows.old, ProgramData et les projets restent facultatifs. Windows et les programmes installés restent exclus sauf sélection explicite de Windows.old complet.</div>
+    <div class="capacity-warning"><strong>Périmètre :</strong> le plan de base inclut les dossiers standards et les données reconnues. Les profils complets, Windows.old, ProgramData et les projets restent facultatifs. Une exclusion est déduite uniquement lorsqu’elle se trouve dans un dossier réellement sélectionné.</div>
     ${destinationStatus}`;
   window.fsbackupDestinationCapacityValid=enough;
   clarifyDiagnosticSummary();
@@ -199,6 +204,7 @@ function initCapacity(){
   window.addEventListener("fsbackup:destination-changed",renderCapacityDiagnostic);
   window.addEventListener("fsbackup:plan-selection-changed",renderCapacityDiagnostic);
   window.addEventListener("fsbackup:inventory-status-changed",renderCapacityDiagnostic);
+  window.addEventListener("fsbackup:exclusions-changed",renderCapacityDiagnostic);
   window.addEventListener("fsbackup:drives-loaded",refreshCapacityDiagnostic);
   setTimeout(refreshCapacityDiagnostic,0);
 }
