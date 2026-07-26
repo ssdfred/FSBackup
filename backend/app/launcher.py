@@ -36,6 +36,7 @@ def run() -> None:
         port=port,
         reload=False,
         access_log=False,
+        log_config=None,
     )
 
 
