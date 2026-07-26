@@ -9,7 +9,7 @@ function capacityFormatBytes(value){
 
 function normalizeDriveRoot(value){
   const match=String(value??"").trim().match(/^([a-zA-Z]:)/);
-  return match?`${match[1].toUpperCase()}\`:"";
+  return match?`${match[1].toUpperCase()}\\`:"";
 }
 
 function selectedDestinationDrive(){
