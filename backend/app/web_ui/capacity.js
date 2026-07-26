@@ -33,14 +33,28 @@ function ensureCapacityPanel(){
     style.id="capacity-styles";
     style.textContent=`
       .capacity-panel{margin:1rem 0;padding:1.1rem;border:1px solid #dfe3f2;border-radius:16px;background:#fff}
-      .capacity-panel.hidden{display:none}.capacity-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.7rem;margin-top:.8rem}
+      .capacity-panel.hidden{display:none}.capacity-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.7rem;margin-top:.8rem}
       .capacity-card{padding:.8rem;border:1px solid #e6e8f1;border-radius:12px;background:#f8f9ff}.capacity-card strong{display:block;margin:.25rem 0;font-size:1.1rem}
       .capacity-warning{margin-top:.8rem;padding:.8rem;border-radius:12px;background:#fff2d9;color:#714900}.capacity-error{margin-top:.8rem;padding:.8rem;border-radius:12px;background:#fde8e8;color:#941d1d}
-      .capacity-ok{margin-top:.8rem;padding:.8rem;border-radius:12px;background:#e5f7ec;color:#176638}@media(max-width:900px){.capacity-grid{grid-template-columns:1fr}}
+      .capacity-ok{margin-top:.8rem;padding:.8rem;border-radius:12px;background:#e5f7ec;color:#176638}@media(max-width:1100px){.capacity-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:700px){.capacity-grid{grid-template-columns:1fr}}
     `;
     document.head.appendChild(style);
   }
   return panel;
+}
+
+function clarifyDiagnosticSummary(){
+  document.querySelectorAll("#source-diagnostic .diagnostic-card").forEach(card=>{
+    const label=card.querySelector("span");
+    const small=card.querySelector("small");
+    if(label?.textContent==="Espace libre conseillé"){
+      label.textContent="Plan de base inclus";
+      if(small)small.textContent="Avant profils complets, anciennes données et projets";
+    }
+    if(label?.textContent==="Taille personnelle estimée"&&small){
+      small.textContent=`${small.textContent} dans les dossiers standards`;
+    }
+  });
 }
 
 function renderCapacityDiagnostic(){
@@ -53,7 +67,9 @@ function renderCapacityDiagnostic(){
   const defaultPlanned=Number(estimate.planned_size_bytes??0);
   const additionalSize=Number(window.getSelectedAdditionalSize?.()??0);
   const recoverySize=Number(window.getSelectedRecoverySize?.()??0);
+  const detectedRecoverySize=Number(window.getDetectedRecoverableProfileSize?.()??0);
   const planned=defaultPlanned+additionalSize+recoverySize;
+  const maximumDetected=defaultPlanned+detectedRecoverySize+Number(window.getSelectedAdditionalSize?.()??0);
   const destinationFree=Number(destination?.free_bytes??0);
   const enough=Boolean(destination&&planned>0&&destinationFree>=planned);
   const destinationStatus=!destination
@@ -68,13 +84,16 @@ function renderCapacityDiagnostic(){
     <p class="eyebrow">Périmètre réel de la sauvegarde</p><h3>Ce qui sera réellement inclus</h3>
     <div class="capacity-grid">
       <article class="capacity-card"><span>Capacité du lecteur source</span><strong>${capacityFormatBytes(disk.total_bytes)}</strong><small>${capacityFormatBytes(disk.used_bytes)} utilisés · ${capacityFormatBytes(disk.free_bytes)} libres</small></article>
-      <article class="capacity-card"><span>Données personnelles incluses</span><strong>${capacityFormatBytes(estimate.total_size_bytes)}</strong><small>${Number(estimate.total_file_count??0).toLocaleString("fr-FR")} fichiers standards</small></article>
-      <article class="capacity-card"><span>Plan réellement sauvegardé</span><strong>${capacityFormatBytes(planned)}</strong><small>${capacityFormatBytes(defaultPlanned)} par défaut · ${capacityFormatBytes(additionalSize)} de projets · ${capacityFormatBytes(recoverySize)} d’anciennes données</small></article>
+      <article class="capacity-card"><span>Dossiers standards inclus</span><strong>${capacityFormatBytes(estimate.total_size_bytes)}</strong><small>${Number(estimate.total_file_count??0).toLocaleString("fr-FR")} fichiers personnels</small></article>
+      <article class="capacity-card"><span>Compléments de profils détectés</span><strong>${capacityFormatBytes(detectedRecoverySize)}</strong><small>AppData et autres fichiers accessibles, facultatifs</small></article>
+      <article class="capacity-card"><span>Plan actuellement sélectionné</span><strong>${capacityFormatBytes(planned)}</strong><small>${capacityFormatBytes(defaultPlanned)} de base · ${capacityFormatBytes(recoverySize)} de profils · ${capacityFormatBytes(additionalSize)} de projets</small></article>
+      <article class="capacity-card"><span>Total récupérable visible</span><strong>${capacityFormatBytes(maximumDetected)}</strong><small>Avant ajout des projets non cochés et hors fichiers système</small></article>
       <article class="capacity-card"><span>Destination</span><strong>${destination?destination.label:"Inconnue"}</strong><small>${destination?`${capacityFormatBytes(destinationFree)} libres`:"Sélectionnez un lecteur détecté"}</small></article>
     </div>
-    <div class="capacity-warning"><strong>Périmètre :</strong> les dossiers personnels Windows et les données reconnues sont inclus automatiquement. Les projets et anciens profils sont ajoutés uniquement lorsqu’ils sont cochés. Les fichiers système et programmes installés restent exclus.</div>
+    <div class="capacity-warning"><strong>Périmètre :</strong> le plan de base inclut les dossiers standards et les données reconnues. Cochez « compléter le profil » pour ajouter AppData et les autres fichiers accessibles. Les projets et anciens profils restent facultatifs. Windows et les programmes installés restent exclus.</div>
     ${destinationStatus}`;
   window.fsbackupDestinationCapacityValid=enough;
+  clarifyDiagnosticSummary();
 }
 
 async function refreshCapacityDiagnostic(){
@@ -93,6 +112,7 @@ async function refreshCapacityDiagnostic(){
     if(!response.ok)throw new Error(data.detail??"Diagnostic impossible.");
     capacityState.diagnostic=data;
     renderCapacityDiagnostic();
+    setTimeout(clarifyDiagnosticSummary,0);
   }catch(error){
     capacityState.diagnostic=null;
     window.fsbackupDestinationCapacityValid=false;
