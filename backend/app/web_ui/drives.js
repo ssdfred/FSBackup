@@ -6,7 +6,7 @@ function driveOptions(drives){
 }
 
 function joinWindowsPath(root,subdirectory){
-  const cleanRoot=root.replace(/[\\/]+$/,"");
+  const cleanRoot=root.replace(/[\\/]+$/,“”);
   const cleanSubdirectory=subdirectory.trim().replace(/^[\\/]+|[\\/]+$/g,"");
   return cleanSubdirectory?`${cleanRoot}\\${cleanSubdirectory}`:`${cleanRoot}\\`;
 }
@@ -93,17 +93,7 @@ async function loadAvailableDrives(){
   }
 }
 
-function loadNativePickerScript(){
-  if(document.querySelector('script[data-native-picker]'))return;
-  const script=document.createElement("script");
-  script.src="/app/picker.js";
-  script.defer=true;
-  script.dataset.nativePicker="true";
-  document.head.appendChild(script);
-}
-
 document.addEventListener("DOMContentLoaded",()=>{
   locationConfigs.forEach(bindLocation);
   loadAvailableDrives();
-  loadNativePickerScript();
 });
