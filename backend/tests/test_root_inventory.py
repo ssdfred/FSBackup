@@ -35,6 +35,10 @@ def test_root_inventory_classifies_projects_system_and_windows_old(
         tmp_path / "Windows.old" / "Users" / "fred" / "Documents" / "old.txt",
         9,
     )
+    _write(
+        tmp_path / "Windows.old" / "Users" / "fred" / "AppData" / "Roaming" / "mail.dat",
+        13,
+    )
 
     report = inventory_root(tmp_path)
     entries = {entry.name: entry for entry in report.entries}
@@ -46,10 +50,33 @@ def test_root_inventory_classifies_projects_system_and_windows_old(
     assert entries["OSADAPT01"].category == RootEntryCategory.REVIEW
     assert entries["Windows.old"].category == RootEntryCategory.OLD_WINDOWS
     assert entries["Windows.old"].included_by_default is False
+    assert entries["Windows.old"].size_bytes == 22
     assert report.review_size_bytes == 12
     assert len(report.old_windows_profiles) == 1
-    assert report.old_windows_profiles[0].name == "fred"
-    assert report.old_windows_profiles[0].personal_size_bytes == 9
+    profile = report.old_windows_profiles[0]
+    assert profile.name == "fred"
+    assert profile.standard_size_bytes == 9
+    assert profile.total_size_bytes == 22
+    assert profile.additional_size_bytes == 13
+
+
+def test_root_inventory_reports_current_profile_content_beyond_standard_folders(
+    tmp_path: Path,
+    allow_temporary_root: None,
+) -> None:
+    _write(tmp_path / "Users" / "fred" / "Documents" / "document.txt", 5)
+    _write(tmp_path / "Users" / "fred" / "AppData" / "Roaming" / "settings.dat", 17)
+    _write(tmp_path / "Users" / "fred" / ".ssh" / "config", 11)
+
+    report = inventory_root(tmp_path)
+
+    assert len(report.current_windows_profiles) == 1
+    profile = report.current_windows_profiles[0]
+    assert profile.path == str(tmp_path / "Users" / "fred")
+    assert profile.standard_size_bytes == 5
+    assert profile.total_size_bytes == 33
+    assert profile.additional_size_bytes == 28
+    assert report.recoverable_profile_size_bytes == 33
 
 
 def test_root_inventory_does_not_follow_directory_symlinks(
