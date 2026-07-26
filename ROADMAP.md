@@ -35,3 +35,6 @@
 ## v1.0
 
 - Stable Release
+- Lanceur Windows
+- Installateur Windows
+- Publication GitHub avec installateur et empreinte SHA-256
