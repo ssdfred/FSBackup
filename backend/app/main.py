@@ -41,7 +41,7 @@ REQUIRED_UI_MODULES = (
     "drive_capacity_bridge.js",
     "backup_layout.js",
 )
-UI_MODULE_VERSION = "10.8.4"
+UI_MODULE_VERSION = "10.8.5"
 
 
 @app.get("/app/", include_in_schema=False)
