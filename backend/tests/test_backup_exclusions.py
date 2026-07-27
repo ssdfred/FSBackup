@@ -84,6 +84,22 @@ def test_confirmed_exclusion_filters_only_matching_files(tmp_path):
     assert filtered.summary.physical_files == 1
 
 
+def test_missing_confirmed_exclusion_does_not_fail_backup_plan(tmp_path):
+    plan = _plan(tmp_path)
+    request = _request(tmp_path, confirmed=True)
+    missing = tmp_path / "temporary" / "node_modules"
+    request.approved_exclusions[0].path = str(missing)
+
+    filtered, excluded_files, excluded_size = BackupOrchestratorService._apply_exclusions(
+        plan,
+        request,
+    )
+
+    assert excluded_files == 0
+    assert excluded_size == 0
+    assert filtered.physical_files == plan.physical_files
+
+
 def test_exclusion_outside_source_is_rejected(tmp_path):
     plan = _plan(tmp_path)
     outside = tmp_path.parent / "outside"
