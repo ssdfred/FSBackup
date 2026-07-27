@@ -41,8 +41,9 @@ REQUIRED_UI_MODULES = (
     "drive_capacity_bridge.js",
     "backup_layout.js",
     "exclusion_confirmation_summary.js",
+    "source_mode_cleanup.js",
 )
-UI_MODULE_VERSION = "10.8.6"
+UI_MODULE_VERSION = "10.8.7"
 
 
 @app.get("/app/", include_in_schema=False)
