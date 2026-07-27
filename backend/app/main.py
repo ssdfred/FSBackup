@@ -43,8 +43,9 @@ REQUIRED_UI_MODULES = (
     "exclusion_confirmation_summary.js",
     "source_mode_cleanup.js",
     "custom_folder_capacity.js",
+    "exclusion_summary_layout.js",
 )
-UI_MODULE_VERSION = "10.8.9"
+UI_MODULE_VERSION = "10.8.10"
 
 
 @app.get("/app/", include_in_schema=False)
