@@ -30,6 +30,17 @@ def test_dashboard_page_is_served() -> None:
     assert "/app/app.js" in response.text
 
 
+def test_critical_backup_modules_are_pinned_in_the_page() -> None:
+    response = client.get("/app/")
+
+    assert response.status_code == 200
+    assert "/app/capacity.js?v=10.8.2" in response.text
+    assert "/app/root_inventory.js?v=10.8.2" in response.text
+    assert "/app/exclusion_payload.js?v=10.8.2" in response.text
+    assert "/app/backup_validation_report.js?v=10.8.2" in response.text
+    assert response.headers["cache-control"].startswith("no-store")
+
+
 def test_new_backup_form_is_served() -> None:
     response = client.get("/app/")
 
