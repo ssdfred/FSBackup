@@ -34,12 +34,12 @@ def test_critical_backup_modules_are_pinned_in_the_page() -> None:
     response = client.get("/app/")
 
     assert response.status_code == 200
-    assert "/app/capacity.js?v=10.8.4" in response.text
-    assert "/app/root_inventory.js?v=10.8.4" in response.text
-    assert "/app/exclusion_payload.js?v=10.8.4" in response.text
-    assert "/app/backup_validation_report.js?v=10.8.4" in response.text
-    assert "/app/drive_capacity_bridge.js?v=10.8.4" in response.text
-    assert "/app/backup_layout.js?v=10.8.4" in response.text
+    assert "/app/capacity.js?v=10.8.5" in response.text
+    assert "/app/root_inventory.js?v=10.8.5" in response.text
+    assert "/app/exclusion_payload.js?v=10.8.5" in response.text
+    assert "/app/backup_validation_report.js?v=10.8.5" in response.text
+    assert "/app/drive_capacity_bridge.js?v=10.8.5" in response.text
+    assert "/app/backup_layout.js?v=10.8.5" in response.text
     assert response.headers["cache-control"].startswith("no-store")
 
 
