@@ -34,6 +34,7 @@ app.include_router(v1_router)
 
 WEB_UI_DIRECTORY = Path(__file__).resolve().parent / "web_ui"
 REQUIRED_UI_MODULES = (
+    "diagnostic_source_guard.js",
     "capacity.js",
     "root_inventory.js",
     "exclusion_payload.js",
@@ -45,7 +46,7 @@ REQUIRED_UI_MODULES = (
     "custom_folder_capacity.js",
     "exclusion_summary_layout.js",
 )
-UI_MODULE_VERSION = "10.8.10"
+UI_MODULE_VERSION = "10.8.11"
 
 
 @app.get("/app/", include_in_schema=False)
