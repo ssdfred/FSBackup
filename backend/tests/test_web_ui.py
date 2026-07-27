@@ -34,15 +34,16 @@ def test_critical_backup_modules_are_pinned_in_the_page() -> None:
     response = client.get("/app/")
 
     assert response.status_code == 200
-    assert "/app/capacity.js?v=10.8.9" in response.text
-    assert "/app/root_inventory.js?v=10.8.9" in response.text
-    assert "/app/exclusion_payload.js?v=10.8.9" in response.text
-    assert "/app/backup_validation_report.js?v=10.8.9" in response.text
-    assert "/app/drive_capacity_bridge.js?v=10.8.9" in response.text
-    assert "/app/backup_layout.js?v=10.8.9" in response.text
-    assert "/app/exclusion_confirmation_summary.js?v=10.8.9" in response.text
-    assert "/app/source_mode_cleanup.js?v=10.8.9" in response.text
-    assert "/app/custom_folder_capacity.js?v=10.8.9" in response.text
+    assert "/app/capacity.js?v=10.8.10" in response.text
+    assert "/app/root_inventory.js?v=10.8.10" in response.text
+    assert "/app/exclusion_payload.js?v=10.8.10" in response.text
+    assert "/app/backup_validation_report.js?v=10.8.10" in response.text
+    assert "/app/drive_capacity_bridge.js?v=10.8.10" in response.text
+    assert "/app/backup_layout.js?v=10.8.10" in response.text
+    assert "/app/exclusion_confirmation_summary.js?v=10.8.10" in response.text
+    assert "/app/source_mode_cleanup.js?v=10.8.10" in response.text
+    assert "/app/custom_folder_capacity.js?v=10.8.10" in response.text
+    assert "/app/exclusion_summary_layout.js?v=10.8.10" in response.text
     assert response.headers["cache-control"].startswith("no-store")
 
 
@@ -138,6 +139,7 @@ def test_dashboard_assets_are_served() -> None:
     exclusion_summary_script = client.get("/app/exclusion_confirmation_summary.js")
     source_cleanup_script = client.get("/app/source_mode_cleanup.js")
     custom_folder_script = client.get("/app/custom_folder_capacity.js")
+    exclusion_layout_script = client.get("/app/exclusion_summary_layout.js")
 
     assert stylesheet.status_code == 200
     assert "capability-grid" in stylesheet.text
@@ -193,3 +195,6 @@ def test_dashboard_assets_are_served() -> None:
     assert "/api/v1/sources/folder-diagnostic" in custom_folder_script.text
     assert "Plan final estimé" in custom_folder_script.text
     assert "Destination compatible" in custom_folder_script.text
+    assert exclusion_layout_script.status_code == 200
+    assert "placeSummaryBelowExclusionList" in exclusion_layout_script.text
+    assert "insertAdjacentElement" in exclusion_layout_script.text
