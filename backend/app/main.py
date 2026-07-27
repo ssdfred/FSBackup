@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from fastapi import FastAPI, Request
-from fastapi.responses import FileResponse, RedirectResponse, Response
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 from app.api.v1.router import router as v1_router
@@ -33,6 +33,29 @@ register_error_handlers(app)
 app.include_router(v1_router)
 
 WEB_UI_DIRECTORY = Path(__file__).resolve().parent / "web_ui"
+REQUIRED_UI_MODULES = (
+    "capacity.js",
+    "root_inventory.js",
+    "exclusion_payload.js",
+    "backup_validation_report.js",
+)
+UI_MODULE_VERSION = "10.8.2"
+
+
+@app.get("/app/", include_in_schema=False)
+def web_ui_index() -> HTMLResponse:
+    """Serve the UI with critical optional modules pinned into the document."""
+
+    html = (WEB_UI_DIRECTORY / "index.html").read_text(encoding="utf-8")
+    required_scripts = "\n".join(
+        f'<script src="/app/{module}?v={UI_MODULE_VERSION}" defer '
+        f'data-fsbackup-required="{module}"></script>'
+        for module in REQUIRED_UI_MODULES
+    )
+    html = html.replace("</body>", f"{required_scripts}\n</body>")
+    return HTMLResponse(html)
+
+
 app.mount("/app", StaticFiles(directory=WEB_UI_DIRECTORY, html=True), name="web-ui")
 
 
