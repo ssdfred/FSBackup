@@ -105,7 +105,7 @@ async function loadAvailableDrives(){
   }
 }
 
-const UI_MODULE_VERSION="10.7.7";
+const UI_MODULE_VERSION="10.8.1";
 
 function loadOptionalModule(src,attribute){
   const alreadyLoaded=[...document.scripts].some(script=>{
@@ -126,6 +126,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   loadOptionalModule("/app/capacity.js","data-fsbackup-capacity");
   loadOptionalModule("/app/root_inventory.js","data-fsbackup-root-inventory");
   loadOptionalModule("/app/exclusion_payload.js","data-fsbackup-payload-bridge");
+  loadOptionalModule("/app/backup_validation_report.js","data-fsbackup-validation-report");
   locationConfigs.forEach(bindLocation);
   loadAvailableDrives();
 });
