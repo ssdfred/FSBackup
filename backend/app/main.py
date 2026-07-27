@@ -43,7 +43,7 @@ REQUIRED_UI_MODULES = (
     "exclusion_confirmation_summary.js",
     "source_mode_cleanup.js",
 )
-UI_MODULE_VERSION = "10.8.7"
+UI_MODULE_VERSION = "10.8.8"
 
 
 @app.get("/app/", include_in_schema=False)
