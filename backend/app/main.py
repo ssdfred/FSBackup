@@ -38,8 +38,9 @@ REQUIRED_UI_MODULES = (
     "root_inventory.js",
     "exclusion_payload.js",
     "backup_validation_report.js",
+    "drive_capacity_bridge.js",
 )
-UI_MODULE_VERSION = "10.8.2"
+UI_MODULE_VERSION = "10.8.3"
 
 
 @app.get("/app/", include_in_schema=False)
