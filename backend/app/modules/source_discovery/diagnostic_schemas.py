@@ -1,4 +1,4 @@
-"""Schemas for the read-only Windows source diagnostic."""
+"""Schemas for read-only source diagnostics."""
 
 from __future__ import annotations
 
@@ -90,6 +90,25 @@ class WindowsDiagnosticRequest(BaseModel):
     """Request for a strict read-only source diagnostic."""
 
     source_root: str
+
+
+class CustomFolderDiagnosticRequest(BaseModel):
+    """Request for a strict read-only custom-folder diagnostic."""
+
+    source_root: str
+    destination_root: str | None = None
+
+
+class CustomFolderDiagnosticReport(BaseModel):
+    """Size and capacity information for a custom backup folder."""
+
+    source_root: str
+    destination_root: str | None = None
+    size_bytes: int = Field(default=0, ge=0)
+    file_count: int = Field(default=0, ge=0)
+    source_disk: DiskUsageDiagnostic = Field(default_factory=DiskUsageDiagnostic)
+    destination_disk: DiskUsageDiagnostic = Field(default_factory=DiskUsageDiagnostic)
+    warnings: list[str] = Field(default_factory=list)
 
 
 class WindowsDiagnosticReport(BaseModel):
