@@ -151,7 +151,10 @@ class BackupOrchestratorService:
         source_root = Path(execution_plan.source_root).resolve(strict=True)
         excluded_roots: list[Path] = []
         for exclusion in request.approved_exclusions:
-            candidate = Path(exclusion.path).expanduser().resolve(strict=True)
+            # Les dossiers temporaires proposés à l'exclusion peuvent disparaître
+            # entre le diagnostic et le lancement. Une exclusion devenue absente
+            # ne doit pas faire échouer toute la sauvegarde.
+            candidate = Path(exclusion.path).expanduser().resolve(strict=False)
             try:
                 candidate.relative_to(source_root)
             except ValueError as exc:
