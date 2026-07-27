@@ -1,4 +1,4 @@
-"""FastAPI endpoints for Windows source discovery."""
+"""FastAPI endpoints for source discovery."""
 
 from pathlib import Path
 import shutil
@@ -9,6 +9,8 @@ from app.modules.execution_planner.windows_service import WindowsExecutionPlanne
 
 from .diagnostic import diagnose_windows_source
 from .diagnostic_schemas import (
+    CustomFolderDiagnosticReport,
+    CustomFolderDiagnosticRequest,
     DiskUsageDiagnostic,
     WindowsDiagnosticReport,
     WindowsDiagnosticRequest,
@@ -16,6 +18,7 @@ from .diagnostic_schemas import (
 from .drives import list_available_drives
 from .exclusion_schemas import ExclusionSuggestionReport, ExclusionSuggestionRequest
 from .exclusions import suggest_exclusions
+from .folder_diagnostic import diagnose_custom_folder
 from .root_inventory import inventory_root
 from .root_inventory_schemas import RootInventoryReport, RootInventoryRequest
 from .schemas import (
@@ -78,6 +81,22 @@ def diagnose_selected_windows_source(
         )
 
     return report
+
+
+@router.post(
+    "/folder-diagnostic",
+    response_model=CustomFolderDiagnosticReport,
+    status_code=status.HTTP_200_OK,
+)
+def diagnose_selected_custom_folder(
+    payload: CustomFolderDiagnosticRequest,
+) -> CustomFolderDiagnosticReport:
+    """Measure a custom source folder and the selected destination capacity."""
+
+    try:
+        return diagnose_custom_folder(payload.source_root, payload.destination_root)
+    except SourceDiscoveryError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
 
 @router.post(
