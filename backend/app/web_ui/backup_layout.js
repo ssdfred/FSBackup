@@ -1,38 +1,59 @@
-const backupLayoutState={scheduled:false,observer:null};
+const backupLayoutState={scheduled:false,observer:null,timers:[]};
+
+function activeExclusionPanel(){
+  const panels=[...document.querySelectorAll("#exclusion-suggestions")];
+  return panels.find(panel=>panel.querySelector(".exclusion-panel"))??panels[0]??null;
+}
+
+function removeEmptyDuplicateExclusionPanels(active){
+  document.querySelectorAll("#exclusion-suggestions").forEach(panel=>{
+    if(panel!==active&&!panel.hasChildNodes())panel.remove();
+  });
+}
 
 function placeBackupPlanningPanels(){
   backupLayoutState.scheduled=false;
   const form=document.querySelector("#backup-form");
   const inventory=document.querySelector("#root-inventory");
-  const exclusions=document.querySelector("#exclusion-suggestions");
+  const exclusions=activeExclusionPanel();
   const capacity=document.querySelector("#backup-capacity-diagnostic");
   const options=form?.querySelector(".option-list");
   if(!form||!options)return;
 
-  let anchor=inventory;
+  removeEmptyDuplicateExclusionPanels(exclusions);
+
   if(exclusions){
-    const expectedPrevious=anchor;
-    if(expectedPrevious&&exclusions.previousElementSibling!==expectedPrevious){
-      expectedPrevious.insertAdjacentElement("afterend",exclusions);
-    }else if(!expectedPrevious&&exclusions.nextElementSibling!==options){
+    if(inventory){
+      if(exclusions.previousElementSibling!==inventory){
+        inventory.insertAdjacentElement("afterend",exclusions);
+      }
+    }else if(exclusions.nextElementSibling!==options){
       options.insertAdjacentElement("beforebegin",exclusions);
     }
-    anchor=exclusions;
   }
 
   if(capacity){
-    if(anchor&&capacity.previousElementSibling!==anchor){
-      anchor.insertAdjacentElement("afterend",capacity);
-    }else if(!anchor&&capacity.nextElementSibling!==options){
+    const anchor=exclusions??inventory;
+    if(anchor){
+      if(capacity.previousElementSibling!==anchor){
+        anchor.insertAdjacentElement("afterend",capacity);
+      }
+    }else if(capacity.nextElementSibling!==options){
       options.insertAdjacentElement("beforebegin",capacity);
     }
   }
 }
 
 function scheduleBackupPlanningLayout(){
-  if(backupLayoutState.scheduled)return;
-  backupLayoutState.scheduled=true;
-  requestAnimationFrame(placeBackupPlanningPanels);
+  if(!backupLayoutState.scheduled){
+    backupLayoutState.scheduled=true;
+    requestAnimationFrame(placeBackupPlanningPanels);
+  }
+
+  backupLayoutState.timers.forEach(timer=>clearTimeout(timer));
+  backupLayoutState.timers=[50,200,600].map(delay=>
+    setTimeout(placeBackupPlanningPanels,delay)
+  );
 }
 
 function initBackupPlanningLayout(){
