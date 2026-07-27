@@ -34,10 +34,12 @@ def test_critical_backup_modules_are_pinned_in_the_page() -> None:
     response = client.get("/app/")
 
     assert response.status_code == 200
-    assert "/app/capacity.js?v=10.8.2" in response.text
-    assert "/app/root_inventory.js?v=10.8.2" in response.text
-    assert "/app/exclusion_payload.js?v=10.8.2" in response.text
-    assert "/app/backup_validation_report.js?v=10.8.2" in response.text
+    assert "/app/capacity.js?v=10.8.4" in response.text
+    assert "/app/root_inventory.js?v=10.8.4" in response.text
+    assert "/app/exclusion_payload.js?v=10.8.4" in response.text
+    assert "/app/backup_validation_report.js?v=10.8.4" in response.text
+    assert "/app/drive_capacity_bridge.js?v=10.8.4" in response.text
+    assert "/app/backup_layout.js?v=10.8.4" in response.text
     assert response.headers["cache-control"].startswith("no-store")
 
 
@@ -129,6 +131,7 @@ def test_dashboard_assets_are_served() -> None:
     drives_script = client.get("/app/drives.js")
     restore_script = client.get("/app/restore.js")
     retention_script = client.get("/app/retention.js")
+    layout_script = client.get("/app/backup_layout.js")
 
     assert stylesheet.status_code == 200
     assert "capability-grid" in stylesheet.text
@@ -169,3 +172,7 @@ def test_dashboard_assets_are_served() -> None:
     assert "/api/v1/backups/retention/execute" in retention_script.text
     assert "SUPPRIMER LES SAUVEGARDES SÉLECTIONNÉES" in retention_script.text
     assert "reclaimable_bytes" in retention_script.text
+    assert layout_script.status_code == 200
+    assert "root-inventory" in layout_script.text
+    assert "exclusion-suggestions" in layout_script.text
+    assert "backup-capacity-diagnostic" in layout_script.text
