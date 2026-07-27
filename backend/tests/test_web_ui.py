@@ -34,13 +34,14 @@ def test_critical_backup_modules_are_pinned_in_the_page() -> None:
     response = client.get("/app/")
 
     assert response.status_code == 200
-    assert "/app/capacity.js?v=10.8.6" in response.text
-    assert "/app/root_inventory.js?v=10.8.6" in response.text
-    assert "/app/exclusion_payload.js?v=10.8.6" in response.text
-    assert "/app/backup_validation_report.js?v=10.8.6" in response.text
-    assert "/app/drive_capacity_bridge.js?v=10.8.6" in response.text
-    assert "/app/backup_layout.js?v=10.8.6" in response.text
-    assert "/app/exclusion_confirmation_summary.js?v=10.8.6" in response.text
+    assert "/app/capacity.js?v=10.8.7" in response.text
+    assert "/app/root_inventory.js?v=10.8.7" in response.text
+    assert "/app/exclusion_payload.js?v=10.8.7" in response.text
+    assert "/app/backup_validation_report.js?v=10.8.7" in response.text
+    assert "/app/drive_capacity_bridge.js?v=10.8.7" in response.text
+    assert "/app/backup_layout.js?v=10.8.7" in response.text
+    assert "/app/exclusion_confirmation_summary.js?v=10.8.7" in response.text
+    assert "/app/source_mode_cleanup.js?v=10.8.7" in response.text
     assert response.headers["cache-control"].startswith("no-store")
 
 
@@ -134,6 +135,7 @@ def test_dashboard_assets_are_served() -> None:
     retention_script = client.get("/app/retention.js")
     layout_script = client.get("/app/backup_layout.js")
     exclusion_summary_script = client.get("/app/exclusion_confirmation_summary.js")
+    source_cleanup_script = client.get("/app/source_mode_cleanup.js")
 
     assert stylesheet.status_code == 200
     assert "capability-grid" in stylesheet.text
@@ -181,3 +183,7 @@ def test_dashboard_assets_are_served() -> None:
     assert exclusion_summary_script.status_code == 200
     assert "exclusion(s) sélectionnée(s)" in exclusion_summary_script.text
     assert "Économie réellement déduite du plan" in exclusion_summary_script.text
+    assert source_cleanup_script.status_code == 200
+    assert "source-mode" in source_cleanup_script.text
+    assert "root-inventory" in source_cleanup_script.text
+    assert "backup-capacity-diagnostic" in source_cleanup_script.text
