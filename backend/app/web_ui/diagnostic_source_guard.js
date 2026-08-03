@@ -4,7 +4,6 @@
     "/api/v1/sources/diagnostic",
     "/api/v1/sources/exclusions/suggestions",
   ]);
-  const requestVersions = new Map();
 
   function normalizeSource(value) {
     return String(value ?? "")
@@ -32,17 +31,13 @@
     if (!guardedEndpoints.has(url.pathname)) return originalFetch(input, options);
 
     const source = requestSource(options);
-    const version = (requestVersions.get(url.pathname) ?? 0) + 1;
-    requestVersions.set(url.pathname, version);
     const response = await originalFetch(input, options);
 
-    const obsolete =
-      requestVersions.get(url.pathname) !== version ||
-      !source ||
-      source !== selectedSource();
-    if (!obsolete) return response;
+    if (source && source === selectedSource()) return response;
 
-    // Une ancienne analyse ne doit jamais écraser l’état du lecteur courant.
+    // Une réponse d’un ancien lecteur ne doit jamais remplacer l’état courant.
+    // Les appels simultanés du diagnostic et de la capacité pour le même lecteur
+    // restent tous deux valides.
     return new Promise(() => {});
   };
 })();
