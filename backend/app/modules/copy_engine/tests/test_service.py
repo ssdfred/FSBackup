@@ -79,7 +79,7 @@ def test_execute_copies_file(tmp_path: Path) -> None:
     assert report.metadata["planned_files"] == 1
 
 
-def test_execute_reports_missing_file(tmp_path: Path) -> None:
+def test_execute_reports_missing_file_as_warning(tmp_path: Path) -> None:
     source_root = tmp_path / "source"
     destination_root = tmp_path / "destination"
 
@@ -92,7 +92,7 @@ def test_execute_reports_missing_file(tmp_path: Path) -> None:
     assert report.summary.missing == 1
     assert report.summary.copied == 0
     assert report.files[0].status == CopyStatus.MISSING
-    assert report.success is False
+    assert report.success is True
     assert len(report.warnings) == 1
     assert report.warnings[0].code == "source_missing"
     assert report.errors == []
@@ -133,10 +133,40 @@ def test_execute_continues_after_missing_file(tmp_path: Path) -> None:
     assert report.summary.total_files == 2
     assert report.summary.missing == 1
     assert report.summary.copied == 1
-    assert report.success is False
+    assert report.success is True
     assert (destination_root / "existing.txt").read_text(
         encoding="utf-8"
     ) == "content"
+
+
+def test_execute_treats_file_disappearing_during_copy_as_warning(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    source_root = tmp_path / "source"
+    destination_root = tmp_path / "destination"
+    source_root.mkdir()
+    source_file = source_root / "volatile.tmp"
+    source_file.write_text("temporary", encoding="utf-8")
+    plan = build_plan(source_root, ["volatile.tmp"])
+
+    def disappearing_copy(source, destination):
+        Path(source).unlink()
+        raise FileNotFoundError(3, "The system cannot find the path specified")
+
+    monkeypatch.setattr(
+        "app.modules.copy_engine.service.copy2",
+        disappearing_copy,
+    )
+
+    report = execute_plan(plan, destination_root)
+
+    assert report.success is True
+    assert report.summary.missing == 1
+    assert report.summary.errors == 0
+    assert report.files[0].status == CopyStatus.MISSING
+    assert report.warnings[0].code == "source_missing"
+    assert report.errors == []
 
 
 def test_execute_rejects_path_outside_destination(tmp_path: Path) -> None:
