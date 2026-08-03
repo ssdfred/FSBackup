@@ -3,7 +3,7 @@ from tempfile import TemporaryDirectory
 
 from app.modules.archive_engine.schemas import ArchiveRequest
 from app.modules.archive_engine.service import ArchiveEngineService
-from app.modules.copy_engine.schemas import CopyRequest
+from app.modules.copy_engine.schemas import CopyRequest, CopyStatus
 from app.modules.copy_engine.service import CopyEngineService
 from app.modules.execution_planner.schemas import (
     ExecutionItem,
@@ -52,6 +52,10 @@ class BackupOrchestratorService:
                         copy_report=copy_report,
                     )
 
+                execution_plan = cls._retain_copied_files(
+                    execution_plan,
+                    copy_report.files,
+                )
                 exclusions = [
                     ManifestExclusion(
                         path=item.path,
@@ -135,6 +139,42 @@ class BackupOrchestratorService:
         )
 
     @staticmethod
+    def _retain_copied_files(
+        execution_plan: ExecutionPlan,
+        copy_results: list,
+    ) -> ExecutionPlan:
+        retained_sources = {
+            result.source
+            for result in copy_results
+            if result.status in {CopyStatus.COPIED, CopyStatus.SKIPPED}
+        }
+        retained = [
+            physical_file
+            for physical_file in execution_plan.physical_files
+            if physical_file.source_path in retained_sources
+        ]
+        missing_count = len(execution_plan.physical_files) - len(retained)
+        summary = execution_plan.summary.model_copy(
+            update={
+                "physical_files": len(retained),
+                "missing_files": missing_count,
+                "estimated_size_bytes": sum(item.size_bytes for item in retained),
+            }
+        )
+        warnings = list(execution_plan.warnings)
+        if missing_count:
+            warnings.append(
+                f"{missing_count} fichier(s) volatil(s) disparu(s) pendant la copie."
+            )
+        return execution_plan.model_copy(
+            update={
+                "physical_files": retained,
+                "summary": summary,
+                "warnings": warnings,
+            }
+        )
+
+    @staticmethod
     def _apply_exclusions(
         execution_plan: ExecutionPlan,
         request: BackupRunRequest,
@@ -151,9 +191,6 @@ class BackupOrchestratorService:
         source_root = Path(execution_plan.source_root).resolve(strict=True)
         excluded_roots: list[Path] = []
         for exclusion in request.approved_exclusions:
-            # Les dossiers temporaires proposés à l'exclusion peuvent disparaître
-            # entre le diagnostic et le lancement. Une exclusion devenue absente
-            # ne doit pas faire échouer toute la sauvegarde.
             candidate = Path(exclusion.path).expanduser().resolve(strict=False)
             try:
                 candidate.relative_to(source_root)
