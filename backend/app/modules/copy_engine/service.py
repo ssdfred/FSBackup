@@ -130,6 +130,20 @@ class CopyEngineService:
                     execution_id,
                     result,
                 )
+            except FileNotFoundError:
+                result = CopyFileResult(
+                    source=str(source),
+                    destination=str(destination),
+                    status=CopyStatus.MISSING,
+                    duration_ms=CopyEngineService._duration_ms(file_started_at),
+                    error="Source file disappeared during backup.",
+                )
+                results.append(result)
+                CopyEngineService._publish_file_event(
+                    event_bus,
+                    execution_id,
+                    result,
+                )
             except OSError as exc:
                 result = CopyFileResult(
                     source=str(source),
@@ -154,7 +168,7 @@ class CopyEngineService:
             started_at=started_at,
             finished_at=finished_at,
             duration_ms=duration_ms,
-            success=summary.missing == 0 and summary.errors == 0,
+            success=summary.errors == 0,
             summary=summary,
             files=results,
             warnings=warnings,
