@@ -4,6 +4,8 @@ from shutil import copy2
 from time import perf_counter
 from uuid import UUID, uuid4
 
+from app.modules.execution_planner.schemas import PhysicalFile
+
 from .events import CopyEvent, CopyEventBus, CopyEventType
 from .schemas import (
     CopyFileResult,
@@ -17,6 +19,17 @@ from .schemas import (
 
 
 class CopyEngineService:
+    CACHE_MARKERS = {
+        "cache",
+        "caches",
+        "code cache",
+        "dxccache",
+        "gpucache",
+        "shadercache",
+        "temp",
+        "tmp",
+    }
+
     @staticmethod
     def execute(
         request: CopyRequest,
@@ -41,123 +54,13 @@ class CopyEngineService:
         )
 
         for physical_file in request.execution_plan.physical_files:
-            file_started_at = perf_counter()
-            source = Path(physical_file.source_path)
-            CopyEngineService._publish(
+            result = CopyEngineService._copy_file(
+                physical_file,
+                destination_root,
+                execution_id,
                 event_bus,
-                CopyEvent(
-                    event_type=CopyEventType.FILE_STARTED,
-                    execution_id=execution_id,
-                    source=str(source),
-                ),
             )
-
-            try:
-                destination = CopyEngineService._safe_destination(
-                    destination_root=destination_root,
-                    relative_path=physical_file.relative_path,
-                )
-            except ValueError as exc:
-                result = CopyFileResult(
-                    source=str(source),
-                    destination=str(destination_root),
-                    status=CopyStatus.ERROR,
-                    duration_ms=CopyEngineService._duration_ms(file_started_at),
-                    error=str(exc),
-                )
-                results.append(result)
-                CopyEngineService._publish_file_event(
-                    event_bus,
-                    execution_id,
-                    result,
-                )
-                continue
-
-            if not physical_file.exists or not source.is_file():
-                result = CopyFileResult(
-                    source=str(source),
-                    destination=str(destination),
-                    status=CopyStatus.MISSING,
-                    duration_ms=CopyEngineService._duration_ms(file_started_at),
-                    error="Source file does not exist.",
-                )
-                results.append(result)
-                CopyEngineService._publish_file_event(
-                    event_bus,
-                    execution_id,
-                    result,
-                )
-                continue
-
-            try:
-                destination.parent.mkdir(parents=True, exist_ok=True)
-
-                if CopyEngineService._is_identical(source, destination):
-                    result = CopyFileResult(
-                        source=str(source),
-                        destination=str(destination),
-                        status=CopyStatus.SKIPPED,
-                        size=source.stat().st_size,
-                        duration_ms=CopyEngineService._duration_ms(file_started_at),
-                    )
-                    results.append(result)
-                    CopyEngineService._publish_file_event(
-                        event_bus,
-                        execution_id,
-                        result,
-                    )
-                    continue
-
-                copy2(source, destination)
-                source_size = source.stat().st_size
-                destination_size = destination.stat().st_size
-
-                if source_size != destination_size:
-                    raise OSError(
-                        "Copied file size does not match source file size."
-                    )
-
-                result = CopyFileResult(
-                    source=str(source),
-                    destination=str(destination),
-                    status=CopyStatus.COPIED,
-                    size=destination_size,
-                    duration_ms=CopyEngineService._duration_ms(file_started_at),
-                )
-                results.append(result)
-                CopyEngineService._publish_file_event(
-                    event_bus,
-                    execution_id,
-                    result,
-                )
-            except FileNotFoundError:
-                result = CopyFileResult(
-                    source=str(source),
-                    destination=str(destination),
-                    status=CopyStatus.MISSING,
-                    duration_ms=CopyEngineService._duration_ms(file_started_at),
-                    error="Source file disappeared during backup.",
-                )
-                results.append(result)
-                CopyEngineService._publish_file_event(
-                    event_bus,
-                    execution_id,
-                    result,
-                )
-            except OSError as exc:
-                result = CopyFileResult(
-                    source=str(source),
-                    destination=str(destination),
-                    status=CopyStatus.ERROR,
-                    duration_ms=CopyEngineService._duration_ms(file_started_at),
-                    error=str(exc),
-                )
-                results.append(result)
-                CopyEngineService._publish_file_event(
-                    event_bus,
-                    execution_id,
-                    result,
-                )
+            results.append(result)
 
         duration_ms = CopyEngineService._duration_ms(execution_started_at)
         finished_at = datetime.now(UTC)
@@ -197,6 +100,166 @@ class CopyEngineService:
             ),
         )
         return report
+
+    @staticmethod
+    def _copy_file(
+        physical_file: PhysicalFile,
+        destination_root: Path,
+        execution_id: UUID,
+        event_bus: CopyEventBus | None,
+    ) -> CopyFileResult:
+        file_started_at = perf_counter()
+        source = Path(physical_file.source_path)
+        CopyEngineService._publish(
+            event_bus,
+            CopyEvent(
+                event_type=CopyEventType.FILE_STARTED,
+                execution_id=execution_id,
+                source=str(source),
+            ),
+        )
+
+        try:
+            destination = CopyEngineService._safe_destination(
+                destination_root,
+                physical_file.relative_path,
+            )
+        except ValueError as exc:
+            return CopyEngineService._finish_file(
+                event_bus,
+                execution_id,
+                CopyFileResult(
+                    source=str(source),
+                    destination=str(destination_root),
+                    status=CopyStatus.ERROR,
+                    duration_ms=CopyEngineService._duration_ms(file_started_at),
+                    error=str(exc),
+                ),
+            )
+
+        if not physical_file.exists or not source.is_file():
+            return CopyEngineService._missing_result(
+                source,
+                destination,
+                file_started_at,
+                execution_id,
+                event_bus,
+                "Source file does not exist.",
+            )
+
+        try:
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            if CopyEngineService._is_identical(source, destination):
+                result = CopyFileResult(
+                    source=str(source),
+                    destination=str(destination),
+                    status=CopyStatus.SKIPPED,
+                    size=source.stat().st_size,
+                    duration_ms=CopyEngineService._duration_ms(file_started_at),
+                )
+            else:
+                copy2(source, destination)
+                source_size = source.stat().st_size
+                destination_size = destination.stat().st_size
+                if source_size != destination_size:
+                    raise OSError(
+                        "Copied file size does not match source file size."
+                    )
+                result = CopyFileResult(
+                    source=str(source),
+                    destination=str(destination),
+                    status=CopyStatus.COPIED,
+                    size=destination_size,
+                    duration_ms=CopyEngineService._duration_ms(file_started_at),
+                )
+        except FileNotFoundError:
+            return CopyEngineService._missing_result(
+                source,
+                destination,
+                file_started_at,
+                execution_id,
+                event_bus,
+                "Source file disappeared during backup.",
+            )
+        except PermissionError as exc:
+            if CopyEngineService._is_tolerable_locked_file(
+                physical_file,
+                source,
+            ):
+                return CopyEngineService._missing_result(
+                    source,
+                    destination,
+                    file_started_at,
+                    execution_id,
+                    event_bus,
+                    f"Fichier de cache verrouillé ignoré : {exc}",
+                )
+            result = CopyFileResult(
+                source=str(source),
+                destination=str(destination),
+                status=CopyStatus.ERROR,
+                duration_ms=CopyEngineService._duration_ms(file_started_at),
+                error=str(exc),
+            )
+        except OSError as exc:
+            result = CopyFileResult(
+                source=str(source),
+                destination=str(destination),
+                status=CopyStatus.ERROR,
+                duration_ms=CopyEngineService._duration_ms(file_started_at),
+                error=str(exc),
+            )
+
+        return CopyEngineService._finish_file(
+            event_bus,
+            execution_id,
+            result,
+        )
+
+    @classmethod
+    def _is_tolerable_locked_file(
+        cls,
+        physical_file: PhysicalFile,
+        source: Path,
+    ) -> bool:
+        if physical_file.potentially_locked:
+            return True
+        lowered_parts = {part.casefold() for part in source.parts}
+        return bool(lowered_parts & cls.CACHE_MARKERS)
+
+    @staticmethod
+    def _missing_result(
+        source: Path,
+        destination: Path,
+        started_at: float,
+        execution_id: UUID,
+        event_bus: CopyEventBus | None,
+        error: str,
+    ) -> CopyFileResult:
+        return CopyEngineService._finish_file(
+            event_bus,
+            execution_id,
+            CopyFileResult(
+                source=str(source),
+                destination=str(destination),
+                status=CopyStatus.MISSING,
+                duration_ms=CopyEngineService._duration_ms(started_at),
+                error=error,
+            ),
+        )
+
+    @staticmethod
+    def _finish_file(
+        event_bus: CopyEventBus | None,
+        execution_id: UUID,
+        result: CopyFileResult,
+    ) -> CopyFileResult:
+        CopyEngineService._publish_file_event(
+            event_bus,
+            execution_id,
+            result,
+        )
+        return result
 
     @staticmethod
     def _publish(
@@ -255,18 +318,10 @@ class CopyEngineService:
     ) -> CopySummary:
         return CopySummary(
             total_files=len(results),
-            copied=sum(
-                result.status == CopyStatus.COPIED for result in results
-            ),
-            skipped=sum(
-                result.status == CopyStatus.SKIPPED for result in results
-            ),
-            missing=sum(
-                result.status == CopyStatus.MISSING for result in results
-            ),
-            errors=sum(
-                result.status == CopyStatus.ERROR for result in results
-            ),
+            copied=sum(result.status == CopyStatus.COPIED for result in results),
+            skipped=sum(result.status == CopyStatus.SKIPPED for result in results),
+            missing=sum(result.status == CopyStatus.MISSING for result in results),
+            errors=sum(result.status == CopyStatus.ERROR for result in results),
             total_bytes=sum(
                 result.size
                 for result in results
@@ -281,7 +336,6 @@ class CopyEngineService:
     ) -> tuple[list[CopyIssue], list[CopyIssue]]:
         warnings: list[CopyIssue] = []
         errors: list[CopyIssue] = []
-
         for result in results:
             if result.status == CopyStatus.MISSING:
                 warnings.append(
@@ -303,7 +357,6 @@ class CopyEngineService:
                         destination=result.destination,
                     )
                 )
-
         return warnings, errors
 
     @staticmethod
