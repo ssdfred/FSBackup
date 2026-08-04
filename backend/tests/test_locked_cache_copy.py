@@ -130,3 +130,72 @@ def test_cloud_error_outside_onedrive_remains_fatal(tmp_path: Path, monkeypatch)
     assert report.files[0].status == CopyStatus.ERROR
     assert report.warnings == []
     assert len(report.errors) == 1
+
+
+def test_unavailable_virtualbox_log_is_warning(tmp_path: Path, monkeypatch) -> None:
+    source = (
+        tmp_path
+        / "Users"
+        / "fred"
+        / "VirtualBox VMs"
+        / "Ubuntu-Wazuh"
+        / "Logs"
+        / "VBox.log"
+    )
+    source.parent.mkdir(parents=True)
+    source.write_text("log", encoding="utf-8")
+    plan = build_single_file_plan(
+        source,
+        "Users/fred/VirtualBox VMs/Ubuntu-Wazuh/Logs/VBox.log",
+    )
+
+    class DeviceUnavailable(OSError):
+        winerror = 433
+
+    def deny_copy(_source, _destination):
+        raise DeviceUnavailable("A device which does not exist was specified")
+
+    monkeypatch.setattr("app.modules.copy_engine.service.copy2", deny_copy)
+
+    report = execute(plan, tmp_path / "destination")
+
+    assert report.success is True
+    assert report.summary.missing == 1
+    assert report.summary.errors == 0
+    assert report.files[0].status == CopyStatus.MISSING
+    assert "VirtualBox" in (report.files[0].error or "")
+    assert len(report.warnings) == 1
+    assert report.errors == []
+
+
+def test_virtualbox_disk_device_error_remains_fatal(tmp_path: Path, monkeypatch) -> None:
+    source = (
+        tmp_path
+        / "Users"
+        / "fred"
+        / "VirtualBox VMs"
+        / "Ubuntu-Wazuh"
+        / "Ubuntu-Wazuh.vdi"
+    )
+    source.parent.mkdir(parents=True)
+    source.write_bytes(b"disk")
+    plan = build_single_file_plan(
+        source,
+        "Users/fred/VirtualBox VMs/Ubuntu-Wazuh/Ubuntu-Wazuh.vdi",
+    )
+
+    class DeviceUnavailable(OSError):
+        winerror = 433
+
+    def deny_copy(_source, _destination):
+        raise DeviceUnavailable("A device which does not exist was specified")
+
+    monkeypatch.setattr("app.modules.copy_engine.service.copy2", deny_copy)
+
+    report = execute(plan, tmp_path / "destination")
+
+    assert report.success is False
+    assert report.summary.errors == 1
+    assert report.files[0].status == CopyStatus.ERROR
+    assert report.warnings == []
+    assert len(report.errors) == 1
