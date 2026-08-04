@@ -19,15 +19,11 @@ from .schemas import (
 
 
 class CopyEngineService:
-    CACHE_MARKERS = {
-        "cache",
-        "caches",
+    LOCKED_CACHE_DIRECTORIES = {
         "code cache",
         "dxccache",
         "gpucache",
         "shadercache",
-        "temp",
-        "tmp",
     }
 
     @staticmethod
@@ -225,7 +221,7 @@ class CopyEngineService:
         if physical_file.potentially_locked:
             return True
         lowered_parts = {part.casefold() for part in source.parts}
-        return bool(lowered_parts & cls.CACHE_MARKERS)
+        return bool(lowered_parts & cls.LOCKED_CACHE_DIRECTORIES)
 
     @staticmethod
     def _missing_result(
