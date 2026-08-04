@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZIP_STORED, ZipFile
 
@@ -171,6 +172,32 @@ def test_deflated_archive_reduces_repetitive_payload(tmp_path: Path) -> None:
     assert report.compression_level == 9
     assert report.saved_bytes > 0
     assert 0 < report.compression_ratio < 1
+
+
+def test_create_normalizes_timestamp_before_1980(tmp_path: Path) -> None:
+    source_directory = tmp_path / "copied"
+    destination_directory = tmp_path / "archives"
+    source_directory.mkdir()
+    source_file = source_directory / "legacy.txt"
+    source_file.write_text("legacy", encoding="utf-8")
+    os.utime(source_file, (0, 0))
+
+    report = ArchiveEngineService.create(
+        ArchiveRequest(
+            source_directory=str(source_directory),
+            destination_directory=str(destination_directory),
+            archive_name="legacy.fsb",
+            manifest=build_manifest(source_directory, ["legacy.txt"]),
+        )
+    )
+
+    assert report.success is True
+    assert report.error is None
+
+    with ZipFile(report.archive_path) as archive:
+        archived_file = archive.getinfo("data/legacy.txt")
+        assert archived_file.date_time == (1980, 1, 1, 0, 0, 0)
+        assert archive.read("data/legacy.txt") == b"legacy"
 
 
 def test_create_reports_missing_source_directory(tmp_path: Path) -> None:
