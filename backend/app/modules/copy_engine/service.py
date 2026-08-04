@@ -208,6 +208,16 @@ class CopyEngineService:
                     "Fichier OneDrive disponible uniquement dans le cloud ignoré "
                     f"(WinError 362) : {source}",
                 )
+            if CopyEngineService._is_unavailable_virtualbox_log(exc, source):
+                return CopyEngineService._missing_result(
+                    source,
+                    destination,
+                    file_started_at,
+                    execution_id,
+                    event_bus,
+                    "Journal VirtualBox indisponible ignoré "
+                    f"(WinError 433) : {source}",
+                )
             result = CopyFileResult(
                 source=str(source),
                 destination=str(destination),
@@ -238,6 +248,19 @@ class CopyEngineService:
         return (
             getattr(exc, "winerror", None) == 362
             and any(part.casefold() == "onedrive" for part in source.parts)
+        )
+
+    @staticmethod
+    def _is_unavailable_virtualbox_log(exc: OSError, source: Path) -> bool:
+        lowered_parts = [part.casefold() for part in source.parts]
+        try:
+            virtualbox_index = lowered_parts.index("virtualbox vms")
+            logs_index = lowered_parts.index("logs", virtualbox_index + 1)
+        except ValueError:
+            return False
+        return (
+            getattr(exc, "winerror", None) == 433
+            and logs_index > virtualbox_index
         )
 
     @staticmethod
