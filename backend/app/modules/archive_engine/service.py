@@ -91,13 +91,21 @@ class ArchiveEngineService:
         metadata = ArchiveEngineService._create_metadata(request.compression)
         files = sorted(path for path in source_directory.rglob("*") if path.is_file())
         zip_options = CompressionEngineService.zip_options(request.compression)
-        with ZipFile(archive_path, mode="w", **zip_options) as archive:
+        with ZipFile(
+            archive_path,
+            mode="w",
+            strict_timestamps=False,
+            **zip_options,
+        ) as archive:
             ArchiveEngineService._add_metadata(archive, metadata)
             ArchiveEngineService._add_manifest(archive, request)
             archive.writestr("data/", "")
             for file_path in files:
                 relative_path = file_path.relative_to(source_directory)
-                archive.write(file_path, arcname=(Path("data") / relative_path).as_posix())
+                archive.write(
+                    file_path,
+                    arcname=(Path("data") / relative_path).as_posix(),
+                )
             original_size = sum(entry.file_size for entry in archive.infolist())
             compressed_size = sum(entry.compress_size for entry in archive.infolist())
         metrics = CompressionEngineService.build_metrics(
