@@ -198,6 +198,16 @@ class CopyEngineService:
                 error=str(exc),
             )
         except OSError as exc:
+            if CopyEngineService._is_unavailable_onedrive_placeholder(exc, source):
+                return CopyEngineService._missing_result(
+                    source,
+                    destination,
+                    file_started_at,
+                    execution_id,
+                    event_bus,
+                    "Fichier OneDrive disponible uniquement dans le cloud ignoré "
+                    f"(WinError 362) : {source}",
+                )
             result = CopyFileResult(
                 source=str(source),
                 destination=str(destination),
@@ -222,6 +232,13 @@ class CopyEngineService:
             return True
         lowered_parts = {part.casefold() for part in source.parts}
         return bool(lowered_parts & cls.LOCKED_CACHE_DIRECTORIES)
+
+    @staticmethod
+    def _is_unavailable_onedrive_placeholder(exc: OSError, source: Path) -> bool:
+        return (
+            getattr(exc, "winerror", None) == 362
+            and any(part.casefold() == "onedrive" for part in source.parts)
+        )
 
     @staticmethod
     def _missing_result(
