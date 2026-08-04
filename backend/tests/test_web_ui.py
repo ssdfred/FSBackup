@@ -65,6 +65,10 @@ def test_new_backup_form_is_served() -> None:
     assert "/app/drives.js" in response.text
     assert 'id="enable-encryption"' in response.text
     assert 'id="verify-integrity"' in response.text
+    assert 'id="enable-segmentation"' in response.text
+    assert 'id="segment-size"' in response.text
+    assert 'class="segment-setting"' in response.text
+    assert "/app/segmentation.css" in response.text
 
 
 def test_backup_progress_and_report_are_served() -> None:
@@ -131,6 +135,7 @@ def test_retention_screen_is_served() -> None:
 
 def test_dashboard_assets_are_served() -> None:
     stylesheet = client.get("/app/styles.css")
+    segmentation_stylesheet = client.get("/app/segmentation.css")
     script = client.get("/app/app.js")
     drives_script = client.get("/app/drives.js")
     restore_script = client.get("/app/restore.js")
@@ -148,6 +153,8 @@ def test_dashboard_assets_are_served() -> None:
     assert "report-panel" in stylesheet.text
     assert "archive-list" in stylesheet.text
     assert "archive-status" in stylesheet.text
+    assert segmentation_stylesheet.status_code == 200
+    assert ".segment-setting" in segmentation_stylesheet.text
     assert script.status_code == 200
     assert "/api/v1/dashboard/summary" in script.text
     assert "/api/v1/backup/run" in script.text

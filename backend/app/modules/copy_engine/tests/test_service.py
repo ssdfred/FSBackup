@@ -205,3 +205,39 @@ def test_execute_rejects_path_outside_destination(tmp_path: Path) -> None:
     assert report.errors[0].code == "copy_failed"
     assert report.warnings == []
     assert not (tmp_path / "secret.txt").exists()
+
+
+def test_execute_stops_when_source_device_becomes_unavailable(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    source_root = tmp_path / "source"
+    destination_root = tmp_path / "destination"
+    source_root.mkdir()
+    (source_root / "first.txt").write_text("first", encoding="utf-8")
+    (source_root / "second.txt").write_text("second", encoding="utf-8")
+    plan = build_plan(source_root, ["first.txt", "second.txt"])
+
+    class DeviceUnavailableError(OSError):
+        winerror = 433
+
+    calls = 0
+
+    def unavailable_copy(_source, _destination):
+        nonlocal calls
+        calls += 1
+        raise DeviceUnavailableError("Device unavailable")
+
+    monkeypatch.setattr(
+        "app.modules.copy_engine.service.copy2",
+        unavailable_copy,
+    )
+
+    report = execute_plan(plan, destination_root)
+
+    assert calls == 1
+    assert report.success is False
+    assert report.summary.total_files == 1
+    assert report.summary.errors == 1
+    assert report.files[0].winerror == 433
+    assert "disque source est devenu indisponible" in report.errors[0].message

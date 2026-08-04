@@ -4,6 +4,8 @@ from pydantic import SecretStr
 
 from app.modules.archive_engine.schemas import ArchiveRequest
 from app.modules.archive_engine.service import ArchiveEngineService
+from app.modules.backup_orchestrator.schemas import BackupRunRequest, BackupSourceMode
+from app.modules.backup_orchestrator.service import BackupOrchestratorService
 from app.modules.encryption_engine.schemas import EncryptionSettings
 from app.modules.manifest_builder.schemas import Manifest, ManifestFile, ManifestSummary
 from app.modules.restore_orchestrator.schemas import RestoreRunRequest
@@ -89,3 +91,67 @@ def test_run_blocks_restore_when_integrity_fails(tmp_path: Path) -> None:
     assert report.restore_report is None
     assert report.error == "Archive integrity verification failed."
     assert destination.exists() is False
+
+
+def test_run_restores_complete_backup_set(tmp_path: Path) -> None:
+    source = tmp_path / "set-source"
+    source.mkdir()
+    (source / "a.txt").write_text("alpha", encoding="utf-8")
+    (source / "b.txt").write_text("bravo", encoding="utf-8")
+    backup = BackupOrchestratorService.run(
+        BackupRunRequest(
+            source_root=str(source),
+            source_mode=BackupSourceMode.CUSTOM_FOLDER,
+            destination_directory=str(tmp_path / "archives"),
+            archive_name="restore-set",
+            segmented=True,
+            segment_size_bytes=5,
+        )
+    )
+    assert backup.success is True
+    destination = tmp_path / "set-restored"
+
+    report = RestoreOrchestratorService.run(
+        RestoreRunRequest(
+            archive_path=backup.backup_set_path or "",
+            destination_directory=str(destination),
+        )
+    )
+
+    assert report.success is True
+    assert report.total_segments == 2
+    assert report.restored_segments == 2
+    assert report.integrity_report.valid is True
+    assert report.restore_report is not None
+    assert report.restore_report.restored_files == 2
+    assert (destination / "a.txt").read_text(encoding="utf-8") == "alpha"
+    assert (destination / "b.txt").read_text(encoding="utf-8") == "bravo"
+
+
+def test_run_rejects_incomplete_backup_set(tmp_path: Path) -> None:
+    backup_set = tmp_path / "incomplete"
+    backup_set.mkdir()
+    (backup_set / "backup-set.json").write_text(
+        """{
+          "backup_set_id": "test-set",
+          "archive_name": "incomplete",
+          "source_root": "D:\\\\",
+          "created_at": "2026-08-04T18:00:00Z",
+          "updated_at": "2026-08-04T18:00:00Z",
+          "segment_size_bytes": 1024,
+          "complete": false,
+          "segments": []
+        }""",
+        encoding="utf-8",
+    )
+
+    report = RestoreOrchestratorService.run(
+        RestoreRunRequest(
+            archive_path=str(backup_set),
+            destination_directory=str(tmp_path / "restored"),
+        )
+    )
+
+    assert report.success is False
+    assert report.restore_report is None
+    assert "incomplete" in (report.error or "").casefold()

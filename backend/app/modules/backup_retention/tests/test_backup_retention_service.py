@@ -75,3 +75,24 @@ def test_simulation_protects_archives_that_cannot_be_evaluated() -> None:
     assert report.summary.protect == 1
     assert report.summary.delete == 0
     assert report.decisions[0].decision == RetentionDecision.PROTECT
+
+
+def test_simulation_protects_segmented_backup_set() -> None:
+    backup_set = archive("backup-set.json", 400)
+    backup_set.backup_set = True
+
+    report = BackupRetentionService.simulate(
+        RetentionSimulationRequest(
+            catalog=catalog([backup_set]),
+            policy=RetentionPolicy(
+                keep_last=0,
+                keep_daily_days=0,
+                keep_weekly_weeks=0,
+                keep_monthly_months=0,
+            ),
+        )
+    )
+
+    assert report.summary.protect == 1
+    assert report.summary.delete == 0
+    assert "suppression partielle" in report.decisions[0].reason

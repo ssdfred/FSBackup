@@ -34,6 +34,9 @@ class BackupRunRequest(BaseModel):
     compression: CompressionSettings = Field(default_factory=CompressionSettings)
     encryption: EncryptionSettings | None = None
     verify_integrity: bool = True
+    segmented: bool = False
+    segment_size_bytes: int = Field(default=5 * 1024**3, ge=1)
+    resume: bool = True
 
 
 class BackupRunReport(BaseModel):
@@ -47,3 +50,8 @@ class BackupRunReport(BaseModel):
     copy_report: CopyReport | None = None
     archive_report: ArchiveReport | None = None
     integrity_report: IntegrityReport | None = None
+    backup_set_path: str | None = None
+    archive_paths: list[str] = Field(default_factory=list)
+    total_segments: int = 0
+    completed_segments: int = 0
+    resumed_segments: int = 0

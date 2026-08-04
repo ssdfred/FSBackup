@@ -50,7 +50,13 @@ class BackupRetentionService:
 
         decisions: list[RetentionArchiveDecision] = []
         for item in archives:
-            if item.status != BackupArchiveStatus.VALID:
+            if item.backup_set:
+                decision = RetentionDecision.PROTECT
+                reason = (
+                    "Les jeux fractionnés sont protégés contre une suppression "
+                    "partielle."
+                )
+            elif item.status != BackupArchiveStatus.VALID:
                 decision = RetentionDecision.PROTECT
                 reason = "Cette archive ne peut pas être évaluée en toute sécurité."
             elif item.path in keep_paths:

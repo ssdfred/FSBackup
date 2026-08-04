@@ -8,6 +8,7 @@ function validationFormatBytes(value){
 
 function validationFormatDuration(value){
   const milliseconds=Number(value??0);
+  if(milliseconds<=0)return "Non mesurée";
   if(milliseconds<1000)return `${milliseconds.toLocaleString("fr-FR")} ms`;
   const seconds=milliseconds/1000;
   if(seconds<60)return `${seconds.toLocaleString("fr-FR",{maximumFractionDigits:1})} s`;
@@ -18,7 +19,7 @@ function validationFormatDuration(value){
 
 function validationRatio(report){
   const ratio=Number(report?.compression_ratio??0);
-  if(Number.isFinite(ratio)&&ratio>0)return `${ratio.toLocaleString("fr-FR",{maximumFractionDigits:1})} %`;
+  if(Number.isFinite(ratio)&&ratio>0)return `${Math.max((1-ratio)*100,0).toLocaleString("fr-FR",{maximumFractionDigits:1})} %`;
   const original=Number(report?.original_size??0);
   const archive=Number(report?.archive_size??0);
   if(!original)return "0 %";
@@ -37,6 +38,8 @@ function ensureValidationReportFields(){
     ["report-excluded-files","Fichiers exclus"],
     ["report-excluded-size","Volume exclu"],
     ["report-encryption","Chiffrement"],
+    ["report-segments","Lots validés"],
+    ["report-resumed-segments","Lots repris"],
   ];
   fields.forEach(([id,label])=>{
     if(document.querySelector(`#${id}`))return;
@@ -72,6 +75,8 @@ function renderValidationDetails(data,verified){
   document.querySelector("#report-excluded-files").textContent=Number(data.excluded_files??0).toLocaleString("fr-FR");
   document.querySelector("#report-excluded-size").textContent=validationFormatBytes(data.excluded_size_bytes);
   document.querySelector("#report-encryption").textContent=archive.encrypted?"Activé":"Désactivé";
+  document.querySelector("#report-segments").textContent=data.total_segments?`${Number(data.completed_segments??0).toLocaleString("fr-FR")} / ${Number(data.total_segments).toLocaleString("fr-FR")}`:"Non fractionnée";
+  document.querySelector("#report-resumed-segments").textContent=Number(data.resumed_segments??0).toLocaleString("fr-FR");
 
   const integrityValid=verified&&integrity?.valid===true;
   const archiveSuccess=archive.success!==false;

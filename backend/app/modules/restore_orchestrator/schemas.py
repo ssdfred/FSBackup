@@ -1,4 +1,4 @@
-from pydantic import BaseModel, SecretStr
+from pydantic import BaseModel, Field, SecretStr
 
 from app.modules.integrity_engine.schemas import IntegrityReport
 from app.modules.restore_engine.schemas import RestoreReport
@@ -18,3 +18,6 @@ class RestoreRunReport(BaseModel):
     restore_report: RestoreReport | None = None
     success: bool
     error: str | None = None
+    archive_paths: list[str] = Field(default_factory=list)
+    total_segments: int = 0
+    restored_segments: int = 0

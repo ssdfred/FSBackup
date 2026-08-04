@@ -6,6 +6,8 @@ from app.modules.archive_engine.schemas import ArchiveRequest
 from app.modules.archive_engine.service import ArchiveEngineService
 from app.modules.backup_catalog.schemas import BackupCatalogRequest
 from app.modules.backup_catalog.service import BackupCatalogService
+from app.modules.backup_orchestrator.schemas import BackupRunRequest, BackupSourceMode
+from app.modules.backup_orchestrator.service import BackupOrchestratorService
 from app.modules.encryption_engine.schemas import EncryptionSettings
 from app.modules.manifest_builder.schemas import Manifest, ManifestFile, ManifestSummary
 
@@ -90,3 +92,35 @@ def test_catalog_requires_password_then_inspects_encrypted_archive(tmp_path: Pat
     assert protected.archives[0].encrypted is True
     assert unlocked.summary.valid == 1
     assert unlocked.archives[0].file_count == 1
+
+
+def test_catalog_lists_backup_set_once_instead_of_individual_segments(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "set-source"
+    source.mkdir()
+    (source / "a.txt").write_text("alpha", encoding="utf-8")
+    (source / "b.txt").write_text("bravo", encoding="utf-8")
+    archives = tmp_path / "archives"
+    backup = BackupOrchestratorService.run(
+        BackupRunRequest(
+            source_root=str(source),
+            source_mode=BackupSourceMode.CUSTOM_FOLDER,
+            destination_directory=str(archives),
+            archive_name="catalog-set",
+            segmented=True,
+            segment_size_bytes=5,
+        )
+    )
+    assert backup.success is True
+
+    report = BackupCatalogService.scan(
+        BackupCatalogRequest(directory=str(archives), recursive=True)
+    )
+
+    assert report.summary.total == 1
+    assert report.summary.valid == 1
+    assert report.archives[0].backup_set is True
+    assert report.archives[0].segment_count == 2
+    assert report.archives[0].completed_segments == 2
+    assert report.archives[0].path.endswith("backup-set.json")

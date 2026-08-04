@@ -28,6 +28,9 @@ class BackupArchiveEntry(BaseModel):
     file_count: int | None = Field(default=None, ge=0)
     original_size_bytes: int | None = Field(default=None, ge=0)
     error: str | None = None
+    backup_set: bool = False
+    segment_count: int = Field(default=0, ge=0)
+    completed_segments: int = Field(default=0, ge=0)
 
 
 class BackupCatalogSummary(BaseModel):

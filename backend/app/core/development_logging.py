@@ -27,6 +27,9 @@ class DevelopmentLogService:
                 ),
                 "archive_name": getattr(request, "archive_name", None),
                 "verify_integrity": getattr(request, "verify_integrity", None),
+                "segmented": getattr(request, "segmented", False),
+                "segment_size_bytes": getattr(request, "segment_size_bytes", None),
+                "resume": getattr(request, "resume", False),
                 "encrypted": getattr(request, "encryption", None) is not None,
                 "selected_item_ids": getattr(request, "selected_item_ids", None),
                 "selected_additional_paths": getattr(
@@ -63,6 +66,9 @@ class DevelopmentLogService:
             {
                 "success": report_data.get("success"),
                 "archive_path": report_data.get("archive_path"),
+                "backup_set_path": report_data.get("backup_set_path"),
+                "completed_segments": report_data.get("completed_segments"),
+                "total_segments": report_data.get("total_segments"),
                 "copied_files": report_data.get("copied_files"),
                 "excluded_files": report_data.get("excluded_files"),
                 "warning_count": len(report_data.get("warnings") or []),

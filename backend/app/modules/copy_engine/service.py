@@ -57,6 +57,8 @@ class CopyEngineService:
                 event_bus,
             )
             results.append(result)
+            if result.status == CopyStatus.ERROR and result.winerror == 433:
+                break
 
         duration_ms = CopyEngineService._duration_ms(execution_started_at)
         finished_at = datetime.now(UTC)
@@ -196,6 +198,7 @@ class CopyEngineService:
                 status=CopyStatus.ERROR,
                 duration_ms=CopyEngineService._duration_ms(file_started_at),
                 error=str(exc),
+                winerror=getattr(exc, "winerror", None),
             )
         except OSError as exc:
             if CopyEngineService._is_unavailable_onedrive_placeholder(exc, source):
@@ -223,7 +226,14 @@ class CopyEngineService:
                 destination=str(destination),
                 status=CopyStatus.ERROR,
                 duration_ms=CopyEngineService._duration_ms(file_started_at),
-                error=str(exc),
+                error=(
+                    "Le disque source est devenu indisponible. "
+                    "La copie a été interrompue pour préserver les données déjà "
+                    f"sauvegardées dans ce lot : {source}"
+                    if getattr(exc, "winerror", None) == 433
+                    else str(exc)
+                ),
+                winerror=getattr(exc, "winerror", None),
             )
 
         return CopyEngineService._finish_file(

@@ -1,0 +1,48 @@
+.segment-setting {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 320px);
+  gap: 24px;
+  align-items: center;
+  border: 1px solid #e7eaf2;
+  border-radius: 12px;
+  padding: 15px;
+  background: #fbfcff;
+}
+
+.segment-setting strong,
+.segment-setting small {
+  display: block;
+}
+
+.segment-setting small {
+  margin-top: 3px;
+  color: #788399;
+}
+
+.segment-setting label {
+  display: grid;
+  gap: 7px;
+  font-weight: 700;
+  color: #273149;
+}
+
+.segment-setting select {
+  width: 100%;
+  border: 1px solid #dce1ec;
+  border-radius: 10px;
+  padding: 11px 13px;
+  font: inherit;
+  background: #fff;
+  color: #172033;
+}
+
+.segment-setting select:focus {
+  outline: 3px solid #5e74ff22;
+  border-color: #5e74ff;
+}
+
+@media (max-width: 700px) {
+  .segment-setting {
+    grid-template-columns: 1fr;
+  }
+}

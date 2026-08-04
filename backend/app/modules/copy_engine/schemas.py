@@ -31,6 +31,7 @@ class CopyFileResult(BaseModel):
     size: int = 0
     duration_ms: int = 0
     error: str | None = None
+    winerror: int | None = None
 
 
 class CopyIssue(BaseModel):

@@ -1,8 +1,12 @@
+from datetime import UTC, datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from app.modules.archive_engine.schemas import ArchiveRequest
+from app.modules.archive_engine.schemas import ArchiveReport, ArchiveRequest
 from app.modules.archive_engine.service import ArchiveEngineService
+from app.modules.backup_set.repository import BackupSetRepository
+from app.modules.backup_set.schemas import BackupSegmentStatus
+from app.modules.backup_set.service import BackupSetService
 from app.modules.copy_engine.schemas import CopyRequest, CopyStatus
 from app.modules.copy_engine.service import CopyEngineService
 from app.modules.execution_planner.schemas import (
@@ -12,7 +16,7 @@ from app.modules.execution_planner.schemas import (
     PhysicalFile,
 )
 from app.modules.execution_planner.windows_service import WindowsExecutionPlannerService
-from app.modules.integrity_engine.schemas import IntegrityRequest
+from app.modules.integrity_engine.schemas import IntegrityReport, IntegrityRequest
 from app.modules.integrity_engine.service import IntegrityEngineService
 from app.modules.manifest_builder.schemas import ManifestExclusion
 from app.modules.manifest_builder.service import ManifestBuilderService
@@ -28,6 +32,13 @@ class BackupOrchestratorService:
             execution_plan, excluded_files, excluded_size = cls._apply_exclusions(
                 execution_plan, request
             )
+            if request.segmented:
+                return cls._run_segmented(
+                    request=request,
+                    execution_plan=execution_plan,
+                    excluded_files=excluded_files,
+                    excluded_size=excluded_size,
+                )
             with TemporaryDirectory(prefix="fsbackup-") as workspace:
                 copy_report = CopyEngineService.execute(
                     CopyRequest(
@@ -126,6 +137,317 @@ class BackupOrchestratorService:
                 )
         except (OSError, ValueError) as exc:
             return BackupRunReport(success=False, error=str(exc))
+
+    @classmethod
+    def _run_segmented(
+        cls,
+        request: BackupRunRequest,
+        execution_plan: ExecutionPlan,
+        excluded_files: int,
+        excluded_size: int,
+    ) -> BackupRunReport:
+        plans = BackupSetService.split_plan(
+            execution_plan,
+            request.segment_size_bytes,
+        )
+        backup_set_directory = BackupSetService.directory(
+            request.destination_directory,
+            request.archive_name,
+        )
+        existing = (
+            BackupSetRepository.load(backup_set_directory)
+            if request.resume
+            else None
+        )
+        if existing is not None:
+            BackupSetService.validate_existing(
+                existing,
+                execution_plan.source_root,
+                request.encryption is not None,
+            )
+        backup_set = BackupSetService.prepare_manifest(
+            existing=existing,
+            archive_name=request.archive_name,
+            source_root=execution_plan.source_root,
+            segment_size_bytes=request.segment_size_bytes,
+            encrypted=request.encryption is not None,
+            plans=plans,
+        )
+        manifest_path = BackupSetRepository.save(backup_set_directory, backup_set)
+        archive_paths: list[str] = []
+        warnings: list[str] = []
+        copied_files = 0
+        resumed_segments = 0
+        last_copy_report = None
+        last_archive_report = None
+
+        for plan, segment in zip(plans, backup_set.segments, strict=True):
+            archive_path = backup_set_directory / segment.archive_name
+            if request.resume and cls._is_reusable_segment(
+                archive_path,
+                segment.sha256,
+                request,
+            ):
+                archive_paths.append(str(archive_path))
+                copied_files += segment.file_count
+                resumed_segments += 1
+                continue
+
+            segment.status = BackupSegmentStatus.RUNNING
+            segment.error = None
+            backup_set.complete = False
+            backup_set.updated_at = datetime.now(UTC)
+            BackupSetRepository.save(backup_set_directory, backup_set)
+
+            with TemporaryDirectory(prefix="fsbackup-segment-") as workspace:
+                copy_report = CopyEngineService.execute(
+                    CopyRequest(
+                        execution_plan=plan,
+                        destination_root=workspace,
+                    )
+                )
+                last_copy_report = copy_report
+                copied_files += copy_report.summary.copied
+                warnings.extend(issue.message for issue in copy_report.warnings)
+                if not copy_report.success:
+                    error = (
+                        copy_report.errors[0].message
+                        if copy_report.errors
+                        else "Segment copy failed."
+                    )
+                    return cls._segmented_failure(
+                        backup_set=backup_set,
+                        backup_set_directory=backup_set_directory,
+                        manifest_path=manifest_path,
+                        segment=segment,
+                        error=error,
+                        copied_files=copied_files,
+                        excluded_files=excluded_files,
+                        excluded_size=excluded_size,
+                        warnings=warnings,
+                        archive_paths=archive_paths,
+                        resumed_segments=resumed_segments,
+                        copy_report=copy_report,
+                    )
+
+                retained_plan = cls._retain_copied_files(plan, copy_report.files)
+                manifest = ManifestBuilderService().build(
+                    retained_plan,
+                    cls._manifest_exclusions(request),
+                )
+                archive_report = ArchiveEngineService.create(
+                    ArchiveRequest(
+                        source_directory=workspace,
+                        destination_directory=str(backup_set_directory),
+                        archive_name=segment.archive_name,
+                        manifest=manifest,
+                        compression=request.compression,
+                        encryption=request.encryption,
+                    )
+                )
+                last_archive_report = archive_report
+                if not archive_report.success:
+                    return cls._segmented_failure(
+                        backup_set=backup_set,
+                        backup_set_directory=backup_set_directory,
+                        manifest_path=manifest_path,
+                        segment=segment,
+                        error=archive_report.error or "Segment archive failed.",
+                        copied_files=copied_files,
+                        excluded_files=excluded_files,
+                        excluded_size=excluded_size,
+                        warnings=warnings,
+                        archive_paths=archive_paths,
+                        resumed_segments=resumed_segments,
+                        copy_report=copy_report,
+                        archive_report=archive_report,
+                    )
+
+                integrity_report = IntegrityEngineService.verify(
+                    IntegrityRequest(
+                        archive_path=archive_report.archive_path,
+                        password=(
+                            request.encryption.password
+                            if request.encryption is not None
+                            else None
+                        ),
+                    )
+                )
+                if not integrity_report.valid:
+                    Path(archive_report.archive_path).unlink(missing_ok=True)
+                    return cls._segmented_failure(
+                        backup_set=backup_set,
+                        backup_set_directory=backup_set_directory,
+                        manifest_path=manifest_path,
+                        segment=segment,
+                        error="Segment integrity verification failed.",
+                        copied_files=copied_files,
+                        excluded_files=excluded_files,
+                        excluded_size=excluded_size,
+                        warnings=warnings + integrity_report.warnings,
+                        archive_paths=archive_paths,
+                        resumed_segments=resumed_segments,
+                        copy_report=copy_report,
+                        archive_report=archive_report,
+                        integrity_report=integrity_report,
+                    )
+
+            segment.status = BackupSegmentStatus.COMPLETED
+            segment.file_count = last_archive_report.file_count
+            segment.archive_size_bytes = last_archive_report.archive_size
+            segment.duration_ms = last_archive_report.duration_ms
+            segment.sha256 = BackupSetService.file_sha256(archive_path)
+            segment.error = None
+            archive_paths.append(str(archive_path))
+            backup_set.updated_at = datetime.now(UTC)
+            BackupSetRepository.save(backup_set_directory, backup_set)
+
+        backup_set.complete = True
+        backup_set.updated_at = datetime.now(UTC)
+        BackupSetRepository.save(backup_set_directory, backup_set)
+        aggregate_archive_report = cls._aggregate_segment_archive_report(
+            backup_set,
+            manifest_path,
+            request,
+        )
+        aggregate_integrity_report = cls._aggregate_segment_integrity_report(
+            backup_set,
+            manifest_path,
+        )
+        return BackupRunReport(
+            success=True,
+            archive_path=str(manifest_path),
+            backup_set_path=str(manifest_path),
+            archive_paths=archive_paths,
+            copied_files=copied_files,
+            excluded_files=excluded_files,
+            excluded_size_bytes=excluded_size,
+            warnings=warnings,
+            copy_report=last_copy_report,
+            archive_report=aggregate_archive_report,
+            integrity_report=aggregate_integrity_report,
+            total_segments=len(backup_set.segments),
+            completed_segments=len(backup_set.segments),
+            resumed_segments=resumed_segments,
+        )
+
+    @staticmethod
+    def _aggregate_segment_archive_report(
+        backup_set,
+        manifest_path: Path,
+        request: BackupRunRequest,
+    ) -> ArchiveReport:
+        original_size = sum(segment.size_bytes for segment in backup_set.segments)
+        archive_size = sum(
+            segment.archive_size_bytes for segment in backup_set.segments
+        )
+        return ArchiveReport(
+            archive_path=str(manifest_path),
+            file_count=sum(segment.file_count for segment in backup_set.segments),
+            archive_size=archive_size,
+            original_size=original_size,
+            saved_bytes=max(original_size - archive_size, 0),
+            compression_ratio=(
+                round(archive_size / original_size, 4) if original_size else 0.0
+            ),
+            compression_method=request.compression.method,
+            compression_level=request.compression.level,
+            encrypted=request.encryption is not None,
+            duration_ms=sum(segment.duration_ms for segment in backup_set.segments),
+            success=True,
+        )
+
+    @staticmethod
+    def _aggregate_segment_integrity_report(
+        backup_set,
+        manifest_path: Path,
+    ) -> IntegrityReport:
+        return IntegrityReport(
+            archive_path=str(manifest_path),
+            valid=True,
+            checked_file_count=sum(
+                segment.file_count for segment in backup_set.segments
+            ),
+            duration_ms=0,
+        )
+
+    @staticmethod
+    def _is_reusable_segment(
+        archive_path: Path,
+        expected_sha256: str | None,
+        request: BackupRunRequest,
+    ) -> bool:
+        if expected_sha256 is None or not archive_path.is_file():
+            return False
+        if BackupSetService.file_sha256(archive_path) != expected_sha256:
+            return False
+        integrity = IntegrityEngineService.verify(
+            IntegrityRequest(
+                archive_path=str(archive_path),
+                password=(
+                    request.encryption.password
+                    if request.encryption is not None
+                    else None
+                ),
+            )
+        )
+        return integrity.valid
+
+    @staticmethod
+    def _segmented_failure(
+        backup_set,
+        backup_set_directory: Path,
+        manifest_path: Path,
+        segment,
+        error: str,
+        copied_files: int,
+        excluded_files: int,
+        excluded_size: int,
+        warnings: list[str],
+        archive_paths: list[str],
+        resumed_segments: int,
+        copy_report=None,
+        archive_report=None,
+        integrity_report=None,
+    ) -> BackupRunReport:
+        segment.status = BackupSegmentStatus.FAILED
+        segment.error = error
+        backup_set.complete = False
+        backup_set.updated_at = datetime.now(UTC)
+        BackupSetRepository.save(backup_set_directory, backup_set)
+        return BackupRunReport(
+            success=False,
+            backup_set_path=str(manifest_path),
+            archive_paths=archive_paths,
+            copied_files=copied_files,
+            excluded_files=excluded_files,
+            excluded_size_bytes=excluded_size,
+            warnings=warnings,
+            error=error,
+            copy_report=copy_report,
+            archive_report=archive_report,
+            integrity_report=integrity_report,
+            total_segments=len(backup_set.segments),
+            completed_segments=sum(
+                item.status == BackupSegmentStatus.COMPLETED
+                for item in backup_set.segments
+            ),
+            resumed_segments=resumed_segments,
+        )
+
+    @staticmethod
+    def _manifest_exclusions(
+        request: BackupRunRequest,
+    ) -> list[ManifestExclusion]:
+        return [
+            ManifestExclusion(
+                path=item.path,
+                reason=item.reason,
+                risk=item.risk,
+                approved_by_user=item.approved_by_user,
+            )
+            for item in request.approved_exclusions
+        ]
 
     @classmethod
     def _build_execution_plan(cls, request: BackupRunRequest) -> ExecutionPlan:

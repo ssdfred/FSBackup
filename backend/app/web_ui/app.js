@@ -84,12 +84,22 @@ function resetBackupResult(){
 
 function bindBackupForm(){
   const encryption=document.querySelector("#enable-encryption");
+  const segmentation=document.querySelector("#enable-segmentation");
+  const segmentSizeField=document.querySelector("#segment-size-field");
+  const verifyIntegrity=document.querySelector("#verify-integrity");
   const passwordFields=document.querySelector("#password-fields");
   const sourceMode=document.querySelector("#source-mode");
   const driveField=document.querySelector("#source-drive-field");
   const folderField=document.querySelector("#source-folder-field");
   const customSource=document.querySelector("#custom-source-root");
   encryption.addEventListener("change",()=>passwordFields.classList.toggle("hidden",!encryption.checked));
+  const syncSegmentation=()=>{
+    segmentSizeField.classList.toggle("hidden",!segmentation.checked);
+    verifyIntegrity.checked=segmentation.checked||verifyIntegrity.checked;
+    verifyIntegrity.disabled=segmentation.checked;
+  };
+  segmentation.addEventListener("change",syncSegmentation);
+  syncSegmentation();
   sourceMode.addEventListener("change",()=>{
     const custom=sourceMode.value==="custom_folder";
     driveField.classList.toggle("hidden",custom);
@@ -106,11 +116,12 @@ function bindBackupForm(){
     if(encryption.checked&&password!==confirmation){setMessage("Les mots de passe ne correspondent pas.","error");return;}
     if(encryption.checked&&password.length<8){setMessage("Le mot de passe doit contenir au moins 8 caractères.","error");return;}
     const level=Number(document.querySelector("#compression-level").value);
-    const verify=document.querySelector("#verify-integrity").checked;
+    const verify=verifyIntegrity.checked;
     const mode=sourceMode.value;
     const sourceRoot=(mode==="custom_folder"?customSource.value:document.querySelector("#source-root").value).trim();
     if(!sourceRoot){setMessage("Sélectionnez une source à sauvegarder.","error");return;}
-    const payload={source_root:sourceRoot,source_mode:mode,destination_directory:document.querySelector("#destination-directory").value.trim(),archive_name:document.querySelector("#archive-name").value.trim(),compression:{method:level===0?"stored":"deflated",level},encryption:encryption.checked?{password}:null,verify_integrity:verify};
+    const segmented=segmentation.checked;
+    const payload={source_root:sourceRoot,source_mode:mode,destination_directory:document.querySelector("#destination-directory").value.trim(),archive_name:document.querySelector("#archive-name").value.trim(),compression:{method:level===0?"stored":"deflated",level},encryption:encryption.checked?{password}:null,verify_integrity:verify,segmented,segment_size_bytes:Number(document.querySelector("#segment-size").value),resume:true};
     submit.disabled=true;
     submit.textContent="Sauvegarde en cours…";
     setProgress("prepare","Analyse de la demande",12);
@@ -121,10 +132,14 @@ function bindBackupForm(){
       const response=await fetch("/api/v1/backup/run",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
       const data=await response.json();
       if(!response.ok)throw new Error(data.error?.message??"La requête a échoué.");
-      if(!data.success)throw new Error(data.error??"La sauvegarde n’a pas pu être créée.");
+      if(!data.success){
+        const preserved=data.total_segments?` ${data.completed_segments} lot(s) sur ${data.total_segments} sont déjà sécurisés. Relancez la même sauvegarde pour reprendre.`:"";
+        throw new Error(`${data.error??"La sauvegarde n’a pas pu être créée."}${preserved}`);
+      }
       setProgress("verify","Sauvegarde terminée",100,"Terminée");
       document.querySelectorAll(".progress-steps li").forEach(item=>{item.classList.add("done");item.classList.remove("active");});
-      setMessage("La sauvegarde a été créée avec succès.","success");
+      const resumeMessage=data.resumed_segments?` ${data.resumed_segments} lot(s) déjà validé(s) ont été réutilisé(s).`:"";
+      setMessage(segmented?`Le jeu de sauvegarde a été créé avec ${data.completed_segments} lot(s).${resumeMessage}`:"La sauvegarde a été créée avec succès.","success");
       renderReport(data,verify);
     }catch(error){document.querySelector("#progress-state").textContent="Échec";document.querySelector("#backup-progress").classList.add("failed");setMessage(error.message,"error");}
     finally{[copyTimer,archiveTimer,verifyTimer].forEach(clearTimeout);submit.disabled=false;submit.textContent="Lancer la sauvegarde";}
@@ -213,7 +228,8 @@ function renderCatalog(data){
     const encoded=encodeURIComponent(entry.path);
     const restore=entry.status==="valid"?`<button class="secondary-action" type="button" data-restore-archive="${encoded}">Restaurer</button>`:'<button class="secondary-action" type="button" disabled>Indisponible</button>';
     const actions=`<div class="archive-actions">${restore}<button class="icon-action" type="button" data-open-archive="${encoded}" aria-label="Ouvrir le dossier" title="Ouvrir le dossier">${catalogActionIcon("folder")}</button><button class="icon-action" type="button" data-copy-archive="${encoded}" aria-label="Copier le chemin" title="Copier le chemin">${catalogActionIcon("copy")}</button></div>`;
-    return `<article class="archive-card"><div class="archive-main"><div class="archive-icon">${entry.encrypted?"🔒":"▣"}</div><div><div class="archive-title"><h3>${entry.name}</h3><span class="archive-status ${status}">${label}</span></div><p class="archive-path">${entry.path}</p><div class="archive-meta"><span>${formatDate(entry.created_at??entry.modified_at)}</span><span>${formatBytes(entry.size_bytes)}</span><span>${entry.file_count??"—"} fichier(s)</span>${entry.application_version?`<span>FSBackup ${entry.application_version}</span>`:""}</div>${entry.error?`<p class="archive-error">${entry.error}</p>`:""}</div></div>${actions}</article>`;
+    const segments=entry.backup_set?`<span>${entry.completed_segments} / ${entry.segment_count} lot(s)</span>`:"";
+    return `<article class="archive-card"><div class="archive-main"><div class="archive-icon">${entry.encrypted?"🔒":entry.backup_set?"▦":"▣"}</div><div><div class="archive-title"><h3>${entry.name}</h3><span class="archive-status ${status}">${label}</span></div><p class="archive-path">${entry.path}</p><div class="archive-meta"><span>${formatDate(entry.created_at??entry.modified_at)}</span><span>${formatBytes(entry.size_bytes)}</span><span>${entry.file_count??"—"} fichier(s)</span>${segments}${entry.application_version?`<span>FSBackup ${entry.application_version}</span>`:""}</div>${entry.error?`<p class="archive-error">${entry.error}</p>`:""}</div></div>${actions}</article>`;
   }).join("");
 }
 
